@@ -33,19 +33,20 @@ const isProduction = process.env.NODE_ENV === 'production';
 // 🔒 SECURITY: HELMET - Security Headers
 // ==========================================
 app.use(helmet({
-  contentSecurityPolicy: {
+  contentSecurityPolicy: isProduction ? {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcElem: ["'self'"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
     },
-  },
+  } : false, // Disable CSP in development
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
@@ -69,7 +70,6 @@ const apiLimiter = rateLimit({
   message: { message: "Too many requests. Please slow down." },
   standardHeaders: true,
   legacyHeaders: false,
-  // Removed keyGenerator - uses default IP-based limiting with IPv6 support
 });
 
 // Login rate limiter - PER IP
@@ -112,9 +112,13 @@ const readLimiter = rateLimit({
 // ==========================================
 // CORS Configuration
 // ==========================================
+const allowedOrigins = isProduction 
+  ? [process.env.FRONTEND_URL || "https://homeloop.onrender.com"]
+  : ["http://127.0.0.1:8000", "http://127.0.0.1:5500", "http://localhost:8000", "http://localhost:5500", "http://localhost:5000"];
+
 app.use(
   cors({
-    origin: ["http://127.0.0.1:8000", "http://127.0.0.1:5500", "http://localhost:8000", "http://localhost:5500"],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -136,6 +140,11 @@ app.use("/uploads", (req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=31536000');
   next();
 }, express.static(path.join(__dirname, "uploads")));
+
+// ==========================================
+// Serve Frontend Static Files
+// ==========================================
+app.use(express.static(path.join(__dirname, "public")));
 
 // ==========================================
 // 🔒 SECURITY: Apply Rate Limiters to Routes
@@ -177,6 +186,13 @@ app.get("/", (req, res) => {
 });
 
 // ==========================================
+// Catch-all route - Serve index.html for client-side routing
+// ==========================================
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ==========================================
 // 🔒 SECURITY: Global Error Handler
 // ==========================================
 app.use((err, req, res, next) => {
@@ -201,7 +217,7 @@ app.use((err, req, res, next) => {
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://127.0.0.1:8000", "http://127.0.0.1:5500", "http://localhost:8000", "http://localhost:5500"],
+    origin: allowedOrigins,
     credentials: true
   },
   maxHttpBufferSize: 1e6,
@@ -220,6 +236,7 @@ httpServer.listen(PORT, () => {
   console.log(`✅ Socket.io enabled for real-time chat`);
   console.log(`🔒 Per-user rate limiting enabled`);
   console.log(`🔒 Security features enabled`);
+  console.log(`🔒 CSP ${isProduction ? 'ENABLED' : 'DISABLED'} (${isProduction ? 'production' : 'development'} mode)`);
 
   startReviewScheduler();
 });
