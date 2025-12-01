@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeLoop Home page</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Socket.io CDN for real-time chat -->
+    <!-- CORRECT - Local version from your server -->
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+   <header class="header">
+    <div class="logo-container">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing">
+      <button class="search-btn">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <div class="dropdown">
+        <a href="#"><i class="fa-solid fa-user"></i> Account</a>
+        <div class="dropdown-content">
+          <a href="login.html">Log In</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </div>
+
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i> Help</a>
+      
+      <!-- Favourites with Badge -->
+      <a href="favourites.html" class="favourites" style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-heart"></i> Favourites
+        <span class="favourites-badge" style="display: none; background: #ff4444; color: white; padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+          0 Replies
+        </span>
+      </a>
+    </nav>
+ </header>
+ 
+ <section class="hero">
+  <h1>Search among hundreds of verified listings</h1>
+</section>
+<!-- Add this filter section right after the hero section and before the featured-header -->
+
+<section class="filter-section">
+  <div class="filter-container">
+    <div class="filter-header">
+      <h3><i class="fa-solid fa-filter"></i> Filter Properties</h3>
+      <button class="reset-filters" id="resetFilters">
+        <i class="fa-solid fa-rotate-right"></i> Reset
+      </button>
+    </div>
+    
+    <div class="filter-controls">
+      <!-- Location Filter -->
+      <div class="filter-group">
+        <label><i class="fa-solid fa-location-dot"></i> Location</label>
+        <input 
+          type="text" 
+          id="locationFilter" 
+          class="filter-input" 
+          placeholder="e.g., Kilimani, Nairobi"
+        >
+      </div>
+
+      <!-- Property Type Filter -->
+      <div class="filter-group">
+        <label><i class="fa-solid fa-house"></i> Property Type</label>
+        <select id="typeFilter" class="filter-select">
+          <option value="">All Types</option>
+          <option value="Apartment">Apartment</option>
+          <option value="Villa">Villa</option>
+          <option value="Condo">Condo</option>
+          <option value="Studio">Studio</option>
+          <option value="Townhouse">Townhouse</option>
+          <option value="Penthouse">Penthouse</option>
+        </select>
+      </div>
+
+      <!-- Price Range Filter -->
+      <div class="filter-group">
+        <label><i class="fa-solid fa-money-bill-wave"></i> Price Range</label>
+        <select id="priceFilter" class="filter-select">
+          <option value="">Any Price</option>
+          <option value="0-20000">Under Ksh 20,000</option>
+          <option value="20000-35000">Ksh 20,000 - 35,000</option>
+          <option value="35000-50000">Ksh 35,000 - 50,000</option>
+          <option value="50000-70000">Ksh 50,000 - 70,000</option>
+          <option value="70000-100000">Ksh 70,000 - 100,000</option>
+          <option value="100000-999999999">Above Ksh 100,000</option>
+        </select>
+      </div>
+
+      <!-- Bedrooms Filter -->
+      <div class="filter-group">
+        <label><i class="fa-solid fa-bed"></i> Bedrooms</label>
+        <select id="bedroomsFilter" class="filter-select">
+          <option value="">Any</option>
+          <option value="1">1 Bed</option>
+          <option value="2">2 Beds</option>
+          <option value="3">3 Beds</option>
+          <option value="4">4+ Beds</option>
+        </select>
+      </div>
+
+      <!-- Bathrooms Filter -->
+      <div class="filter-group">
+        <label><i class="fa-solid fa-bath"></i> Bathrooms</label>
+        <select id="bathroomsFilter" class="filter-select">
+          <option value="">Any</option>
+          <option value="1">1 Bath</option>
+          <option value="2">2 Baths</option>
+          <option value="3">3+ Baths</option>
+        </select>
+      </div>
+
+      <!-- Apply Button -->
+      <div class="filter-group filter-action">
+        <button class="apply-filters" id="applyFilters">
+          <i class="fa-solid fa-check"></i> Apply Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Filters Display -->
+    <div class="active-filters" id="activeFilters" style="display: none;">
+      <span class="active-filters-label">Active Filters:</span>
+      <div class="filter-tags" id="filterTags"></div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+</section>
+<section class="featured-header">
+  <h2>Featured Listings</h2>
+</section>
+
+<section class="featured-cards">
+  <a href="property1.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Kilimani, Nairobi</p>
+    <p class="type">Apartment</p>
+    <p>3 Bed • 2 Bath</p>
+    <p class="price">Ksh 50,000</p>
+    <p class="units-left">Only 3 units left</p>
+  </a>
+
+  <a href="property2.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Westlands, Nairobi</p>
+    <p class="type">Condo</p>
+    <p>2 Bed • 1 Bath</p>
+    <p class="price">Ksh 35,000</p>
+    <p class="units-left">Only 1 unit left</p>
+  </a>
+
+  <a href="property3.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Karen, Nairobi</p>
+    <p class="type">Villa</p>
+    <p>4 Bed • 3 Bath</p>
+    <p class="price">Ksh 70,000</p>
+    <p class="units-left">Only 2 units left</p>
+  </a>
+
+  <a href="property4.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Runda, Nairobi</p>
+    <p class="type">Studio</p>
+    <p>1 Bed • 1 Bath</p>
+    <p class="price">Ksh 20,000</p>
+    <p class="units-left">Only 5 units left</p>
+  </a>
+</section>
+
+<section class="Recommended-header">
+  <h2>Recommended Listings</h2>
+</section>
+
+<section class="Recommended-cards">
+  <a href="property1.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Kilimani, Nairobi</p>
+    <p class="type">Apartment</p>
+    <p>3 Bed • 2 Bath</p>
+    <p class="price">Ksh 50,000</p>
+    <p class="units-left">Only 3 units left</p>
+  </a>
+
+  <a href="property2.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Westlands, Nairobi</p>
+    <p class="type">Condo</p>
+    <p>2 Bed • 1 Bath</p>
+    <p class="price">Ksh 35,000</p>
+    <p class="units-left">Only 1 unit left</p>
+  </a>
+
+  <a href="property3.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Karen, Nairobi</p>
+    <p class="type">Villa</p>
+    <p>4 Bed • 3 Bath</p>
+    <p class="price">Ksh 70,000</p>
+    <p class="units-left">Only 2 units left</p>
+  </a>
+
+  <a href="property4.html" class="card">
+    <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+    <p class="location">Runda, Nairobi</p>
+    <p class="type">Studio</p>
+    <p>1 Bed • 1 Bath</p>
+    <p class="price">Ksh 20,000</p>
+    <p class="units-left">Only 5 units left</p>
+  </a>
+</section>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+      <p>Find your dream home with verified listings and trusted agents.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/index.HTML">Home</a></li>
+        <li><a href="/index.HTML">Listings</a></li>
+        <li><a href="/about.html">About</a></li>
+        <li><a href="help.html#support"><i class="fa-solid fa-phone"></i> Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="FAQS.html">FAQs</a></li>
+        <li><a href="help.html">Help</a></li>
+         <li><a href="terms.html">Terms</a></li>
+        <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-contact">
+      <h4>Contact</h4>
+      <p>Email: info@homeloop.com</p>
+      <p>Phone: +254 792 508 999</p>
+      <p>Address: Nairobi, Kenya</p>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="index.js"></script>
+</body>
+</html>

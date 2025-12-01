@@ -1,0 +1,388 @@
+/* ========================================
+   LOGIN PAGE - COMPACT & CLEAN
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #1a001f 0%, #2e0033 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+/* Login Container */
+.login-container {
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+  background: rgba(59, 0, 71, 0.4);
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 77, 210, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo Text */
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logo-text:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* Welcome Text */
+.welcome-text {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #ccc;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+}
+
+/* Login Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group label {
+  flex: 0 0 75px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  text-align: left;
+}
+
+.form-group input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(46, 0, 51, 0.3);
+  color: white;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #ff4dd2;
+  background: rgba(46, 0, 51, 0.5);
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+/* Forgot Password */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+.forgot-link {
+  color: #ff9900;
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Login Button */
+.login-btn {
+  background: white;
+  color: #2a002a;
+  border: none;
+  padding: 9px 30px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 5px auto;
+  width: fit-content;
+}
+
+.login-btn:hover {
+  background: #c77dae;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 12px 0 10px;
+  color: #aaa;
+  font-size: 0.75rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.divider span {
+  padding: 0 10px;
+}
+
+/* Social Login Buttons */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.social-login button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+/* Google Button */
+.google-btn {
+  background: white;
+  color: #444;
+}
+
+.google-btn:hover {
+  background: #f2f2f2;
+}
+
+.google-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Facebook Button */
+.facebook-btn {
+  background: #1877f2;
+  color: white;
+}
+
+.facebook-btn:hover {
+  background: #145dbf;
+}
+
+.facebook-btn i {
+  font-size: 0.9rem;
+}
+
+/* Sign Up Section */
+.signup-section {
+  margin-top: 12px;
+}
+
+.signup-section p {
+  color: #ccc;
+  font-size: 0.8rem;
+}
+
+.signup-link {
+  color: #00bcd4;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.signup-link:hover {
+  color: #ff9900;
+}
+
+/* Terms Section */
+.terms-section {
+  margin-top: 10px;
+}
+
+.terms-section p {
+  color: #aaa;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.terms-link {
+  color: #ff4dd2;
+  text-decoration: underline;
+  transition: all 0.3s;
+}
+
+.terms-link:hover {
+  color: #ff9900;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .login-container {
+    padding: 20px;
+    max-width: 350px;
+  }
+
+  .logo-text {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+  }
+
+  .welcome-text {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+  }
+
+  /* KEEP LABEL AND INPUT SIDE BY SIDE */
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .form-group label {
+    flex: 0 0 70px;
+    font-size: 0.8rem;
+  }
+
+  .form-group input {
+    flex: 1;
+    padding: 7px 9px;
+    font-size: 0.8rem;
+  }
+
+  .login-btn {
+    padding: 8px 25px;
+    font-size: 0.85rem;
+  }
+
+  .social-login button {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+  }
+
+  .social-login {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+
+  .login-container {
+    padding: 18px;
+    max-width: 100%;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .welcome-text {
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    margin-bottom: 10px;
+  }
+
+  /* KEEP LABEL AND INPUT SIDE BY SIDE ON MOBILE */
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .form-group label {
+    flex: 0 0 65px;
+    font-size: 0.75rem;
+  }
+
+  .form-group input {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .login-btn {
+    padding: 7px 22px;
+    font-size: 0.8rem;
+  }
+
+  .social-login button {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .google-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .signup-section p {
+    font-size: 0.75rem;
+  }
+
+  .terms-section p {
+    font-size: 0.65rem;
+  }
+}

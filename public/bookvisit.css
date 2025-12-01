@@ -1,0 +1,102 @@
+/* Background */
+body {
+  background-color: #1a001f; /* dark purple */
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.visit-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #2e0033; /* lighter purple */
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.visit-container h1 {
+  text-align: center;
+  color: #ff4dd2;
+  margin-bottom: 10px;
+}
+
+.intro-text {
+  text-align: center;
+  font-size: 0.95em;
+  margin-bottom: 20px;
+  color: #ddd;
+}
+
+/* Form styling */
+.visit-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.visit-form label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+.visit-form input,
+.visit-form textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 15px;
+  font-size: 1em;
+  background-color: lightgray 
+}
+.visit-form input::placeholder,
+.visit-form textarea::placeholder {
+  color: #bbb; /* softer placeholder text */
+}
+
+
+.visit-form input:focus,
+.visit-form textarea:focus {
+  outline: 2px solid #ff4dd2;
+  background-color: #e6e6e6;
+}
+
+textarea {
+  resize: none;
+}
+
+/* Submit Button */
+.btn.submit {
+  background-color: #ff4dd2;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 1em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn.submit:hover {
+  background-color: #ff1ab3;
+}
+.success-message {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-size: 1em;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.success-message.show {
+  opacity: 1;
+}
+

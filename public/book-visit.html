@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Visit - HomeLoop</title>
+  <link rel="stylesheet" href="bookvisit.css">
+</head>
+<body>
+  <!-- Header placeholder -->
+  <div id="header-placeholder"></div>
+
+  <main class="visit-container">
+    <h1>Book a Visit</h1>
+    <p class="intro-text">Fill in your details to schedule a property visit. An agent will contact you to confirm your appointment.</p>
+
+    <form class="visit-form" id="visitForm">
+      <!-- Full Name -->
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" name="fullName" required>
+
+      <!-- Email -->
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <!-- Phone -->
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <!-- Date -->
+      <label for="date">Preferred Date</label>
+      <input type="date" id="date" name="date" required>
+
+      <!-- Time -->
+      <label for="time">Preferred Time</label>
+      <input type="time" id="time" name="time" required>
+
+      <!-- Notes -->
+      <label for="notes">Additional Notes</label>
+      <textarea id="notes" name="notes" rows="4" placeholder="Any special requests or questions?"></textarea>
+
+      <!-- Submit -->
+      <button type="submit" class="btn submit">Submit Request</button>
+    </form>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">Your visit request has been submitted!</div>
+  </main>
+
+  <!-- Footer placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Inject header and footer -->
+  <script src="inject.js"></script>
+  <script src="bookvisit.js"></script>
+</body>
+</html>

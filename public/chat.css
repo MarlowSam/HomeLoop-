@@ -1,0 +1,103 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #1a001f;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+/* Contact Agent Button */
+#contactAgentBtn {
+  padding: 12px 20px;
+  background: #6a0dad;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 20px;
+}
+
+#contactAgentBtn:hover {
+  background: #8e24aa;
+}
+
+/* Chat Popup */
+.chat-popup {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  overflow: hidden;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.chat-header {
+  background: #6a0dad;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.chat-body {
+  height: 250px;
+  padding: 10px;
+  overflow-y: auto;
+  background: #f9f9f9;
+  color: #000;
+}
+
+.chat-footer {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+.chat-footer button {
+  padding: 10px 15px;
+  background: #6a0dad;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Message Bubbles */
+.message {
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 75%;
+  clear: both;
+}
+
+.user-message {
+  background: #6a0dad;
+  color: #fff;
+  float: right;
+}
+
+.agent-message {
+  background: #e0e0e0;
+  color: #000;
+  float: left;
+}

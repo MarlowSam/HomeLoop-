@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>House Details - HomeLoop</title>
+  <link rel="stylesheet" href="house.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CORRECT - Local version from your server -->
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing">
+      <button class="search-btn">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <div class="dropdown">
+        <a href="#"><i class="fa-solid fa-user"></i> Account</a>
+        <div class="dropdown-content">
+          <a href="login.html">Login</a>
+          <a href="signup.html">Signup</a>
+        </div>
+      </div>
+
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i> Help</a>
+      
+      <a href="favourites.html" class="favourites" style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-heart"></i> Favourites
+        <span class="favourites-badge" style="display: none; background: #ff4444; color: white; padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+          0 Replies
+        </span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="house-details-container">
+
+    <!-- Hero Image -->
+    <div class="hero-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80')"></div>
+
+    <!-- House Quick Info -->
+    <div class="house-details">
+      <p class="location">Loading...</p>
+      <p class="type">Loading...</p>
+      <p class="price">Loading...</p>
+      <p class="units-left">Loading...</p>
+
+      <!-- Action Buttons -->
+      <div class="actions"> 
+        <a href="bookvisit.html" class="btn book"><i class="fa-solid fa-calendar-check"></i> Book Visit</a>
+        <a href="#" id="chatAgentBtn" class="btn contact"><i class="fa-solid fa-message"></i> Chat Agent</a>
+        <a href="#" class="favourite"><i class="fa-solid fa-heart"></i> Add to Favourites</a>
+        <span class="fav-message"></span>
+      </div>
+    </div>
+
+    <!-- House Details Section -->
+    <div class="house-description">
+      <h2>House Details</h2>
+      <p>Loading property details...</p>
+      
+      <!-- Gallery -->
+      <div class="gallery">
+        <!-- Images will be loaded here by JavaScript -->
+      </div>
+    </div>
+
+    <!-- House Reviews Section -->
+    <div class="house-reviews">
+      <div class="reviews-header">
+        <h2>House Reviews</h2>
+        <div class="overall-rating">
+          <span class="stars" id="overallStars">⭐⭐⭐⭐⭐</span>
+          <span id="overallRating">(0.0 / 5)</span>
+        </div>
+      </div>
+
+      <div id="reviewsList">
+        <div class="no-reviews">
+          <p>No reviews yet. Be the first to review this property!</p>
+        </div>
+      </div>
+
+      <a href="#" class="see-all-reviews" id="seeAllReviews" style="display: none;">See All Reviews</a>
+
+      <!-- Agent Profile Card -->
+      <a href="agent profile.html" class="agent-profile-card" id="agentProfileCard">
+        <img src="Images/default avatar.png" alt="Agent" class="agent-profile-photo" id="agentProfilePhoto">
+        <div class="agent-profile-info">
+          <strong id="agentProfileName">View Agent's Profile</strong>
+          <span>See more properties from this agent</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Similar Properties -->
+    <div class="more-properties">
+      <h2>Similar Properties</h2>
+      <div class="house-cards">
+        <!-- Similar properties will be loaded here by JavaScript -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+        <p>Find your dream home with verified listings and trusted agents.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/index.HTML">Home</a></li>
+          <li><a href="/index.HTML">Listings</a></li>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="help.html#support"><i class="fa-solid fa-phone"></i> Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="FAQS.html">FAQs</a></li>
+          <li><a href="help.html">Help</a></li>
+          <li><a href="terms.html">Terms</a></li>
+          <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p>Email: info@homeloop.com</p>
+        <p>Phone: +254 792 508 999</p>
+        <p>Address: Nairobi, Kenya</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Chat Popup -->
+  <div id="chatPopup" class="chat-popup">
+    <div class="chat-header">
+      <span><i class="fa-solid fa-comments"></i> Chat with Agent</span>
+      <button id="closeChat">&times;</button>
+    </div>
+
+    <div class="chat-body" id="chatMessages">
+      <div class="agent-message message">
+        👋 Hello! You're asking about this property. How can I help?
+      </div>
+    </div>
+
+    <div class="chat-footer">
+      <input type="text" id="chatInput" placeholder="Type your message..." />
+      <button id="sendMessage"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Load scripts -->
+  <script src="favourites.js"></script>
+  <script src="chat.js"></script>
+  <script src="house.js"></script>
+</body>
+</html>

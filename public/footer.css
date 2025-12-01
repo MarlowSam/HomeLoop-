@@ -1,0 +1,149 @@
+/* ========== FOOTER ========== */
+.footer {
+  background: #000;
+  color: white;
+  padding: 35px 20px 20px;
+  margin-top: 40px;
+  border-top: 2px solid rgba(255, 77, 210, 0.3);
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 25px;
+}
+
+.footer-left {
+  flex: 1 1 250px;
+}
+
+.footer-logo {
+  display: none; /* Hide image logo */
+}
+
+/* Footer Text Logo */
+.footer-left::before {
+  content: 'HomeLoop';
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.footer-left:hover::before {
+  filter: brightness(1.2);
+}
+
+.footer-left p {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.footer-links,
+.footer-contact {
+  flex: 1 1 200px;
+}
+
+.footer-links h4,
+.footer-contact h4 {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: #ff4dd2;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li {
+  margin-bottom: 8px;
+}
+
+.footer-links ul li a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.footer-links ul li a:hover {
+  color: #ff4dd2;
+  padding-left: 5px;
+}
+
+.footer-contact p {
+  margin: 6px 0;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.footer-social {
+  margin-top: 12px;
+}
+
+.footer-social a {
+  color: white;
+  margin-right: 15px;
+  font-size: 1.4rem;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.footer-social a:hover {
+  color: #ff4dd2;
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #333;
+  margin-top: 20px;
+  padding-top: 15px;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+  }
+
+  .footer-left,
+  .footer-links,
+  .footer-contact {
+    flex: 1 1 auto;
+  }
+  
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+  
+  .footer-left p {
+    font-size: 0.8rem;
+  }
+  
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+  
+  .footer-links ul li a,
+  .footer-contact p {
+    font-size: 0.8rem;
+  }
+}

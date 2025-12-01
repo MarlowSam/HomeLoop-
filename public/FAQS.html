@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQs - HomeLoop</title>
+  <link rel="stylesheet" href="FAQs.css">    
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing">
+      <button class="search-btn">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <div class="dropdown">
+        <a href="#"><i class="fa-solid fa-user"></i> Account</a>
+        <div class="dropdown-content">
+          <a href="login.html">Log In</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </div>
+
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i> Help</a>
+      
+      <a href="favourites.html" class="favourites" style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-heart"></i> Favourites
+        <span class="favourites-badge" style="display: none; background: #ff4444; color: white; padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+          0 Replies
+        </span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="faq-container">
+    <h1>Frequently Asked Questions</h1>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>How do I search for a house?</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Use the search box at the top of the homepage to filter by location, price, or features.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>How can I list my property as an agent?</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Sign up for an agent account and access your dashboard to add new listings.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>What should I do if I forget my password?</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Use the "Forgot Password" option on the login page to reset it.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>How do I report a suspicious listing?</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        Go to the listing page and click "Report." For urgent issues, please contact support directly.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>When can I reach customer support?</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        WhatsApp is available 24/7, and phone support runs Mon–Fri (7am–5pm), Sat (9am–4pm).
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+        <p>Find your dream home with verified listings and trusted agents.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/index.HTML">Home</a></li>
+          <li><a href="/index.HTML">Listings</a></li>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="help.html#support"><i class="fa-solid fa-phone"></i> Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="FAQS.html">FAQs</a></li>
+          <li><a href="help.html">Help</a></li>
+          <li><a href="terms.html">Terms</a></li>
+          <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p>Email: info@homeloop.com</p>
+        <p>Phone: +254 792 508 999</p>
+        <p>Address: Nairobi, Kenya</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // FAQ Toggle functionality
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isActive = question.classList.contains('active');
+        
+        // Close all other FAQs
+        document.querySelectorAll('.faq-question').forEach(q => {
+          q.classList.remove('active');
+          q.nextElementSibling.style.display = 'none';
+        });
+        
+        // Toggle current FAQ
+        if (!isActive) {
+          question.classList.add('active');
+          answer.style.display = 'block';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

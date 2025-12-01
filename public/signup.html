@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - HomeLoop</title>
+  <link rel="stylesheet" href="signup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="signup-container">
+    <!-- Logo Text -->
+    <div class="logo-text">HomeLoop</div>
+    
+    <h1 class="welcome-text">Create Account</h1>
+    <p class="subtitle">Sign up to get started</p>
+
+    <!-- Signup Form -->
+    <form class="signup-form" id="signupForm">
+      <!-- Email -->
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+
+      <!-- Username -->
+      <div class="form-row">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username" required>
+      </div>
+
+      <!-- Password -->
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+
+      <!-- Sign Up Button -->
+      <button type="submit" class="signup-btn">Sign Up</button>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>OR VERIFY WITH PHONE</span>
+      </div>
+
+      <!-- Phone Login Section -->
+      <div class="phone-login">
+        <div class="form-row phone-row">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="Enter phone number">
+          <button type="button" class="send-btn">Send</button>
+        </div>
+
+        <div class="form-row code-row">
+          <label for="code">Code</label>
+          <input type="text" id="code" placeholder="Enter code">
+          <button type="button" class="submit-btn">Submit</button>
+        </div>
+      </div>
+
+      <!-- Terms Checkbox -->
+      <div class="terms">
+        <label class="terms-label">
+          <input type="checkbox" id="agree" name="agree" required>
+          <span>By creating an account I agree to <a href="terms.html" target="_blank">HomeLoop's Terms and Conditions</a></span>
+        </label>
+
+        <!-- Agent Checkbox -->
+        <label class="agent-label">
+          <input type="checkbox" name="is_agent" id="isAgent">
+          <span>I am an Agent</span>
+        </label>
+      </div>
+
+      <!-- Agent Details Form -->
+      <div id="agentForm" class="agent-form">
+        <h3>Agent Details</h3>
+        
+        <div class="form-row">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-row">
+          <label for="license">License No.</label>
+          <input type="text" id="license" placeholder="Enter license number">
+        </div>
+
+        <div class="form-row">
+          <label for="agency">Agency</label>
+          <input type="text" id="agency" placeholder="Enter agency name">
+        </div>
+
+        <div class="form-row">
+          <label for="phoneAgent">Phone</label>
+          <input type="tel" id="phoneAgent" placeholder="Enter phone number">
+        </div>
+      </div>
+
+      <!-- Login Link -->
+      <div class="login-section">
+        <p>Already have an account? <a href="login.html" class="login-link">Log In</a></p>
+      </div>
+    </form>
+  </div>
+
+  <script src="signup.js"></script>
+</body>
+</html>

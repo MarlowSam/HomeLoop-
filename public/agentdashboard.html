@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Dashboard</title>
+  <link rel="stylesheet" href="agentdashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <h2>Agent Dashboard</h2>
+  </div>
+
+  <div class="dashboard-container"> 
+    <!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Agent Dashboard</h2>
+  </div>
+  <ul>
+    <li><a href="#" class="active" data-target="overview">Overview</a></li>
+    <li><a href="#" data-target="bookings">Bookings</a></li>
+    <li>
+      <a href="#" data-target="listings" style="display: flex; align-items: center; justify-content: space-between;">
+        <span>Listings</span>
+        <span class="inquiry-badge" id="inquiryBadge" style="display: none; background: #ff4444; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+          0 Inquiries
+        </span>
+      </a>
+    </li>
+    <li><a href="#" data-target="profile">Profile</a></li>
+  </ul>
+</div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Overview -->
+      <section id="overview" class="active">
+        <h1>Welcome</h1>
+        <p>Here's a quick look at your activity.</p>
+        <div class="stats">
+          <div class="stat-box">
+            <p>Total Listings</p>
+            <strong>12</strong>
+          </div>
+          <div class="stat-box">
+            <p>Total Bookings</p>
+            <strong>8</strong>
+          </div>
+          <div class="stat-box">
+            <p>Featured Listings</p>
+            <strong>3</strong>
+          </div>
+          <div class="stat-box verified">
+            <p>Status: <span class="verified-text">Verified Agent</span></p>
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" 
+                 alt="Verified Badge" class="badge">
+          </div>
+        </div>
+      </section>
+
+      <!-- Replace ONLY the Bookings section in agentdashboard.html -->
+<section id="bookings">
+  <h1>Bookings</h1>
+  <p>View and manage all property bookings and appointments.</p>
+  
+  <!-- Action Buttons -->
+  <div class="booking-actions" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+    <button class="btn-primary" onclick="loadBookings()" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+    <button class="btn-secondary" onclick="exportBookingsToCSV()" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fas fa-download"></i> Export CSV
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table class="booking-table">
+      <thead>
+        <tr>
+          <th>Booker Name</th>
+          <th>Phone Number</th>
+          <th>Email</th>
+          <th>Preferred Date</th>
+          <th>Preferred Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Bookings will be loaded here dynamically -->
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 2rem;">
+            Loading bookings...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+      <!-- Listings -->
+<section id="listings">
+  <h1>Listings</h1>
+  <p>Manage your property listings here.</p>
+
+  <!-- Add New Listing Button -->
+  <div class="add-listing-section">
+    <button class="btn-primary" id="addListingBtn">
+      <i class="fas fa-plus"></i> Add New Listing
+    </button>
+  </div>
+
+  <!-- Add Listing Form (Hidden by default) -->
+  <div class="add-listing-form" id="addListingForm" style="display: none;">
+    <h2>Add New Property Listing</h2>
+    <form id="newListingForm">
+      
+      <!-- Hero Image Upload -->
+      <div class="form-group">
+        <label for="heroImage">Hero Image (Main Display) *</label>
+        <input type="file" id="heroImage" accept="image/*" required>
+        <div class="hero-preview-container" id="heroPreviewContainer"></div>
+      </div>
+
+      <!-- Gallery Images Upload -->
+      <div class="form-group">
+        <label for="galleryImages">Gallery Images (Up to 3 additional images)</label>
+        <input type="file" id="galleryImages" accept="image/*" multiple>
+        <div class="gallery-preview-container" id="galleryPreviewContainer"></div>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="propertyLocation">Location *</label>
+        <input type="text" id="propertyLocation" placeholder="e.g., Kilimani, Nairobi" required>
+        <small>Include both area and city (e.g., Kilimani, Nairobi)</small>
+      </div>
+            <!-- Property Type and Details -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="propertyType">Property Type *</label>
+                <select id="propertyType" required>
+                  <option value="">Select Type</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Condo">Condo</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Studio">Studio</option>
+                  <option value="House">House</option>
+                  <option value="Townhouse">Townhouse</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="bedrooms">Bedrooms *</label>
+                <input type="number" id="bedrooms" min="0" placeholder="e.g., 2" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bathrooms">Bathrooms *</label>
+                <input type="number" id="bathrooms" min="0" placeholder="e.g., 1" required>
+              </div>
+
+              <div class="form-group">
+                <label for="propertyPrice">Monthly Rent (Ksh) *</label>
+                <input type="number" id="propertyPrice" min="0" placeholder="e.g., 35000" required>
+              </div>
+            </div>
+
+            <!-- Units Available -->
+            <div class="form-group">
+              <label for="unitsAvailable">Units Available *</label>
+              <input type="number" id="unitsAvailable" min="1" placeholder="e.g., 5" required>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-group">
+              <label for="additionalInfo">Additional Information</label>
+              <textarea id="additionalInfo" rows="5" placeholder="Describe amenities, nearby facilities, parking, security, utilities included, etc..."></textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Continue
+              </button>
+              <button type="button" class="btn-secondary" id="cancelListingBtn">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Featured Listing Modal -->
+        <div class="modal-overlay" id="featuredModal" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2><i class="fas fa-star"></i> Feature Your Listing</h2>
+            </div>
+            <div class="modal-body">
+              <div class="featured-info">
+                <p class="featured-description">
+                  Make your property stand out! Featured listings appear at the top of search results and get 
+                  <strong>3x more views</strong> than regular listings.
+                </p>
+                
+                <div class="featured-benefits">
+                  <h3>Benefits of Featured Listing:</h3>
+                  <ul>
+                    <li><i class="fas fa-check-circle"></i> Top placement in search results</li>
+                    <li><i class="fas fa-check-circle"></i> Highlighted with special badge</li>
+                    <li><i class="fas fa-check-circle"></i> 3x more visibility</li>
+                    <li><i class="fas fa-check-circle"></i> 30 days featured duration</li>
+                  </ul>
+                </div>
+
+                <div class="featured-price">
+                  <h3>One-time Fee: <span class="price-highlight">Ksh 500</span></h3>
+                  <p class="price-note">Valid for 30 days</p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-primary" id="payFeaturedBtn">
+                <i class="fas fa-credit-card"></i> Pay Ksh 500 & Feature
+              </button>
+              <button class="btn-secondary" id="skipFeaturedBtn">
+                <i class="fas fa-forward"></i> Skip & Add to My Properties
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Featured Listings -->
+        <div class="agent-properties">
+          <div class="section-header">
+            <h2>Featured Listings</h2>
+            <a href="#" class="see-all">See All</a>
+          </div>
+          <div class="house-cards horizontal-scroll">
+            <a href="property1.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Kilimani, Nairobi</p>
+              <p class="type">Apartment</p>
+              <p>3 Bed • 2 Bath</p>
+              <p class="price">Ksh 50,000</p>
+              <p class="units-left">Only 3 units left</p>
+            </a>
+            
+            <a href="property2.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Westlands, Nairobi</p>
+              <p class="type">Condo</p>
+              <p>2 Bed • 1 Bath</p>
+              <p class="price">Ksh 35,000</p>
+              <p class="units-left">Only 1 unit left</p>
+            </a>
+            
+            <a href="property3.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Karen, Nairobi</p>
+              <p class="type">Villa</p>
+              <p>4 Bed • 3 Bath</p>
+              <p class="price">Ksh 70,000</p>
+              <p class="units-left">Only 2 units left</p>
+            </a>
+            
+            <a href="property4.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Runda, Nairobi</p>
+              <p class="type">Studio</p>
+              <p>1 Bed • 1 Bath</p>
+              <p class="price">Ksh 20,000</p>
+              <p class="units-left">Only 5 units left</p>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Agent Listings -->
+        <div class="agent-properties">
+          <div class="section-header">
+            <h2>My Properties</h2>
+            <a href="#" class="see-all">See All</a>
+          </div>
+          <div class="house-cards horizontal-scroll">
+            <a href="property1.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Kilimani, Nairobi</p>
+              <p class="type">Apartment</p>
+              <p>3 Bed • 2 Bath</p>
+              <p class="price">Ksh 50,000</p>
+              <p class="units-left">Only 3 units left</p>
+            </a>
+            
+            <a href="property2.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Westlands, Nairobi</p>
+              <p class="type">Condo</p>
+              <p>2 Bed • 1 Bath</p>
+              <p class="price">Ksh 35,000</p>
+              <p class="units-left">Only 1 unit left</p>
+            </a>
+            
+            <a href="property3.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Karen, Nairobi</p>
+              <p class="type">Villa</p>
+              <p>4 Bed • 3 Bath</p>
+              <p class="price">Ksh 70,000</p>
+              <p class="units-left">Only 2 units left</p>
+            </a>
+            
+            <a href="property4.html" class="card">
+              <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60')"></div>
+              <p class="location">Runda, Nairobi</p>
+              <p class="type">Studio</p>
+              <p>1 Bed • 1 Bath</p>
+              <p class="price">Ksh 20,000</p>
+              <p class="units-left">Only 5 units left</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      
+      <!-- Profile Editor -->
+      <section id="profile">
+        <h1>My Profile</h1>
+        <p>Edit your profile information</p>
+
+        <!-- Profile Form -->
+        <div class="profile-editor">
+          <form id="profileForm">
+            <!-- Profile Photo -->
+            <div class="form-group photo-upload">
+              <label>Profile Photo</label>
+              <div class="photo-preview">
+                <img id="photoPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile Photo">
+              </div>
+              <input type="file" id="photoInput" accept="image/*" style="display: none;">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('photoInput').click()">
+                <i class="fas fa-camera"></i> Change Photo
+              </button>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="form-section">
+              <h3>Basic Information</h3>
+              <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" required>
+              </div>
+
+              <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" rows="3" placeholder="Tell clients about yourself..."></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="experience">Years of Experience</label>
+                  <input type="number" id="experience" min="0">
+                </div>
+
+                <div class="form-group">
+                  <label for="licenseNumber">License Number</label>
+                  <input type="text" id="licenseNumber">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="specializations">Specializations</label>
+                <input type="text" id="specializations" placeholder="e.g., Residential, Commercial, Rentals">
+              </div>
+
+              <div class="form-group">
+                <label for="areasOfOperation">Areas of Operation</label>
+                <input type="text" id="areasOfOperation" placeholder="e.g., Nairobi, Kiambu">
+              </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="form-section">
+              <h3>Contact Information</h3>
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="tel" id="phone" placeholder="+254700000000">
+                </div>
+
+                <div class="form-group">
+                  <label for="whatsapp">WhatsApp Number</label>
+                  <input type="tel" id="whatsapp" placeholder="+254700000000">
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Media -->
+            <div class="form-section">
+              <h3>Social Media</h3>
+              <div class="form-group">
+                <label for="facebook"><i class="fab fa-facebook"></i> Facebook</label>
+                <input type="url" id="facebook" placeholder="https://facebook.com/yourprofile">
+              </div>
+
+              <div class="form-group">
+                <label for="linkedin"><i class="fab fa-linkedin"></i> LinkedIn</label>
+                <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+              </div>
+
+              <div class="form-group">
+                <label for="instagram"><i class="fab fa-instagram"></i> Instagram</label>
+                <input type="url" id="instagram" placeholder="https://instagram.com/yourprofile">
+              </div>
+            </div>
+            
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Save Profile
+              </button>
+              <button type="button" class="btn-secondary" id="previewBtn">
+                <i class="fas fa-eye"></i> Preview Profile
+              </button>
+            </div>
+          </form>
+
+          <!-- Success Message -->
+          <div id="successMessage" class="success-message" style="display: none;">
+            <i class="fas fa-check-circle"></i> Profile saved successfully!
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+<!-- Inquiry Notification Popup -->
+<div id="inquiryNotificationModal" class="modal-overlay" style="display: none; z-index: 10000;">
+  <div class="modal-content" style="max-width: 500px; text-align: center; padding: 2rem;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+    <h2 style="margin-bottom: 1rem;">You have new inquiries!</h2>
+    <p id="inquiryNotificationText" style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+      You have <strong>5 new inquiries</strong> waiting for your response.
+    </p>
+    <button id="viewInquiriesBtn" class="btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+      <i class="fas fa-eye"></i> View Inquiries
+    </button>
+    <button id="closeInquiryNotification" class="btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem; margin-left: 1rem;">
+      Close
+    </button>
+  </div>
+</div>
+  <script src="agentdashboard.js"></script>
+</body>
+</html>

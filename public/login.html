@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - HomeLoop</title>
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Sign-In SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <!-- Facebook SDK -->
+  <script async defer crossorigin="anonymous" 
+    src="https://connect.facebook.net/en_US/sdk.js"></script>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Logo Text -->
+    <div class="logo-text">HomeLoop</div>
+    
+    <h1 class="welcome-text">Welcome Back</h1>
+    <p class="subtitle">Login to access your account</p>
+
+    <!-- Login Form -->
+    <form class="login-form" id="loginForm">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+
+      <!-- Forgot Password -->
+      <div class="forgot-password">
+        <a href="#" class="forgot-link">Forgot Password?</a>
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit" class="login-btn">Log In</button>
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <!-- Social Login Buttons -->
+    <div class="social-login">
+      <!-- Google Login Button -->
+      <div id="g_id_onload"
+           data-client_id="635748400290-mrjqtbe7nquslqck3apepd4gv45hsva8.apps.googleusercontent.com"
+           data-context="signin"
+           data-ux_mode="popup"
+           data-callback="handleGoogleLogin"
+           data-auto_prompt="false">
+      </div>
+
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 533.5 544.3">
+          <path fill="#4285F4" d="M533.5 278.4c0-18.2-1.5-36-4.3-53.3H272v100.8h146.9c-6.4 34.6-25.5 63.9-54.5 83.5v69.4h87.9c51.4-47.3 81.2-116.7 81.2-200.4z"/>
+          <path fill="#34A853" d="M272 544.3c73.4 0 134.9-24.3 179.9-65.9l-87.9-69.4c-24.4 16.4-55.7 26-92 26-70.8 0-130.8-47.8-152.3-112.1H30.2v70.6C75.5 492.4 167 544.3 272 544.3z"/>
+          <path fill="#FBBC05" d="M119.7 318.9c-5.3-15.7-8.4-32.4-8.4-49.5s3.1-33.8 8.4-49.5v-70.6H30.2c-18.3 36.5-28.8 77.2-28.8 120.1s10.5 83.6 28.8 120.1l89.5-70.6z"/>
+          <path fill="#EA4335" d="M272 107.7c39.8 0 75.4 13.7 103.6 40.7l77.7-77.7C406.9 24.3 345.4 0 272 0 167 0 75.5 51.9 30.2 144.7l89.5 70.6C141.2 155.5 201.2 107.7 272 107.7z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- Facebook Login Button -->
+      <button class="facebook-btn" id="facebookLoginBtn">
+        <i class="fa-brands fa-facebook-f"></i>
+        Continue with Facebook
+      </button>
+    </div>
+
+    <!-- Sign Up Link -->
+    <div class="signup-section">
+      <p>Don't have an account? <a href="signup.html" class="signup-link">Sign Up</a></p>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms-section">
+      <p>By continuing, you agree to HomeLoop's <a href="terms.html" class="terms-link">Terms & Conditions</a> and <a href="Privacy Policy.html" class="terms-link">Privacy Policy</a></p>
+    </div>
+  </div>
+  
+  <script src="login.js"></script>
+</body>
+</html>
