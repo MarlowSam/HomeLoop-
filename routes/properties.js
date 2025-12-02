@@ -3,11 +3,11 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import crypto from "crypto"; // 🔒 SECURITY: For random filenames
-import sharp from "sharp"; // 🔒 SECURITY: Image processing
+import sharp from "sharp"; // 🔒 SECURITY: Image processingz
 import fs from "fs"; // 🔒 SECURITY: File operations
 import { fileURLToPath } from "url";
 import db from "../db.js";
-import { verifyToken, requireAgent } from "../middleware/authMiddleware.js";
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

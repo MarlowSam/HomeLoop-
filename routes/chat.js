@@ -3,7 +3,7 @@ import express from "express";
 import createDOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import db from "../db.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 

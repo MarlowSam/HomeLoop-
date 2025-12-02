@@ -2,7 +2,7 @@
 import express from "express";
 import crypto from "crypto"; // 🔒 SECURITY: For signature verification
 import db from "../db.js";
-import { verifyToken, requireAgent } from "../middleware/authMiddleware.js";
+import { verifyToken } from '../middleware/auth.js';
 import dotenv from "dotenv";
 
 dotenv.config();
