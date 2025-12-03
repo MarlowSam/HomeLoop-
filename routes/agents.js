@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
 import db from "../db.js";
-import { verifyToken, requireAgent } from "../middleware/authMiddleware.js";
+import { verifyToken, requireAgent } from '../middleware/auth.js';
 
 const router = express.Router();
 
