@@ -7,7 +7,7 @@ import sharp from "sharp"; // 🔒 SECURITY: Image processingz
 import fs from "fs"; // 🔒 SECURITY: File operations
 import { fileURLToPath } from "url";
 import db from "../db.js";
-import { verifyToken } from '../middleware/auth.js';
+import { verifyToken, requireAgent } from '../middleware/auth.js';
 
 const router = express.Router();
 
