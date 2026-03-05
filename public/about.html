@@ -3,62 +3,341 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Homeloop</title>
-  <link rel="stylesheet" href="about.css"> <!-- Your About page CSS -->
-  <link rel="stylesheet" href="footer.css"> <!-- Footer CSS -->
-  <link rel="stylesheet" href="header.css"> <!-- Header CSS if separate -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- For social icons -->
+  <title>About Us - HomeLoop</title>
+  <link rel="stylesheet" href="about.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- Header injection -->
-  <div id="header-placeholder"></div>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
 
-  <!-- About Page Main Content -->
-  <main class="about-content">
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing">
+      <button class="search-btn">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <div class="dropdown">
+        <a href="#"><i class="fa-solid fa-user"></i> <span>Account</span></a>
+        <div class="dropdown-content">
+          <a href="login.html">Log In</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </div>
+
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i> <span>Help</span></a>
+      
+      <a href="favourites.html" class="favourites">
+        <i class="fa-solid fa-heart"></i> <span>Favourites</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="about-container">
+    
     <!-- Hero Section -->
-    <section class="hero">
-      <h1>Welcome to Homeloop</h1>
-      <p>Your fastest route to finding your perfect home.</p>
-      <button onclick="location.href='index.html'">Start Your Search</button>
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1><i class="fa-solid fa-home"></i> About HomeLoop</h1>
+        <p class="hero-subtitle">Connecting you to your dream home through verified listings and trusted agents</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <i class="fa-solid fa-building"></i>
+          <h3>500+</h3>
+          <p>Properties Listed</p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-user-tie"></i>
+          <h3>100+</h3>
+          <p>Verified Agents</p>
+        </div>
+        <div class="stat-card">
+          <i class="fa-solid fa-users"></i>
+          <h3>1000+</h3>
+          <p>Happy Clients</p>
+        </div>
+      </div>
     </section>
 
-    <!-- Mission Section -->
-    <section class="mission">
-      <h2>Our Mission</h2>
-      <p>At Homeloop, we aim to make property search effortless for everyone. Whether you’re buying, renting, or exploring new neighborhoods, we provide up-to-date listings, smart search tools, and expert guidance to help you make the right move quickly.</p>
-    </section>
-
-    <!-- Features Section -->
-    <section class="why-choose">
-      <h2>Why Choose Homeloop?</h2>
-      <ul>
-        <li>Fast & Easy Search</li>
-        <li>Verified Listings</li>
-        <li>Real-Time Alerts</li>
-        <li>Expert Guidance</li>
-        <li>User-Friendly Interface</li>
-      </ul>
+    <!-- Mission & Vision -->
+    <section class="mission-vision">
+      <div class="mission-card">
+        <div class="card-icon">
+          <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <h2>Our Mission</h2>
+        <p>To revolutionize the property rental and sales market in Kenya by providing a transparent, efficient, and user-friendly platform that connects property seekers with verified agents and quality listings.</p>
+      </div>
+      
+      <div class="vision-card">
+        <div class="card-icon">
+          <i class="fa-solid fa-eye"></i>
+        </div>
+        <h2>Our Vision</h2>
+        <p>To become the most trusted and comprehensive real estate platform in Kenya, empowering individuals to find their perfect home while enabling agents to grow their business through technology.</p>
+      </div>
     </section>
 
     <!-- Story Section -->
-    <section class="story">
-      <h2>Our Story</h2>
-      <p>Homeloop was founded to tackle the challenges of traditional property search. We wanted a platform where finding your dream home is as simple as a few clicks. Since 2025, we’ve been helping users discover, compare, and secure properties faster than ever before.</p>
+    <section class="story-section">
+      <div class="story-content">
+        <h2><i class="fa-solid fa-book-open"></i> Our Story</h2>
+        <p>HomeLoop was born from a simple observation: finding a home in Kenya shouldn't be a frustrating, time-consuming process filled with uncertainty and mistrust. Founded in 2024, we set out to create a platform that brings transparency, efficiency, and trust to the property market.</p>
+        
+        <p>We understand the challenges both property seekers and agents face. For seekers, it's the endless scrolling through unreliable listings, dealing with unresponsive agents, and worrying about scams. For agents, it's reaching the right audience and managing inquiries efficiently.</p>
+        
+        <p>HomeLoop bridges this gap by verifying every agent, ensuring property listings are accurate and up-to-date, and providing tools that make the entire process seamless—from browsing properties to booking site visits and communicating with agents in real-time.</p>
+        
+        <p>Today, we're proud to serve thousands of users across Kenya, helping families find their dream homes and agents grow their businesses. But we're just getting started.</p>
+      </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section class="features-section">
+      <h2><i class="fa-solid fa-star"></i> What We Offer</h2>
+      <div class="features-grid">
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3>Verified Listings</h3>
+          <p>Every property on HomeLoop is verified by our team to ensure accuracy and legitimacy, giving you peace of mind.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+          <h3>Trusted Agents</h3>
+          <p>We work only with verified, professional agents who meet our standards for reliability and customer service.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <h3>Easy Booking</h3>
+          <p>Schedule property visits directly through our platform with instant confirmation and reminders.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <h3>Real-Time Chat</h3>
+          <p>Communicate instantly with agents through our integrated chat system for quick responses to your questions.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-filter"></i>
+          </div>
+          <h3>Smart Filters</h3>
+          <p>Find your perfect home faster with advanced search filters for location, price, property type, and more.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <h3>Save Favorites</h3>
+          <p>Bookmark properties you love and receive notifications when similar listings become available.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+      <h2><i class="fa-solid fa-gem"></i> Our Core Values</h2>
+      <div class="values-grid">
+        
+        <div class="value-card">
+          <i class="fa-solid fa-handshake"></i>
+          <h3>Trust</h3>
+          <p>We build trust through transparency, verification, and commitment to quality in everything we do.</p>
+        </div>
+
+        <div class="value-card">
+          <i class="fa-solid fa-lightbulb"></i>
+          <h3>Innovation</h3>
+          <p>We continuously improve our platform with cutting-edge technology to serve you better.</p>
+        </div>
+
+        <div class="value-card">
+          <i class="fa-solid fa-users"></i>
+          <h3>Community</h3>
+          <p>We're building a community where property seekers and agents thrive together.</p>
+        </div>
+
+        <div class="value-card">
+          <i class="fa-solid fa-medal"></i>
+          <h3>Excellence</h3>
+          <p>We strive for excellence in every interaction, listing, and feature we provide.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-choose-section">
+      <h2><i class="fa-solid fa-question-circle"></i> Why Choose HomeLoop?</h2>
+      <div class="why-grid">
+        
+        <div class="why-item">
+          <div class="why-number">01</div>
+          <div class="why-content">
+            <h3>No Hidden Fees</h3>
+            <p>Browse and connect with agents for free. Transparent pricing, no surprises.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-number">02</div>
+          <div class="why-content">
+            <h3>Time-Saving</h3>
+            <p>Find properties that match your exact needs in minutes, not weeks.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-number">03</div>
+          <div class="why-content">
+            <h3>Local Expertise</h3>
+            <p>Our agents know Nairobi and surrounding areas inside out.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-number">04</div>
+          <div class="why-content">
+            <h3>24/7 Support</h3>
+            <p>Our customer support team is always ready to help you with any questions.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-number">05</div>
+          <div class="why-content">
+            <h3>Mobile Friendly</h3>
+            <p>Search for properties on the go with our fully responsive mobile platform.</p>
+          </div>
+        </div>
+
+        <div class="why-item">
+          <div class="why-number">06</div>
+          <div class="why-content">
+            <h3>Regular Updates</h3>
+            <p>New listings added daily. Be the first to know about available properties.</p>
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
-      <h2>Ready to Find Your Home?</h2>
-      <button onclick="location.href='index.html'">Explore Homes Now</button>
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2><i class="fa-solid fa-rocket"></i> Ready to Find Your Dream Home?</h2>
+        <p>Join thousands of satisfied users who found their perfect property through HomeLoop</p>
+        <div class="cta-buttons">
+          <a href="index.html" class="btn-primary">
+            <i class="fa-solid fa-search"></i> Browse Properties
+          </a>
+          <a href="signup.html" class="btn-secondary">
+            <i class="fa-solid fa-user-plus"></i> Create Account
+          </a>
+        </div>
+      </div>
     </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+      <h2><i class="fa-solid fa-envelope"></i> Get In Touch</h2>
+      <p>Have questions or want to learn more about HomeLoop? We'd love to hear from you!</p>
+      <div class="contact-grid">
+        
+        <div class="contact-card">
+          <i class="fa-solid fa-envelope"></i>
+          <h3>Email Us</h3>
+          <a href="mailto:info@homeloop.com">info@homeloop.com</a>
+        </div>
+
+        <div class="contact-card">
+          <i class="fa-solid fa-phone"></i>
+          <h3>Call Us</h3>
+          <a href="tel:+254792508999">+254 792 508 999</a>
+        </div>
+
+        <div class="contact-card">
+          <i class="fa-solid fa-location-dot"></i>
+          <h3>Visit Us</h3>
+          <p>Nairobi, Kenya</p>
+        </div>
+
+        <div class="contact-card">
+          <i class="fa-solid fa-headset"></i>
+          <h3>Support</h3>
+          <a href="help.html">Help Center</a>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <!-- Footer injection -->
-  <div id="footer-placeholder"></div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+        <p>Find your dream home with verified listings and trusted agents.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="listings.html">Listings</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="help.html#support">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="FAQS.html">FAQs</a></li>
+          <li><a href="help.html">Help</a></li>
+          <li><a href="terms.html">Terms</a></li>
+          <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
 
-  <!-- JavaScript for injecting header and footer -->
-  <script src="inject.js"></script>
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p>Email: info@homeloop.com</p>
+        <p>Phone: +254 792 508 999</p>
+        <p>Address: Nairobi, Kenya</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+    </div>
+  </footer>
 
+  <script src="config.js"></script>
+  <script src="about.js"></script>
 </body>
 </html>

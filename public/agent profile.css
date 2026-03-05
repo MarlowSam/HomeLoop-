@@ -1,5 +1,6 @@
 /* ========================================
-   AGENT PROFILE PAGE - MODERN REDESIGN
+   AGENT PROFILE PAGE - COMPLETE CSS
+   All issues fixed: Header + Horizontal Hero Layout + Bundle Tags
    ======================================== */
 
 * {
@@ -14,16 +15,19 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ========== HEADER ========== */
+/* ========================================
+   HEADER - LAPTOP: HORIZONTAL, MOBILE: WRAPPED
+   ======================================== */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   min-height: 70px;
-  padding: 0 25px;
+  padding: 10px 25px;
   background: rgba(59, 0, 71, 0.95);
   backdrop-filter: blur(10px);
   display: flex;
@@ -33,14 +37,16 @@ body {
   z-index: 1000;
   border-bottom: 2px solid rgba(255, 77, 210, 0.2);
   flex-wrap: nowrap;
+  gap: 15px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 10px 0;
+  padding: 0;
   flex-shrink: 0;
+  order: 1;
 }
 
 .logo {
@@ -71,8 +77,9 @@ body {
 .search-container {
   flex: 1;
   max-width: 500px;
-  margin: 0 25px;
+  margin: 0 20px;
   display: flex;
+  order: 2;
 }
 
 .search-container input {
@@ -117,6 +124,8 @@ body {
   gap: 20px;
   align-items: center;
   flex-wrap: nowrap;
+  order: 3;
+  margin-left: 0;
 }
 
 .nav-links a {
@@ -146,6 +155,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
+  z-index: 10000;
 }
 
 .dropdown > a {
@@ -159,9 +169,9 @@ body {
   top: calc(100% + 8px);
   right: 0;
   background: #3b0047;
-  min-width: 180px;
+  min-width: 140px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+  z-index: 10001;
   border-radius: 12px;
   border: 1px solid rgba(255, 77, 210, 0.3);
   overflow: hidden;
@@ -170,33 +180,58 @@ body {
 
 .dropdown-content a {
   color: white;
-  padding: 12px 18px;
+  padding: 10px 16px;
   text-decoration: none;
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
   white-space: nowrap;
 }
 
 .dropdown-content a:hover {
   background: rgba(255, 77, 210, 0.2);
-  padding-left: 22px;
+  padding-left: 20px;
 }
 
-.dropdown:hover .dropdown-content,
-.dropdown .dropdown-content:hover {
+.dropdown:hover .dropdown-content {
   visibility: visible;
   opacity: 1;
 }
 
-/* ========== MAIN CONTAINER ========== */
-.agent-profile-container {
-  max-width: 1400px;
-  margin: 90px auto 30px;
-  padding: 0 25px;
+.dropdown-content:hover {
+  visibility: visible;
+  opacity: 1;
 }
 
-/* ========== AGENT HERO SECTION ========== */
+/* Hide text labels on smaller screens */
+@media (max-width: 1024px) {
+  .nav-links a {
+    font-size: 1.1rem;
+    padding: 8px;
+  }
+  
+  .nav-links a i {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  
+  .nav-links .nav-text {
+    display: none;
+  }
+}
+
+/* ========================================
+   MAIN CONTAINER
+   ======================================== */
+.agent-profile-container {
+  max-width: 1200px;
+  margin: 110px auto 30px;
+  padding: 0 20px;
+}
+
+/* ========================================
+   AGENT HERO SECTION - HORIZONTAL LAYOUT
+   ======================================== */
 .agent-hero {
   background: linear-gradient(135deg, #3b0047 0%, #2e0033 100%);
   border-radius: 15px;
@@ -204,9 +239,6 @@ body {
   margin-bottom: 20px;
   box-shadow: 0 6px 20px rgba(255, 77, 210, 0.3);
   border: 2px solid rgba(255, 77, 210, 0.2);
-}
-
-.agent-hero-content {
   display: flex;
   align-items: center;
   gap: 25px;
@@ -220,6 +252,10 @@ body {
   border: 4px solid #ff4dd2;
   box-shadow: 0 6px 20px rgba(255, 77, 210, 0.5);
   flex-shrink: 0;
+}
+
+.agent-info {
+  flex: 1;
 }
 
 .agent-info h1 {
@@ -264,17 +300,22 @@ body {
   color: #e0e0e0;
 }
 
-/* ========== INFO CARDS ========== */
+/* ========================================
+   INFO CARDS
+   ======================================== */
 .info-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 25px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .info-card {
   background: #3b0047;
-  padding: 20px 25px;
+  padding: 22px 25px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 77, 210, 0.2);
@@ -290,7 +331,7 @@ body {
 .info-card h2 {
   color: #ff4dd2;
   font-size: 1.2rem;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -363,7 +404,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid rgba(255, 77, 210, 0.1);
 }
 
@@ -389,27 +430,19 @@ body {
   gap: 6px;
 }
 
-.badge {
-  width: 50px;
-  height: 50px;
-  margin: 10px auto 0;
-  display: block;
-  filter: drop-shadow(0 0 10px rgba(0, 255, 153, 0.5));
-}
-
-/* ========== PROPERTIES SECTION ========== */
+/* ========================================
+   PROPERTIES SECTION - GRID ON LAPTOP, SCROLL ON MOBILE
+   ======================================== */
 .agent-properties {
   background: #3b0047;
   padding: 25px 30px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 77, 210, 0.2);
+  margin-bottom: 20px;
 }
 
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 2px solid rgba(255, 77, 210, 0.3);
@@ -417,40 +450,31 @@ body {
 
 .section-header h2 {
   color: #ff4dd2;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.see-all {
-  color: #ff9900;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: rgba(255, 153, 0, 0.15);
-  border: 1px solid rgba(255, 153, 0, 0.3);
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* Properties Row Container */
+.properties-row {
+  margin-bottom: 20px;
 }
 
-.see-all:hover {
-  background: rgba(255, 153, 0, 0.25);
-  transform: translateX(5px);
+.properties-row:last-child {
+  margin-bottom: 0;
 }
 
-/* ========== PROPERTIES GRID ========== */
-.properties-grid {
+/* LAPTOP: Grid layout with 5 columns, NO scrollbar */
+.properties-scroll {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 18px;
+  gap: 15px;
+  padding: 10px 0;
 }
 
+/* Ensure card has position relative for absolute positioning of bundle tag */
 .property-card {
   display: block;
   background: #2e0033;
@@ -461,6 +485,8 @@ body {
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 77, 210, 0.2);
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  position: relative;
 }
 
 .property-card:hover {
@@ -471,7 +497,7 @@ body {
 
 .card-image {
   width: 100%;
-  height: 140px;
+  height: 130px;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -487,6 +513,56 @@ body {
   background: linear-gradient(to top, rgba(46, 0, 51, 1), transparent);
 }
 
+/* ========================================
+   BUNDLE GIFT TAG STYLING
+   ======================================== */
+.bundle-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(255, 165, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-left: 4px solid #FF8C00;
+}
+
+.bundle-tag::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 4px;
+  border-color: transparent transparent #FF8C00 transparent;
+  transform: translateY(-8px);
+}
+
+.bundle-tag i {
+  font-size: 0.9rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 .card-content {
   padding: 12px;
 }
@@ -494,7 +570,7 @@ body {
 .location {
   color: #fff;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   margin-bottom: 5px;
   display: flex;
   align-items: center;
@@ -503,42 +579,50 @@ body {
 
 .location i {
   color: #ff9900;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .type {
   color: #aaa;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   margin-bottom: 5px;
 }
 
 .details {
   color: #ccc;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   margin-bottom: 8px;
 }
 
 .price {
   font-weight: bold;
   color: #ff4dd2;
-  font-size: 1.05rem;
+  font-size: 1rem;
   margin-bottom: 6px;
 }
 
 .units-left {
   color: #ffffff;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   display: inline-block;
 }
 
-/* ========== FOOTER ========== */
+/* ========================================
+   FOOTER - 2x2 GRID
+   ======================================== */
 .footer {
   background: #000;
   color: white;
-  padding: 30px 20px 18px;
+  padding: 35px 0 20px;
   margin-top: 40px;
   border-top: 2px solid rgba(255, 77, 210, 0.3);
+  overflow-x: hidden;
+}
+
+.footer-wrapper {
+  width: 100%;
+  overflow: hidden;
 }
 
 .footer-container {
@@ -546,8 +630,9 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 30px;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto 25px;
+  padding: 0 20px;
 }
 
 .footer-left {
@@ -643,62 +728,73 @@ body {
   text-align: center;
   border-top: 1px solid #333;
   margin-top: 20px;
-  padding-top: 15px;
+  padding: 15px 20px 0;
   font-size: 0.85rem;
   color: #888;
+  width: 100%;
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 1200px) {
-  .properties-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
 
-@media (max-width: 992px) {
-  .properties-grid {
+/* TABLET: 3 columns */
+@media (max-width: 1024px) {
+  .properties-scroll {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* MOBILE: Horizontal scroll with almost invisible scrollbar */
 @media (max-width: 768px) {
   .header {
-    min-height: auto;
     padding: 10px 15px;
     flex-wrap: wrap;
   }
 
+  .logo-container {
+    order: 1;
+  }
+  
   .logo-container::before {
     font-size: 1.5rem;
   }
 
+  .nav-links {
+    order: 2;
+    gap: 15px;
+    font-size: 1.15rem;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    padding: 8px;
+    font-size: 1.15rem;
+  }
+  
+  .nav-links a i {
+    font-size: 1.15rem;
+  }
+  
+  .nav-links .nav-text {
+    display: none !important;
+  }
+  
   .search-container {
     order: 3;
+    flex: 1 1 100%;
     width: 100%;
     margin: 10px 0 0 0;
     max-width: 100%;
   }
 
-  .nav-links {
-    gap: 10px;
-    font-size: 0.85rem;
-  }
-
-  .nav-links a {
-    padding: 6px 8px;
-  }
-
   .agent-profile-container {
     padding: 0 15px;
-    margin: 150px auto 25px;
+    margin: 140px auto 25px;
   }
 
   .agent-hero {
     padding: 20px;
-  }
-
-  .agent-hero-content {
-    gap: 20px;
   }
 
   .agent-photo {
@@ -715,38 +811,95 @@ body {
   }
 
   .stat-item {
-    padding: 7px 12px;
+    padding: 8px 14px;
   }
 
   .stat-item span {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
   }
 
-  /* Keep info cards side by side */
+  /* Stack info cards vertically on mobile */
   .info-cards {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 15px;
   }
 
   .info-card {
-    padding: 18px 20px;
-  }
-
-  .info-card h2 {
-    font-size: 1.1rem;
-  }
-
-  .properties-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    padding: 20px;
   }
 
   .agent-properties {
     padding: 20px;
   }
 
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  /* MOBILE: Switch to horizontal scroll */
+  .properties-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    padding: 10px 0 15px 0;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Almost invisible scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 77, 210, 0.15) transparent;
+  }
+
+  .properties-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .properties-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .properties-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 77, 210, 0.15);
+    border-radius: 8px;
+  }
+
+  .properties-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 77, 210, 0.25);
+  }
+
+  .property-card {
+    min-width: 180px;
+    max-width: 180px;
+    flex-shrink: 0;
+  }
+
   .card-image {
     height: 120px;
+  }
+
+  /* Mobile adjustments for bundle tag */
+  .bundle-tag {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .bundle-tag i {
+    font-size: 0.75rem;
+  }
+
+  /* Footer 2x2 grid on mobile */
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 20px;
+  }
+  
+  .footer-bottom {
+    grid-column: 1 / -1;
   }
 }
 
@@ -755,16 +908,24 @@ body {
     font-size: 1.3rem;
   }
 
+  .nav-links {
+    gap: 12px;
+  }
+  
+  .nav-links a {
+    font-size: 1.1rem;
+  }
+  
+  .nav-links a i {
+    font-size: 1.1rem;
+  }
+
   .agent-profile-container {
-    margin: 150px auto 20px;
+    margin: 140px auto 20px;
   }
 
   .agent-hero {
     padding: 18px;
-  }
-
-  .agent-hero-content {
-    gap: 15px;
   }
 
   .agent-photo {
@@ -779,11 +940,10 @@ body {
 
   .agent-bio {
     font-size: 0.85rem;
-    margin-bottom: 12px;
   }
 
   .stat-item {
-    padding: 6px 10px;
+    padding: 7px 12px;
   }
 
   .stat-item i {
@@ -791,30 +951,24 @@ body {
   }
 
   .stat-item span {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
-  /* Keep info cards side by side even on mobile */
   .info-cards {
-    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
   .info-card {
-    padding: 15px;
+    padding: 18px;
   }
 
   .info-card h2 {
-    font-size: 1rem;
+    font-size: 1.05rem;
   }
 
   .contact-item {
     padding: 8px;
     font-size: 0.82rem;
-  }
-
-  .contact-item i {
-    font-size: 1rem;
   }
 
   .social-links a {
@@ -823,37 +977,21 @@ body {
     font-size: 1.1rem;
   }
 
-  .badge {
-    width: 40px;
-    height: 40px;
-  }
-
-  .properties-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-
   .agent-properties {
     padding: 18px;
-  }
-
-  .section-header {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
   }
 
   .section-header h2 {
     font-size: 1.1rem;
   }
 
-  .see-all {
-    font-size: 0.82rem;
-    padding: 6px 12px;
+  .property-card {
+    min-width: 160px;
+    max-width: 160px;
   }
 
   .card-image {
-    height: 100px;
+    height: 110px;
   }
 
   .card-content {
@@ -861,7 +999,7 @@ body {
   }
 
   .location {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 
   .type, .details {
@@ -869,10 +1007,31 @@ body {
   }
 
   .price {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
   }
 
   .units-left {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+  }
+
+  /* Footer stays 2x2 on small mobile */
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.85rem;
+  }
+  
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+  
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+  
+  .footer-contact p,
+  .footer-links ul li a {
+    font-size: 0.8rem;
   }
 }

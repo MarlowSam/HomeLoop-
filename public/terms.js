@@ -1,4 +1,5 @@
 // terms.js - Terms and Conditions Page Functionality
+// UPDATED FOR LOCAL AND PRODUCTIONa
 
 document.addEventListener('DOMContentLoaded', function() {
   // Check login status and update dropdown
@@ -19,7 +20,7 @@ async function checkLoginStatus() {
   if (!dropdownContent) return;
 
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -39,7 +40,7 @@ async function checkLoginStatus() {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -73,7 +74,7 @@ async function checkLoginStatus() {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -107,7 +108,7 @@ async function checkLoginStatus() {
       logoutLink.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-          await fetch('/api/auth/logout', {
+          await fetch(`${API_BASE_URL}/api/auth/logout`, {
             method: 'POST',
             credentials: 'include'
           });

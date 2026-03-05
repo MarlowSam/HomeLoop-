@@ -1,5 +1,5 @@
 /* ========================================
-   FAQS PAGE - MATCHING HOMEPAGE STYLE
+   FAQS PAGE - FIXED MOBILE VIEW
    ======================================== */
 
 * {
@@ -14,16 +14,19 @@ body {
   color: white;
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ========== HEADER ========== */
+/* ========================================
+   HEADER - LAPTOP: HORIZONTAL, MOBILE: WRAPPED
+   ======================================== */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   min-height: 70px;
-  padding: 0 25px;
+  padding: 10px 25px;
   background: rgba(59, 0, 71, 0.95);
   backdrop-filter: blur(10px);
   display: flex;
@@ -33,14 +36,16 @@ body {
   z-index: 1000;
   border-bottom: 2px solid rgba(255, 77, 210, 0.2);
   flex-wrap: nowrap;
+  gap: 15px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 10px 0;
+  padding: 0;
   flex-shrink: 0;
+  order: 1;
 }
 
 .logo {
@@ -71,8 +76,9 @@ body {
 .search-container {
   flex: 1;
   max-width: 500px;
-  margin: 0 25px;
+  margin: 0 20px;
   display: flex;
+  order: 2;
 }
 
 .search-container input {
@@ -117,6 +123,8 @@ body {
   gap: 20px;
   align-items: center;
   flex-wrap: nowrap;
+  order: 3;
+  margin-left: 0;
 }
 
 .nav-links a {
@@ -133,6 +141,11 @@ body {
   white-space: nowrap;
 }
 
+/* Hide text labels on all screens, keep only icons */
+.nav-links a span {
+  display: none !important;
+}
+
 .nav-links a:hover {
   color: #ff4dd2;
   background: rgba(255, 77, 210, 0.1);
@@ -143,9 +156,14 @@ body {
   color: #ff9900 !important;
 }
 
+.favourites-badge {
+  display: none !important;
+}
+
 .dropdown {
   position: relative;
   display: inline-block;
+  z-index: 10000;
 }
 
 .dropdown > a {
@@ -159,10 +177,10 @@ body {
   top: calc(100% + 8px);
   right: 0;
   background: #3b0047;
-  min-width: 180px;
+  min-width: 140px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
-  border-radius: 12px;
+  z-index: 10001;
+  border-radius: 10px;
   border: 1px solid rgba(255, 77, 210, 0.3);
   overflow: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -170,17 +188,18 @@ body {
 
 .dropdown-content a {
   color: white;
-  padding: 12px 18px;
+  padding: 10px 16px;
   text-decoration: none;
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
   white-space: nowrap;
+  text-align: center;
 }
 
 .dropdown-content a:hover {
   background: rgba(255, 77, 210, 0.2);
-  padding-left: 22px;
+  color: #ff4dd2;
 }
 
 .dropdown:hover .dropdown-content,
@@ -189,12 +208,9 @@ body {
   opacity: 1;
 }
 
-.dropdown-content:hover {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* ========== MAIN CONTENT - FAQ SECTION ========== */
+/* ========================================
+   MAIN CONTENT - FAQ SECTION
+   ======================================== */
 .faq-container {
   max-width: 900px;
   margin: 120px auto 60px;
@@ -273,13 +289,21 @@ body {
   border-left: 3px solid #ff4dd2;
 }
 
-/* ========== FOOTER ========== */
+/* ========================================
+   FOOTER - 2x2 GRID
+   ======================================== */
 .footer {
   background: #000;
   color: white;
-  padding: 35px 20px 20px;
+  padding: 35px 0 20px;
   margin-top: 40px;
   border-top: 2px solid rgba(255, 77, 210, 0.3);
+  overflow-x: hidden;
+}
+
+.footer-wrapper {
+  width: 100%;
+  overflow: hidden;
 }
 
 .footer-container {
@@ -289,6 +313,7 @@ body {
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto 25px;
+  padding: 0 20px;
 }
 
 .footer-left {
@@ -384,41 +409,58 @@ body {
   text-align: center;
   border-top: 1px solid #333;
   margin-top: 20px;
-  padding-top: 15px;
+  padding: 15px 20px 0;
   font-size: 0.85rem;
   color: #888;
+  width: 100%;
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* MOBILE: Header wraps, content pushed down, footer 2x2 */
 @media (max-width: 768px) {
   .header {
-    min-height: auto;
     padding: 10px 15px;
     flex-wrap: wrap;
+  }
+
+  .logo-container {
+    order: 1;
   }
 
   .logo-container::before {
     font-size: 1.5rem;
   }
 
+  .nav-links {
+    order: 2;
+    gap: 15px;
+    font-size: 1.15rem;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    padding: 8px;
+    font-size: 1.15rem;
+  }
+
+  .nav-links a i {
+    font-size: 1.15rem;
+  }
+
   .search-container {
     order: 3;
+    flex: 1 1 100%;
     width: 100%;
     margin: 10px 0 0 0;
     max-width: 100%;
   }
 
-  .nav-links {
-    gap: 10px;
-    font-size: 0.85rem;
-  }
-
-  .nav-links a {
-    padding: 6px 8px;
-  }
-
+  /* Push FAQ content down to avoid overlap */
   .faq-container {
-    margin: 100px 20px 40px;
+    margin: 150px 20px 40px;
     padding: 30px 20px;
   }
 
@@ -430,16 +472,16 @@ body {
     padding: 12px 15px;
   }
 
+  /* Footer 2x2 grid on mobile */
   .footer-container {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 20px;
   }
 
-  .footer-left,
-  .footer-links,
-  .footer-contact {
-    flex: 1 1 auto;
+  .footer-bottom {
+    grid-column: 1 / -1;
   }
 }
 
@@ -449,14 +491,19 @@ body {
   }
 
   .nav-links {
-    gap: 8px;
+    gap: 12px;
   }
 
-  .nav-links a span {
-    display: none;
+  .nav-links a {
+    font-size: 1.1rem;
+  }
+
+  .nav-links a i {
+    font-size: 1.1rem;
   }
 
   .faq-container {
+    margin: 150px 15px 30px;
     padding: 25px 15px;
   }
 
@@ -472,5 +519,26 @@ body {
   .faq-answer {
     padding: 12px;
     font-size: 0.9rem;
+  }
+
+  /* Footer stays 2x2 on small mobile */
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.85rem;
+  }
+
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+
+  .footer-contact p,
+  .footer-links ul li a {
+    font-size: 0.8rem;
   }
 }

@@ -4,35 +4,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book a Visit - HomeLoop</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="bookvisit.css">
 </head>
 <body>
-  <!-- Header placeholder -->
-  <div id="header-placeholder"></div>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
 
+    <nav class="nav-links">
+      <a href="#" class="favourites">
+        <i class="fas fa-heart"></i>
+        <span class="nav-text">Favourites</span>
+      </a>
+      <a href="#">
+        <i class="fas fa-question-circle"></i>
+        <span class="nav-text">Help</span>
+      </a>
+      <div class="dropdown">
+        <a>
+          <i class="fas fa-user-circle"></i>
+          <span class="nav-text">Account</span>
+        </a>
+        <div class="dropdown-content">
+          <a href="#">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing">
+      <button class="search-btn">Search</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
   <main class="visit-container">
     <h1>Book a Visit</h1>
     <p class="intro-text">Fill in your details to schedule a property visit. An agent will contact you to confirm your appointment.</p>
 
     <form class="visit-form" id="visitForm">
       <!-- Full Name -->
-      <label for="fullName">Full Name</label>
-      <input type="text" id="fullName" name="fullName" required>
+      <label for="fullName">Full Name *</label>
+      <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
 
       <!-- Email -->
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+      <label for="email">Email *</label>
+      <input type="email" id="email" name="email" placeholder="your@email.com" required>
 
       <!-- Phone -->
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
+      <label for="phone">Phone Number *</label>
+      <input type="tel" id="phone" name="phone" placeholder="254712345678" required>
 
       <!-- Date -->
-      <label for="date">Preferred Date</label>
+      <label for="date">Preferred Date *</label>
       <input type="date" id="date" name="date" required>
 
       <!-- Time -->
-      <label for="time">Preferred Time</label>
+      <label for="time">Preferred Time *</label>
       <input type="time" id="time" name="time" required>
 
       <!-- Notes -->
@@ -40,18 +71,128 @@
       <textarea id="notes" name="notes" rows="4" placeholder="Any special requests or questions?"></textarea>
 
       <!-- Submit -->
-      <button type="submit" class="btn submit">Submit Request</button>
+      <button type="submit" class="btn submit">
+        <i class="fas fa-calendar-check"></i> Submit Request
+      </button>
     </form>
-
-    <!-- Success Message -->
-    <div id="successMessage" class="success-message">Your visit request has been submitted!</div>
   </main>
 
-  <!-- Footer placeholder -->
-  <div id="footer-placeholder"></div>
+  <!-- Payment Modal -->
+  <div id="paymentModal">
+    <div class="payment-modal-content">
+      <div class="payment-header">
+        <h2><i class="fas fa-credit-card"></i> Payment Required</h2>
+        <p>Complete payment to confirm your booking</p>
+      </div>
 
-  <!-- Inject header and footer -->
-  <script src="inject.js"></script>
+      <div class="payment-details">
+        <div class="payment-item">
+          <span class="payment-label">Property:</span>
+          <span class="payment-value" id="propertyName">Loading...</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Visit Date:</span>
+          <span class="payment-value" id="visitDate">-</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Visit Time:</span>
+          <span class="payment-value" id="visitTime">-</span>
+        </div>
+        <div class="payment-item">
+          <span class="payment-label">Viewing Fee:</span>
+          <span class="payment-value payment-total">Ksh <span id="viewingFee">1,500</span></span>
+        </div>
+      </div>
+
+      <div class="mpesa-info">
+        <i class="fas fa-mobile-alt"></i>
+        <p>Pay via <strong>M-Pesa STK Push</strong></p>
+        <p>Enter your M-Pesa phone number below</p>
+      </div>
+
+      <div class="phone-input-group">
+        <label for="mpesaPhone"><i class="fas fa-phone"></i> M-Pesa Phone Number</label>
+        <input type="tel" id="mpesaPhone" placeholder="254712345678" maxlength="12" required>
+      </div>
+
+      <div class="payment-buttons">
+        <button class="btn-pay" id="payBtn">
+          <i class="fas fa-check-circle"></i> Pay Now
+        </button>
+        <button class="btn-cancel" id="cancelPayBtn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+
+      <div class="payment-status" id="paymentStatus"></div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="successModal">
+    <div class="success-modal-content">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2>Booking Successful!</h2>
+      <p>Your visit has been confirmed. You will receive an SMS confirmation shortly. An agent will contact you to finalize the details.</p>
+      <p><strong>Reference:</strong> <span id="bookingReference">BK123456</span></p>
+      <a href="index.html" class="btn-home">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-wrapper">
+      <div class="footer-container">
+        <div class="footer-left">
+          <img src="logo.png" alt="HomeLoop Logo" class="footer-logo">
+          <p>Find your dream home with verified listings and trusted agents.</p>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Listings</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#"><i class="fas fa-phone"></i> Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p><i class="fas fa-envelope"></i> Email: info@homeloop.com</p>
+          <p><i class="fas fa-phone"></i> Phone: +254 792 508 999</p>
+          <p><i class="fas fa-map-marker-alt"></i> Address: Nairobi, Kenya</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
   <script src="bookvisit.js"></script>
 </body>
 </html>

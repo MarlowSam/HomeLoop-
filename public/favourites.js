@@ -1,12 +1,10 @@
 // favourites.js - Complete Favorites System with Chat Integration
+// UPDATED FOR LOCAL AND PRODUCTION
 
 document.addEventListener('DOMContentLoaded', async function() {
   await loadFavouritesAndInquiries();
 });
-
-// ============================================
 // LOAD FAVORITES + INQUIRIES WITH REPLY STATUS
-// ============================================
 async function loadFavouritesAndInquiries() {
   const container = document.getElementById('favouritesContainer');
   
@@ -15,7 +13,7 @@ async function loadFavouritesAndInquiries() {
   container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 2rem; color: #ccc;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>Loading your favourites...</p>';
   
   try {
-    const convResponse = await fetch('/api/chat/conversations', {
+    const convResponse = await fetch(`${API_BASE_URL}/api/chat/conversations`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -75,16 +73,13 @@ async function loadFavouritesAndInquiries() {
     container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #ff4d4d; padding: 2rem;">Error loading favorites. Please refresh the page.</p>';
   }
 }
-
-// ============================================
 // GET INQUIRED PROPERTIES WITH FULL DETAILS
-// ============================================
 async function getInquiredPropertiesDetails(conversations) {
   const properties = [];
   
   for (const conv of conversations) {
     try {
-      const propResponse = await fetch(`/api/properties/${conv.property_id}`, {
+      const propResponse = await fetch(`${API_BASE_URL}/api/properties/${conv.property_id}`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -93,7 +88,7 @@ async function getInquiredPropertiesDetails(conversations) {
         const propData = await propResponse.json();
         const property = propData.property;
         
-        const messagesResponse = await fetch(`/api/chat/conversations/${conv.conversation_id}/messages`, {
+        const messagesResponse = await fetch(`${API_BASE_URL}/api/chat/conversations/${conv.conversation_id}/messages`, {
           method: 'GET',
           credentials: 'include'
         });
@@ -113,7 +108,7 @@ async function getInquiredPropertiesDetails(conversations) {
           type: property.property_type || 'Property',
           price: `Ksh ${Number(property.price).toLocaleString('en-KE')}`,
           img: property.images && property.images.length > 0 
-            ? `/uploads${property.images[0].replace('/uploads', '')}`
+            ? `${API_BASE_URL}${property.images[0]}`
             : null,
           hasInquiry: true,
           hasUnread: conv.unread_count > 0,
@@ -146,7 +141,7 @@ function createPropertyCard(property) {
   
   const imageUrl = property.img || 
     (property.images && property.images.length > 0 
-      ? `/uploads${property.images[0].replace('/uploads', '')}`
+      ? `${API_BASE_URL}${property.images[0]}`
       : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60');
   
   let statusHtml = '';
@@ -214,7 +209,7 @@ async function addToFavourites(property) {
       price: property.price,
       units_available: property.units_available || 1,
       img: property.img || (property.images && property.images.length > 0 
-        ? `/uploads${property.images[0].replace('/uploads', '')}`
+        ? `${API_BASE_URL}${property.images[0]}`
         : null)
     });
     localStorage.setItem('favourites', JSON.stringify(favourites));

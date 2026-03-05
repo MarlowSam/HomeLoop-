@@ -90,13 +90,24 @@ router.put("/profile", verifyToken, requireAgent, profileUpload.single('profile_
 
     await db.promise().query(query, params);
 
-    res.json({ 
+    // CRITICAL: Set proper headers to prevent navigation
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    res.status(200).json({ 
+      success: true,
       message: "Profile updated successfully",
       profile_picture: req.file ? `/uploads/profiles/${req.file.filename}` : null
     });
   } catch (err) {
     console.error("❌ Error updating agent profile:", err);
-    res.status(500).json({ message: "Error updating profile", error: err.message });
+    res.status(500).json({ 
+      success: false,
+      message: "Error updating profile", 
+      error: err.message 
+    });
   }
 });
 

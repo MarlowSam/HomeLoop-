@@ -1,3 +1,5 @@
+// signup.js - UPDATED FOR LOCAL AND PRODUCTION
+
 document.addEventListener('DOMContentLoaded', function() {
   const signupForm = document.querySelector('.signup-form'); // Changed from .signup
   const agentCheckbox = document.querySelector('input[name="is_agent"]');
@@ -135,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Attempting to connect to backend...');
         console.log('Request body:', requestBody);
         
-        const response = await fetch('/api/auth/signup', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

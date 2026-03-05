@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listings - HomeLoop</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="listings-page">
+   <header class="header">
+    <div class="logo-container">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
+    </div>
+
+    <div class="search-container">
+      <input type="text" placeholder="Search house Listing" id="searchInput">
+      <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+
+    <nav class="nav-links">
+      <div class="dropdown">
+        <a href="#"><i class="fa-solid fa-user"></i> <span>Account</span></a>
+        <div class="dropdown-content">
+          <a href="login.html">Log In</a>
+          <a href="signup.html">Sign Up</a>
+        </div>
+      </div>
+
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i> <span>Help</span></a>
+      
+      <a href="favourites.html" class="favourites">
+        <i class="fa-solid fa-heart"></i> <span>Favourites</span>
+        <span class="favourites-badge" style="display: none;">0 Replies</span>
+      </a>
+    </nav>
+ </header>
+
+<!-- Back Navigation -->
+<div class="featured-header">
+  <h2>
+    <a href="index.html" style="color: #ff9900; text-decoration: none; margin-right: 10px;">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <span id="sectionTitle">Featured Listings</span>
+  </h2>
+</div>
+
+<!-- Sticky Collapsible Filter Section -->
+<section class="filter-section">
+  <div class="filter-container">
+    <div class="filter-header">
+      <h3 onclick="toggleFilterMobile()"><i class="fa-solid fa-filter"></i> Filter Properties</h3>
+      <button class="filter-toggle" id="filterToggle" onclick="toggleFilterMobile()">
+        <span id="toggleText">Show Filters</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <button class="reset-filters" id="resetFilters">
+        <i class="fa-solid fa-rotate-right"></i> Reset
+      </button>
+    </div>
+    
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label><i class="fa-solid fa-location-dot"></i> Location</label>
+        <input 
+          type="text" 
+          id="locationFilter" 
+          class="filter-input" 
+          placeholder="e.g., Kilimani, Nairobi"
+        >
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fa-solid fa-house"></i> Property Type</label>
+        <select id="typeFilter" class="filter-select">
+          <option value="">All Types</option>
+          <option value="Apartment">Apartment</option>
+          <option value="Villa">Villa</option>
+          <option value="Condo">Condo</option>
+          <option value="Studio">Studio</option>
+          <option value="Townhouse">Townhouse</option>
+          <option value="Penthouse">Penthouse</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fa-solid fa-money-bill-wave"></i> Price Range</label>
+        <select id="priceFilter" class="filter-select">
+          <option value="">Any Price</option>
+          <option value="0-20000">Under Ksh 20,000</option>
+          <option value="20000-35000">Ksh 20,000 - 35,000</option>
+          <option value="35000-50000">Ksh 35,000 - 50,000</option>
+          <option value="50000-70000">Ksh 50,000 - 70,000</option>
+          <option value="70000-100000">Ksh 70,000 - 100,000</option>
+          <option value="100000-999999999">Above Ksh 100,000</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fa-solid fa-bed"></i> Bedrooms</label>
+        <select id="bedroomsFilter" class="filter-select">
+          <option value="">Any</option>
+          <option value="1">1 Bed</option>
+          <option value="2">2 Beds</option>
+          <option value="3">3 Beds</option>
+          <option value="4">4+ Beds</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label><i class="fa-solid fa-bath"></i> Bathrooms</label>
+        <select id="bathroomsFilter" class="filter-select">
+          <option value="">Any</option>
+          <option value="1">1 Bath</option>
+          <option value="2">2 Baths</option>
+          <option value="3">3+ Baths</option>
+        </select>
+      </div>
+
+      <div class="filter-group filter-action">
+        <button class="apply-filters" id="applyFilters">
+          <i class="fa-solid fa-check"></i> Apply Filters
+        </button>
+      </div>
+    </div>
+
+    <div class="active-filters" id="activeFilters">
+      <span class="active-filters-label">Active Filters:</span>
+      <div class="filter-tags" id="filterTags"></div>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+</section>
+
+<!-- Listings Grid (5 columns on desktop, 2 on mobile) -->
+<div class="listings-grid" id="listingsGrid">
+  <!-- Cards will be loaded by JavaScript -->
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+  <a href="#" class="pagination-btn" id="prevBtn">
+    <i class="fa-solid fa-arrow-left"></i> Previous
+  </a>
+  <span class="page-info" id="pageInfo">1/20</span>
+  <a href="#" class="pagination-btn" id="nextBtn">
+    Next <i class="fa-solid fa-arrow-right"></i>
+  </a>
+</div>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+      <p>Find your dream home with verified listings and trusted agents.</p>
+    </div>
+    
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="listings.html">Listings</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="help.html#support">Contact Us</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-links">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="FAQS.html">FAQs</a></li>
+        <li><a href="help.html">Help</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-contact">
+      <h4>Contact</h4>
+      <p>Email: info@homeloop.com</p>
+      <p>Phone: +254 792 508 999</p>
+      <p>Address: Nairobi, Kenya</p>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="config.js"></script>
+<script src="indexlistings.js"></script>
+</body>
+</html>

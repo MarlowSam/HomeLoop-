@@ -1,4 +1,3 @@
-// Privacy policy.js - Privacy Policy Page Functionality
 
 document.addEventListener('DOMContentLoaded', function() {
   // Check login status and update dropdown
@@ -19,8 +18,7 @@ async function checkLoginStatus() {
   if (!dropdownContent) return;
 
   try {
-    const response = await fetch('/api/
-auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -40,8 +38,7 @@ auth/me', {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/
-auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -75,8 +72,7 @@ auth/logout', {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/
-auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -110,8 +106,7 @@ auth/logout', {
       logoutLink.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-          await fetch('/api/
-auth/logout', {
+          await fetch(`${API_BASE_URL}/api/auth/logout`, {
             method: 'POST',
             credentials: 'include'
           });

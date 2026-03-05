@@ -1,6 +1,6 @@
 /* ========================================
-   HOUSE DETAILS PAGE - REDESIGNED
-   Mobile-friendly, professional, modern
+   HOUSE DETAILS PAGE - COMPLETE CSS
+   With Bundle Tag & Simplified Property Type Badges
    ======================================== */
 
 * {
@@ -15,6 +15,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ========== HEADER ========== */
@@ -24,7 +25,7 @@ body {
   left: 0;
   width: 100%;
   min-height: 70px;
-  padding: 0 25px;
+  padding: 10px 25px;
   background: rgba(59, 0, 71, 0.95);
   backdrop-filter: blur(10px);
   display: flex;
@@ -33,15 +34,17 @@ body {
   box-shadow: 0 4px 20px rgba(255, 77, 210, 0.3);
   z-index: 1000;
   border-bottom: 2px solid rgba(255, 77, 210, 0.2);
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 10px 0;
+  padding: 0;
   flex-shrink: 0;
+  order: 1;
 }
 
 .logo {
@@ -70,10 +73,12 @@ body {
 }
 
 .search-container {
-  flex: 1;
-  max-width: 500px;
-  margin: 0 25px;
+  flex: 1 1 100%;
+  max-width: 100%;
+  margin: 0;
   display: flex;
+  order: 4;
+  width: 100%;
 }
 
 .search-container input {
@@ -118,6 +123,8 @@ body {
   gap: 20px;
   align-items: center;
   flex-wrap: nowrap;
+  order: 2;
+  margin-left: auto;
 }
 
 .nav-links a {
@@ -140,6 +147,24 @@ body {
   transform: translateY(-2px);
 }
 
+/* Hide text labels on smaller screens, keep only icons */
+@media (max-width: 1024px) {
+  .nav-links a {
+    font-size: 1.2rem;
+    padding: 8px;
+  }
+  
+  .nav-links a i {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+  
+  /* Hide all nav text labels */
+  .nav-links .nav-text {
+    display: none;
+  }
+}
+
 .favourites {
   color: #ff9900 !important;
 }
@@ -147,6 +172,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
+  z-index: 10000;
 }
 
 .dropdown > a {
@@ -160,9 +186,9 @@ body {
   top: calc(100% + 8px);
   right: 0;
   background: #3b0047;
-  min-width: 180px;
+  min-width: 140px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+  z-index: 10001;
   border-radius: 12px;
   border: 1px solid rgba(255, 77, 210, 0.3);
   overflow: hidden;
@@ -171,25 +197,25 @@ body {
 
 .dropdown-content a {
   color: white;
-  padding: 12px 18px;
+  padding: 10px 16px;
   text-decoration: none;
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
   white-space: nowrap;
 }
 
 .dropdown-content a:hover {
   background: rgba(255, 77, 210, 0.2);
-  padding-left: 22px;
+  padding-left: 20px;
 }
 
-.dropdown:hover .dropdown-content,
-.dropdown .dropdown-content:hover {
+.dropdown:hover .dropdown-content {
   visibility: visible;
   opacity: 1;
 }
 
+/* Ensure dropdown stays visible when hovering over it */
 .dropdown-content:hover {
   visibility: visible;
   opacity: 1;
@@ -268,17 +294,39 @@ body {
   display: inline-block;
 }
 
-/* ========== ACTION BUTTONS ========== */
+/* ========== VIEWING FEE ========== */
+.viewing-fee {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  display: inline-block;
+}
+
+/* ========== ACTION BUTTONS - FIXED FOR MOBILE ========== */
+.actions-container {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 77, 210, 0.2);
+  width: 100%;
+  overflow: hidden;
+}
+
 .actions {
   display: flex;
   gap: 10px;
   flex-wrap: nowrap;
   align-items: center;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 77, 210, 0.2);
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 5px;
+}
+
+.actions::-webkit-scrollbar {
+  display: none;
 }
 
 .btn {
@@ -350,6 +398,7 @@ body {
   margin-left: 8px;
   display: none;
   animation: fadeIn 0.3s ease;
+  flex-shrink: 0;
 }
 
 @keyframes fadeIn {
@@ -651,6 +700,7 @@ body {
   padding: 8px 0 15px 0;
   scrollbar-width: thin;
   scrollbar-color: #ff4dd2 #2e0033;
+  -webkit-overflow-scrolling: touch;
 }
 
 .more-properties .house-cards::-webkit-scrollbar {
@@ -684,6 +734,7 @@ body {
   overflow: hidden;
   border: 1px solid rgba(255, 77, 210, 0.2);
   flex-shrink: 0;
+  position: relative;
 }
 
 .card:hover {
@@ -731,10 +782,6 @@ body {
   font-size: 0.9rem;
 }
 
-.card .location::before {
-  font-size: 0.85rem;
-}
-
 .card .type {
   color: #aaa;
   font-size: 0.85rem;
@@ -755,7 +802,78 @@ body {
   display: inline-block;
 }
 
-/* ========== CHAT POPUP - SIDE POPUP MIDDLE RIGHT ========== */
+/* ========================================
+   BUNDLE TAG & PROPERTY TYPE BADGES
+   ======================================== */
+
+/* Property Type Text (Airbnb = Blue, Commercial = Green) - Simple colored text */
+.property-type-badge {
+  display: inline-block;
+  padding: 0;
+  margin: 3px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.airbnb-badge {
+  color: #29B6F6;
+}
+
+.commercial-badge {
+  color: #4CAF50;
+}
+
+/* Bundle Gift Tag (Top-left corner on cards) */
+.bundle-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(255, 165, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-left: 4px solid #FF8C00;
+}
+
+.bundle-tag::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 4px;
+  border-color: transparent transparent #FF8C00 transparent;
+  transform: translateY(-8px);
+}
+
+.bundle-tag i {
+  font-size: 0.9rem;
+  animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ========== CHAT POPUP - RESPONSIVE ========== */
 .chat-popup {
   display: none;
   flex-direction: column;
@@ -763,9 +881,9 @@ body {
   top: 50%;
   transform: translateY(-50%);
   right: 20px;
-  width: 340px;
+  width: 380px;
   max-width: calc(100vw - 40px);
-  height: 450px;
+  height: 500px;
   max-height: 80vh;
   background: #3b0047;
   border-radius: 18px;
@@ -778,22 +896,23 @@ body {
 .chat-header {
   background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
   color: white;
-  padding: 12px 18px;
+  padding: 14px 18px;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.05rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .chat-header button {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   color: white;
   cursor: pointer;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -814,7 +933,7 @@ body {
 }
 
 .chat-body::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .chat-body::-webkit-scrollbar-thumb {
@@ -858,11 +977,12 @@ body {
   background: #3b0047;
   border-top: 1px solid rgba(255, 77, 210, 0.2);
   gap: 8px;
+  flex-shrink: 0;
 }
 
 #chatInput {
   flex: 1;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 20px;
   border: 2px solid rgba(255, 77, 210, 0.3);
   background: #2e0033;
@@ -883,12 +1003,12 @@ body {
   background: linear-gradient(135deg, #ff4dd2, #ff9900);
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 #sendMessage:hover {
@@ -896,14 +1016,14 @@ body {
   box-shadow: 0 3px 12px rgba(255, 77, 210, 0.4);
 }
 
-/* ========== REVIEW MODAL - SIDE POPUP MIDDLE RIGHT ========== */
+/* ========== REVIEW MODAL ========== */
 #reviewModal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(26, 0, 31, 0.8);
+  background: rgba(26, 0, 31, 0.85);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -914,12 +1034,12 @@ body {
 
 .review-modal-content {
   background: #3b0047;
-  padding: 25px;
+  padding: 28px;
   border-radius: 18px 0 0 18px;
-  width: 380px;
-  max-width: 85vw;
-  height: 450px;
-  max-height: 80vh;
+  width: 420px;
+  max-width: 90vw;
+  height: 500px;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: -8px 0 35px rgba(255, 77, 210, 0.4);
   border: 2px solid rgba(255, 77, 210, 0.3);
@@ -928,12 +1048,8 @@ body {
 }
 
 @keyframes slideInFromRight {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 .review-modal-content::-webkit-scrollbar {
@@ -949,26 +1065,26 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
   border-bottom: 2px solid rgba(255, 77, 210, 0.3);
 }
 
 .review-modal-header h2 {
   margin: 0;
   color: #ff4dd2;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
 }
 
 .review-modal-close {
   background: rgba(255, 77, 210, 0.2);
   border: none;
-  font-size: 24px;
+  font-size: 26px;
   cursor: pointer;
   color: #ff4dd2;
   padding: 0;
-  width: 35px;
-  height: 35px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -983,15 +1099,15 @@ body {
 }
 
 .star-rating {
-  font-size: 28px;
+  font-size: 30px;
   cursor: pointer;
-  padding: 10px 0;
+  padding: 12px 0;
   text-align: center;
 }
 
 .star-rating span {
   cursor: pointer;
-  margin-right: 8px;
+  margin-right: 10px;
   transition: all 0.2s;
   color: #666;
 }
@@ -1006,18 +1122,18 @@ body {
   margin-bottom: 10px;
   font-weight: 600;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
 }
 
 #reviewForm textarea {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: 2px solid rgba(255, 77, 210, 0.3);
   border-radius: 10px;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   resize: vertical;
-  min-height: 100px;
+  min-height: 110px;
   background: #2e0033;
   color: #fff;
   transition: all 0.3s;
@@ -1035,15 +1151,15 @@ body {
 
 #reviewForm button[type="submit"] {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
   color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 600;
-  margin-top: 14px;
+  margin-top: 16px;
   transition: all 0.3s ease;
   box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
 }
@@ -1053,45 +1169,19 @@ body {
   box-shadow: 0 5px 22px rgba(255, 77, 210, 0.5);
 }
 
-/* ========== THANK YOU ALERT - STYLED ========== */
-.swal2-popup {
-  background: #3b0047 !important;
-  border: 2px solid rgba(255, 77, 210, 0.3) !important;
-  border-radius: 18px !important;
-  color: white !important;
-}
-
-.swal2-title {
-  color: #ff4dd2 !important;
-  font-size: 1.6rem !important;
-}
-
-.swal2-html-container {
-  color: #e0e0e0 !important;
-  font-size: 1rem !important;
-}
-
-.swal2-confirm {
-  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%) !important;
-  border: none !important;
-  border-radius: 10px !important;
-  padding: 10px 30px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3) !important;
-}
-
-.swal2-confirm:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 5px 22px rgba(255, 77, 210, 0.5) !important;
-}
-
-/* ========== FOOTER ========== */
+/* ========== FOOTER - 2x2 GRID ON MOBILE ========== */
 .footer {
   background: #000;
   color: white;
-  padding: 35px 20px 20px;
+  padding: 35px 0 20px;
   margin-top: 40px;
   border-top: 2px solid rgba(255, 77, 210, 0.3);
+  overflow-x: hidden;
+}
+
+.footer-wrapper {
+  width: 100%;
+  overflow: hidden;
 }
 
 .footer-container {
@@ -1101,6 +1191,7 @@ body {
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto 25px;
+  padding: 0 20px;
 }
 
 .footer-left {
@@ -1196,46 +1287,73 @@ body {
   text-align: center;
   border-top: 1px solid #333;
   margin-top: 20px;
-  padding-top: 15px;
+  padding: 15px 20px 0;
   font-size: 0.85rem;
   color: #888;
+  width: 100%;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1024px) {
+  .chat-popup {
+    width: 360px;
+    height: 480px;
+  }
+  
+  .review-modal-content {
+    width: 380px;
+  }
+}
+
 @media (max-width: 768px) {
   .header {
-    min-height: auto;
     padding: 10px 15px;
-    flex-wrap: wrap;
   }
 
+  .logo-container {
+    order: 1;
+  }
+  
   .logo-container::before {
     font-size: 1.5rem;
   }
 
-  .search-container {
-    order: 3;
-    width: 100%;
-    margin: 10px 0 0 0;
-    max-width: 100%;
-  }
-
   .nav-links {
-    gap: 10px;
-    font-size: 0.85rem;
+    order: 2;
+    gap: 15px;
+    font-size: 1.15rem;
+    margin-left: auto;
   }
 
   .nav-links a {
-    padding: 6px 8px;
+    padding: 8px;
+    font-size: 1.15rem;
+  }
+  
+  .nav-links a i {
+    font-size: 1.15rem;
+  }
+  
+  /* Hide text, show only icons and badge */
+  .nav-links .nav-text {
+    display: none !important;
+  }
+  
+  .search-container {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
   }
 
   .house-details-container {
     padding: 0 15px;
-    margin: 90px auto 15px;
+    margin: 140px auto 15px;
   }
 
   .hero-image {
-    height: 250px;
+    height: 280px;
     border-radius: 12px;
   }
 
@@ -1247,28 +1365,15 @@ body {
   }
 
   .house-details .location {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
   }
 
   .house-details .price {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 
-  /* Keep buttons horizontal */
-  .actions {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 10px;
-  }
-
-  .btn,
-  .favourite {
-    flex-shrink: 0;
-    font-size: 0.8rem;
-    padding: 8px 14px;
+  .viewing-fee {
+    font-size: 0.85rem;
   }
 
   .gallery {
@@ -1285,75 +1390,68 @@ body {
     align-items: flex-start;
   }
 
-  .agent-profile-card {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .agent-profile-photo {
-    width: 50px;
-    height: 50px;
-  }
-
   .card {
-    min-width: 180px;
-    max-width: 180px;
+    min-width: 190px;
+    max-width: 190px;
   }
 
-  .card-image {
-    height: 120px;
+  .bundle-tag {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .bundle-tag i {
+    font-size: 0.75rem;
+  }
+  
+  .property-type-badge {
+    font-size: 0.7rem;
   }
 
-  /* Chat popup mobile - side popup */
+  /* Chat popup - Full screen on mobile */
   .chat-popup {
-    width: 300px;
-    max-width: 85vw;
-    height: 450px;
-    bottom: 10px;
-    right: 10px;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    top: 0;
+    right: 0;
+    transform: none;
+    border-radius: 0;
   }
 
-  /* Review modal mobile - side popup */
+  /* Review modal - Full screen on mobile */
   #reviewModal {
-    align-items: flex-start;
-    justify-content: flex-end;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   .review-modal-content {
-    width: 320px;
-    max-width: 85vw;
-    border-radius: 18px 0 0 18px;
+    width: 100vw;
+    max-width: 100vw;
     height: 100vh;
-  }
-
-  .review-modal-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .star-rating {
-    font-size: 24px;
-  }
-
-  #reviewForm textarea {
-    min-height: 80px;
-    font-size: 0.85rem;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
   }
 
   .footer-container {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
-    font-size: 0.85rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 20px;
   }
-
+  
   .footer-left,
   .footer-links,
   .footer-contact {
-    flex: 1 1 auto;
+    /* Each takes one grid cell in 2x2 layout */
   }
-
-  .footer-left::before {
-    font-size: 1.3rem;
+  
+  .footer-bottom {
+    grid-column: 1 / -1;
   }
 }
 
@@ -1363,33 +1461,41 @@ body {
   }
 
   .nav-links {
-    gap: 8px;
+    gap: 12px;
   }
-
-  .nav-links a span {
-    display: none;
+  
+  .nav-links a {
+    font-size: 1.1rem;
   }
-
-  .house-details-container {
-    margin: 110px auto 15px;
-  }
-
-  .hero-image {
-    height: 220px;
-  }
-
-  .house-details .location {
+  
+  .nav-links a i {
     font-size: 1.1rem;
   }
 
+  .house-details-container {
+    margin: 140px auto 15px;
+  }
+
+  .hero-image {
+    height: 240px;
+  }
+
+  .house-details .location {
+    font-size: 1.15rem;
+  }
+
   .house-details .price {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+  }
+
+  .viewing-fee {
+    font-size: 0.8rem;
   }
 
   .btn,
   .favourite {
-    font-size: 0.75rem;
-    padding: 7px 12px;
+    font-size: 0.82rem;
+    padding: 8px 14px;
   }
 
   .house-description h2,
@@ -1403,83 +1509,63 @@ body {
   }
 
   .card {
-    min-width: 160px;
-    max-width: 160px;
+    min-width: 170px;
+    max-width: 170px;
   }
 
-  .chat-popup {
-    height: 350px;
-    width: 280px;
+  .property-type-badge {
+    font-size: 0.68rem;
   }
 
   .review-modal-content {
-    width: 280px;
-    height: 350px;
-    padding: 20px;
+    padding: 22px;
+  }
+  
+  .star-rating {
+    font-size: 26px;
+  }
+  
+  /* Footer stays 2x2 even on very small screens */
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.85rem;
+  }
+  
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+  
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+  
+  .footer-contact p,
+  .footer-links ul li a {
+    font-size: 0.8rem;
   }
 }
-/* ========== CUSTOM ALERT POPUP ========== */
-.custom-alert-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(26, 0, 31, 0.85);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  animation: fadeIn 0.2s ease;
-}
 
-.custom-alert-box {
-  background: #3b0047;
-  padding: 30px 35px;
-  border-radius: 15px;
-  border: 2px solid rgba(255, 77, 210, 0.3);
-  box-shadow: 0 8px 30px rgba(255, 77, 210, 0.4);
-  max-width: 400px;
-  width: 90%;
-  text-align: center;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
+/* ========== ANIMATIONS ========== */
+@keyframes slideInRight {
   from {
+    transform: translateX(400px);
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
+    transform: translateX(0);
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-.custom-alert-box p {
-  color: #e0e0e0;
-  font-size: 1rem;
-  margin: 0 0 20px 0;
-  line-height: 1.5;
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
 }
-
-.custom-alert-btn {
-  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
-  color: white;
-  border: none;
-  padding: 10px 30px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
-}
-
-.custom-alert-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(255, 77, 210, 0.5);
-}
-
-/* ========== THANK YOU ALERT - STYLED ========== */

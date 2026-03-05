@@ -6,7 +6,8 @@
   <title>Agent Dashboard</title>
   <link rel="stylesheet" href="agentdashboard.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <link rel="stylesheet" href="dashboardpopups.css">
+  <link rel="stylesheet" href="balance-FIXED.css">
 </head>
 <body>
   <!-- Mobile Header -->
@@ -26,6 +27,7 @@
   <ul>
     <li><a href="#" class="active" data-target="overview">Overview</a></li>
     <li><a href="#" data-target="bookings">Bookings</a></li>
+    <li><a href="#" data-target="balance"><i class="fas fa-wallet"></i> Balance</a></li>
     <li>
       <a href="#" data-target="listings" style="display: flex; align-items: center; justify-content: space-between;">
         <span>Listings</span>
@@ -65,7 +67,7 @@
         </div>
       </section>
 
-      <!-- Replace ONLY the Bookings section in agentdashboard.html -->
+      <!-- Bookings Section -->
 <section id="bookings">
   <h1>Bookings</h1>
   <p>View and manage all property bookings and appointments.</p>
@@ -93,7 +95,6 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Bookings will be loaded here dynamically -->
         <tr>
           <td colspan="6" style="text-align: center; padding: 2rem;">
             Loading bookings...
@@ -103,15 +104,148 @@
     </table>
   </div>
 </section>
+
+      <!-- Balance Section -->
+      <section id="balance">
+        <h1><i class="fas fa-wallet"></i> My Balance</h1>
+        <p>Manage your earnings and withdraw funds to M-Pesa.</p>
+
+        <!-- Earnings Overview -->
+        <div class="earnings-overview">
+          <div class="earnings-card available">
+            <div class="earnings-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="earnings-info">
+              <p class="earnings-label">Available to Withdraw</p>
+              <h2 class="earnings-amount" id="availableBalance">Ksh 0</h2>
+              <small>Ready for withdrawal</small>
+            </div>
+          </div>
+
+          <div class="earnings-card pending">
+            <div class="earnings-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="earnings-info">
+              <p class="earnings-label">Pending Balance</p>
+              <h2 class="earnings-amount" id="pendingBalance">Ksh 0</h2>
+              <small>Awaiting visit confirmation</small>
+            </div>
+          </div>
+
+          <div class="earnings-card total">
+            <div class="earnings-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="earnings-info">
+              <p class="earnings-label">Total Earned</p>
+              <h2 class="earnings-amount" id="lifetimeEarnings">Ksh 0</h2>
+              <small>All-time earnings</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Withdrawal Form -->
+        <div class="withdrawal-section">
+          <h2><i class="fas fa-mobile-alt"></i> Withdraw to M-Pesa</h2>
+          
+          <div class="withdrawal-form-container">
+            <form id="withdrawalForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="withdrawAmount">
+                    <i class="fas fa-coins"></i> Amount (Ksh)
+                  </label>
+                  <input 
+                    type="number" 
+                    id="withdrawAmount" 
+                    min="1000" 
+                    step="1" 
+                    placeholder="Enter amount (Min: Ksh 1,000)" 
+                    required>
+                  <small id="withdrawFee">Transaction fee: ~Ksh 0</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="mpesaNumber">
+                    <i class="fas fa-phone"></i> M-Pesa Phone Number
+                  </label>
+                  <input 
+                    type="tel" 
+                    id="mpesaNumber" 
+                    placeholder="254712345678" 
+                    pattern="254[0-9]{9}"
+                    maxlength="12"
+                    required>
+                  <small>Format: 254XXXXXXXXX</small>
+                </div>
+              </div>
+
+              <div class="withdrawal-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                  <p><strong>Please note:</strong></p>
+                  <ul>
+                    <li>Minimum withdrawal: Ksh 1,000</li>
+                    <li>Processing time: Instant to 5 minutes</li>
+                    <li>M-Pesa transaction fees apply</li>
+                    <li>You can only withdraw your available balance</li>
+                  </ul>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary btn-withdraw">
+                <i class="fas fa-paper-plane"></i> Request Withdrawal
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Withdrawal History -->
+        <div class="withdrawal-history">
+          <div class="section-header">
+            <h2><i class="fas fa-history"></i> Withdrawal History</h2>
+            <button class="btn-secondary" onclick="loadWithdrawalHistory()">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table class="withdrawal-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>M-Pesa Number</th>
+                  <th>Status</th>
+                  <th>Transaction ID</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawalHistoryBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.6);">
+                    No withdrawal history yet
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- Listings -->
 <section id="listings">
   <h1>Listings</h1>
   <p>Manage your property listings here.</p>
 
-  <!-- Add New Listing Button -->
+  <!-- Add New Listing Buttons -->
   <div class="add-listing-section">
-    <button class="btn-primary" id="addListingBtn">
+    <button class="btn-primary listing-btn" id="addListingBtn">
       <i class="fas fa-plus"></i> Add New Listing
+    </button>
+    <button class="btn-secondary listing-btn" id="addBundleBtn">
+      <i class="fas fa-gift"></i> Add Bundle Package
     </button>
   </div>
 
@@ -134,68 +268,411 @@
         <div class="gallery-preview-container" id="galleryPreviewContainer"></div>
       </div>
 
+      <!-- Video Upload -->
+      <div class="form-group">
+        <label for="propertyVideos">Property Videos (Up to 2 videos, max 100MB each)</label>
+        <input type="file" id="propertyVideos" accept="video/mp4,video/webm" multiple>
+        <small>Recommended: MP4 format, under 1 minute duration, max 100MB per video</small>
+        <div class="video-preview-container" id="videoPreviewContainer"></div>
+      </div>
+
       <!-- Location -->
       <div class="form-group">
         <label for="propertyLocation">Location *</label>
         <input type="text" id="propertyLocation" placeholder="e.g., Kilimani, Nairobi" required>
         <small>Include both area and city (e.g., Kilimani, Nairobi)</small>
       </div>
-            <!-- Property Type and Details -->
-            <div class="form-row">
-              <div class="form-group">
-                <label for="propertyType">Property Type *</label>
-                <select id="propertyType" required>
-                  <option value="">Select Type</option>
-                  <option value="Apartment">Apartment</option>
-                  <option value="Condo">Condo</option>
-                  <option value="Villa">Villa</option>
-                  <option value="Studio">Studio</option>
-                  <option value="House">House</option>
-                  <option value="Townhouse">Townhouse</option>
-                </select>
-              </div>
 
-              <div class="form-group">
-                <label for="bedrooms">Bedrooms *</label>
-                <input type="number" id="bedrooms" min="0" placeholder="e.g., 2" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="bathrooms">Bathrooms *</label>
-                <input type="number" id="bathrooms" min="0" placeholder="e.g., 1" required>
-              </div>
-
-              <div class="form-group">
-                <label for="propertyPrice">Monthly Rent (Ksh) *</label>
-                <input type="number" id="propertyPrice" min="0" placeholder="e.g., 35000" required>
-              </div>
-            </div>
-
-            <!-- Units Available -->
-            <div class="form-group">
-              <label for="unitsAvailable">Units Available *</label>
-              <input type="number" id="unitsAvailable" min="1" placeholder="e.g., 5" required>
-            </div>
-
-            <!-- Additional Information -->
-            <div class="form-group">
-              <label for="additionalInfo">Additional Information</label>
-              <textarea id="additionalInfo" rows="5" placeholder="Describe amenities, nearby facilities, parking, security, utilities included, etc..."></textarea>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-              <button type="submit" class="btn-primary">
-                <i class="fas fa-save"></i> Continue
-              </button>
-              <button type="button" class="btn-secondary" id="cancelListingBtn">
-                <i class="fas fa-times"></i> Cancel
-              </button>
-            </div>
-          </form>
+      <!-- Property Type and Details -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="propertyType">Property Type *</label>
+          <select id="propertyType" required>
+            <option value="">Select Type</option>
+            <option value="Apartment">Apartment</option>
+            <option value="Condo">Condo</option>
+            <option value="Villa">Villa</option>
+            <option value="Studio">Studio</option>
+            <option value="House">House</option>
+            <option value="Townhouse">Townhouse</option>
+            <option value="Airbnb">Airbnb</option>
+            <option value="Commercial">Commercial</option>
+          </select>
         </div>
+
+        <div class="form-group">
+          <label for="bedrooms">Bedrooms *</label>
+          <input type="number" id="bedrooms" min="0" placeholder="e.g., 2" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bathrooms">Bathrooms *</label>
+          <input type="number" id="bathrooms" min="0" placeholder="e.g., 1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="propertyPrice">Monthly Rent (Ksh) *</label>
+          <input type="number" id="propertyPrice" min="0" placeholder="e.g., 35000" required>
+        </div>
+      </div>
+
+      <!-- Viewing Fee and Units -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="viewingFee">Viewing Fee (Ksh) *</label>
+          <input type="number" id="viewingFee" min="0" placeholder="e.g., 500" required>
+          <small>Fee charged to users for viewing this property</small>
+        </div>
+
+        <div class="form-group">
+          <label for="unitsAvailable">Units Available *</label>
+          <input type="number" id="unitsAvailable" min="1" placeholder="e.g., 5" required>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="form-group">
+        <label for="additionalInfo">Additional Information</label>
+        <textarea id="additionalInfo" rows="5" placeholder="Describe amenities, nearby facilities, parking, security, utilities included, etc..."></textarea>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Continue
+        </button>
+        <button type="button" class="btn-secondary" id="cancelListingBtn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add Bundle Package Form (Hidden by default) -->
+  <div class="add-listing-form" id="addBundleForm" style="display: none;">
+    <h2>Add Bundle Package</h2>
+    <div class="bundle-notice">
+      <i class="fas fa-info-circle"></i>
+      <p>Bundle packages allow you to group up to 4 properties together with a single viewing fee, offering customers better value and increasing your booking potential.</p>
+    </div>
+
+    <form id="newBundleForm">
+      <!-- Bundle Viewing Fee -->
+      <div class="form-group bundle-fee-group">
+        <label for="bundleViewingFee">Bundle Viewing Fee (Ksh) *</label>
+        <input type="number" id="bundleViewingFee" min="0" placeholder="e.g., 1500" required>
+        <small>Single fee for viewing all properties in this bundle</small>
+      </div>
+
+      <!-- House 1 -->
+      <div class="bundle-house-section">
+        <h3 class="bundle-house-title">
+          <i class="fas fa-home"></i> Property 1
+        </h3>
+        
+        <div class="form-group">
+          <label for="bundle1HeroImage">Hero Image *</label>
+          <input type="file" id="bundle1HeroImage" accept="image/*" class="bundle-hero-input" required>
+          <div class="hero-preview-container" id="bundle1HeroPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle1GalleryImages">Gallery Images (Up to 3)</label>
+          <input type="file" id="bundle1GalleryImages" accept="image/*" multiple class="bundle-gallery-input">
+          <div class="gallery-preview-container" id="bundle1GalleryPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle1Videos">Videos (Up to 2, max 100MB each)</label>
+          <input type="file" id="bundle1Videos" accept="video/mp4,video/webm" multiple class="bundle-video-input">
+          <div class="video-preview-container" id="bundle1VideoPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle1Location">Location *</label>
+          <input type="text" id="bundle1Location" placeholder="e.g., Kilimani, Nairobi" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle1Type">Property Type *</label>
+            <select id="bundle1Type" required>
+              <option value="">Select Type</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Condo">Condo</option>
+              <option value="Villa">Villa</option>
+              <option value="Studio">Studio</option>
+              <option value="House">House</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle1Bedrooms">Bedrooms *</label>
+            <input type="number" id="bundle1Bedrooms" min="0" placeholder="e.g., 2" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle1Bathrooms">Bathrooms *</label>
+            <input type="number" id="bundle1Bathrooms" min="0" placeholder="e.g., 1" required>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle1Price">Monthly Rent (Ksh) *</label>
+            <input type="number" id="bundle1Price" min="0" placeholder="e.g., 35000" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle1Units">Units Available *</label>
+          <input type="number" id="bundle1Units" min="1" placeholder="e.g., 5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle1Info">Additional Information</label>
+          <textarea id="bundle1Info" rows="3" placeholder="Describe amenities, parking, security, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- House 2 -->
+      <div class="bundle-house-section">
+        <h3 class="bundle-house-title">
+          <i class="fas fa-home"></i> Property 2
+        </h3>
+        
+        <div class="form-group">
+          <label for="bundle2HeroImage">Hero Image *</label>
+          <input type="file" id="bundle2HeroImage" accept="image/*" class="bundle-hero-input" required>
+          <div class="hero-preview-container" id="bundle2HeroPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle2GalleryImages">Gallery Images (Up to 3)</label>
+          <input type="file" id="bundle2GalleryImages" accept="image/*" multiple class="bundle-gallery-input">
+          <div class="gallery-preview-container" id="bundle2GalleryPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle2Videos">Videos (Up to 2, max 100MB each)</label>
+          <input type="file" id="bundle2Videos" accept="video/mp4,video/webm" multiple class="bundle-video-input">
+          <div class="video-preview-container" id="bundle2VideoPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle2Location">Location *</label>
+          <input type="text" id="bundle2Location" placeholder="e.g., Kilimani, Nairobi" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle2Type">Property Type *</label>
+            <select id="bundle2Type" required>
+              <option value="">Select Type</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Condo">Condo</option>
+              <option value="Villa">Villa</option>
+              <option value="Studio">Studio</option>
+              <option value="House">House</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle2Bedrooms">Bedrooms *</label>
+            <input type="number" id="bundle2Bedrooms" min="0" placeholder="e.g., 2" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle2Bathrooms">Bathrooms *</label>
+            <input type="number" id="bundle2Bathrooms" min="0" placeholder="e.g., 1" required>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle2Price">Monthly Rent (Ksh) *</label>
+            <input type="number" id="bundle2Price" min="0" placeholder="e.g., 35000" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle2Units">Units Available *</label>
+          <input type="number" id="bundle2Units" min="1" placeholder="e.g., 5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle2Info">Additional Information</label>
+          <textarea id="bundle2Info" rows="3" placeholder="Describe amenities, parking, security, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- House 3 -->
+      <div class="bundle-house-section">
+        <h3 class="bundle-house-title">
+          <i class="fas fa-home"></i> Property 3 (Optional)
+        </h3>
+        
+        <div class="form-group">
+          <label for="bundle3HeroImage">Hero Image</label>
+          <input type="file" id="bundle3HeroImage" accept="image/*" class="bundle-hero-input">
+          <div class="hero-preview-container" id="bundle3HeroPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle3GalleryImages">Gallery Images (Up to 3)</label>
+          <input type="file" id="bundle3GalleryImages" accept="image/*" multiple class="bundle-gallery-input">
+          <div class="gallery-preview-container" id="bundle3GalleryPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle3Videos">Videos (Up to 2, max 100MB each)</label>
+          <input type="file" id="bundle3Videos" accept="video/mp4,video/webm" multiple class="bundle-video-input">
+          <div class="video-preview-container" id="bundle3VideoPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle3Location">Location</label>
+          <input type="text" id="bundle3Location" placeholder="e.g., Kilimani, Nairobi">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle3Type">Property Type</label>
+            <select id="bundle3Type">
+              <option value="">Select Type</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Condo">Condo</option>
+              <option value="Villa">Villa</option>
+              <option value="Studio">Studio</option>
+              <option value="House">House</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle3Bedrooms">Bedrooms</label>
+            <input type="number" id="bundle3Bedrooms" min="0" placeholder="e.g., 2">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle3Bathrooms">Bathrooms</label>
+            <input type="number" id="bundle3Bathrooms" min="0" placeholder="e.g., 1">
+          </div>
+
+          <div class="form-group">
+            <label for="bundle3Price">Monthly Rent (Ksh)</label>
+            <input type="number" id="bundle3Price" min="0" placeholder="e.g., 35000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle3Units">Units Available</label>
+          <input type="number" id="bundle3Units" min="1" placeholder="e.g., 5">
+        </div>
+
+        <div class="form-group">
+          <label for="bundle3Info">Additional Information</label>
+          <textarea id="bundle3Info" rows="3" placeholder="Describe amenities, parking, security, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- House 4 -->
+      <div class="bundle-house-section">
+        <h3 class="bundle-house-title">
+          <i class="fas fa-home"></i> Property 4 (Optional)
+        </h3>
+        
+        <div class="form-group">
+          <label for="bundle4HeroImage">Hero Image</label>
+          <input type="file" id="bundle4HeroImage" accept="image/*" class="bundle-hero-input">
+          <div class="hero-preview-container" id="bundle4HeroPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle4GalleryImages">Gallery Images (Up to 3)</label>
+          <input type="file" id="bundle4GalleryImages" accept="image/*" multiple class="bundle-gallery-input">
+          <div class="gallery-preview-container" id="bundle4GalleryPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle4Videos">Videos (Up to 2, max 100MB each)</label>
+          <input type="file" id="bundle4Videos" accept="video/mp4,video/webm" multiple class="bundle-video-input">
+          <div class="video-preview-container" id="bundle4VideoPreview"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle4Location">Location</label>
+          <input type="text" id="bundle4Location" placeholder="e.g., Kilimani, Nairobi">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle4Type">Property Type</label>
+            <select id="bundle4Type">
+              <option value="">Select Type</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Condo">Condo</option>
+              <option value="Villa">Villa</option>
+              <option value="Studio">Studio</option>
+              <option value="House">House</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bundle4Bedrooms">Bedrooms</label>
+            <input type="number" id="bundle4Bedrooms" min="0" placeholder="e.g., 2">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bundle4Bathrooms">Bathrooms</label>
+            <input type="number" id="bundle4Bathrooms" min="0" placeholder="e.g., 1">
+          </div>
+
+          <div class="form-group">
+            <label for="bundle4Price">Monthly Rent (Ksh)</label>
+            <input type="number" id="bundle4Price" min="0" placeholder="e.g., 35000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bundle4Units">Units Available</label>
+          <input type="number" id="bundle4Units" min="1" placeholder="e.g., 5">
+        </div>
+
+        <div class="form-group">
+          <label for="bundle4Info">Additional Information</label>
+          <textarea id="bundle4Info" rows="3" placeholder="Describe amenities, parking, security, etc..."></textarea>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Continue
+        </button>
+        <button type="button" class="btn-secondary" id="cancelBundleBtn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
 
         <!-- Featured Listing Modal -->
         <div class="modal-overlay" id="featuredModal" style="display: none;">
@@ -329,14 +806,14 @@
       </section>
 
       
-      <!-- Profile Editor -->
+      <!-- Profile Editor - FIXED VERSION -->
       <section id="profile">
         <h1>My Profile</h1>
         <p>Edit your profile information</p>
 
         <!-- Profile Form -->
         <div class="profile-editor">
-          <form id="profileForm">
+          <div id="profileForm">
             <!-- Profile Photo -->
             <div class="form-group photo-upload">
               <label>Profile Photo</label>
@@ -426,16 +903,16 @@
             </div>
             
 
-            <!-- Form Actions -->
+            <!-- Form Actions - FIXED BUTTON -->
             <div class="form-actions">
-              <button type="submit" class="btn-primary">
+              <button type="button" class="btn-primary" id="saveProfileBtn">
                 <i class="fas fa-save"></i> Save Profile
               </button>
               <button type="button" class="btn-secondary" id="previewBtn">
                 <i class="fas fa-eye"></i> Preview Profile
               </button>
             </div>
-          </form>
+          </div>
 
           <!-- Success Message -->
           <div id="successMessage" class="success-message" style="display: none;">
@@ -445,6 +922,7 @@
       </section>
     </div>
   </div>
+
 <!-- Inquiry Notification Popup -->
 <div id="inquiryNotificationModal" class="modal-overlay" style="display: none; z-index: 10000;">
   <div class="modal-content" style="max-width: 500px; text-align: center; padding: 2rem;">
@@ -461,6 +939,23 @@
     </button>
   </div>
 </div>
-  <script src="agentdashboard.js"></script>
+
+<!-- Load Config First -->
+<script src="config.js"></script>
+
+<!-- Load Helper Functions -->
+<script src="helpers.js"></script>
+
+<!-- Load Feature Modules -->
+<script src="overview.js"></script>
+<script src="dashboardbookings.js"></script>
+<script src="chatdashboard.js"></script>
+<script src="listings.js"></script>
+<script src="profile.js"></script>
+<script src="balance.js"></script>
+
+<!-- Load Main Last -->
+<script src="main.js"></script>
+
 </body>
 </html>

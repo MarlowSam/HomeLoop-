@@ -1,4 +1,6 @@
 // house.js - Property Details Page with Chat Integration & Reviews
+// UPDATED FOR LOCAL AND PRODUCTION - FIXED AGENT PROFILE LINK
+
 
 let currentPropertyData = null;
 
@@ -45,7 +47,7 @@ async function checkLoginStatus() {
   if (!dropdownContent) return;
 
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -65,7 +67,7 @@ async function checkLoginStatus() {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -99,7 +101,7 @@ async function checkLoginStatus() {
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
           try {
-            await fetch('/api/auth/logout', {
+            await fetch(`${API_BASE_URL}/api/auth/logout`, {
               method: 'POST',
               credentials: 'include'
             });
@@ -133,7 +135,7 @@ async function checkLoginStatus() {
       logoutLink.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
-          await fetch('/api/auth/logout', {
+          await fetch(`${API_BASE_URL}/api/auth/logout`, {
             method: 'POST',
             credentials: 'include'
           });
@@ -308,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
         units_available: currentPropertyData.units_available || 1,
         images: currentPropertyData.images,
         img: currentPropertyData.images && currentPropertyData.images.length > 0 
-          ? `http://127.0.0.1:5000${currentPropertyData.images[0]}`
+          ? `${API_BASE_URL}${currentPropertyData.images[0]}`
           : null
       };
       
@@ -342,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 async function loadPropertyDetails(propertyId) {
   try {
-    const response = await fetch(`/api/properties/${propertyId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -366,7 +368,7 @@ function displayPropertyDetails(property) {
   // Update hero image
   const heroImage = document.querySelector('.hero-image');
   if (heroImage && property.images && property.images.length > 0) {
-    heroImage.style.backgroundImage = `url('http://127.0.0.1:5000${property.images[0]}')`;
+    heroImage.style.backgroundImage = `url('${API_BASE_URL}${property.images[0]}')`;
   }
   
   // Full location (without pin emoji)
@@ -385,6 +387,15 @@ function displayPropertyDetails(property) {
   
   const unitsElement = document.querySelector('.units-left');
   if (unitsElement) unitsElement.textContent = `Only ${property.units_available} unit${property.units_available !== 1 ? 's' : ''} left`;
+  
+  // Add viewing fee if exists
+  const viewingFeeElement = document.querySelector('.viewing-fee');
+  if (viewingFeeElement && property.viewing_fee) {
+    viewingFeeElement.textContent = `Viewing Fee: Ksh ${formatPrice(property.viewing_fee)}`;
+    viewingFeeElement.style.display = 'block';
+  } else if (viewingFeeElement) {
+    viewingFeeElement.style.display = 'none';
+  }
   
   // Update description - ONLY show additional info if available
   const descriptionElement = document.querySelector('.house-description p');
@@ -405,7 +416,7 @@ function displayPropertyDetails(property) {
     const additionalImages = property.images.slice(1, 4);
     additionalImages.forEach((image, index) => {
       const img = document.createElement('img');
-      img.src = `http://127.0.0.1:5000${image}`;
+      img.src = `${API_BASE_URL}${image}`;
       img.alt = `Property image ${index + 2}`;
       gallery.appendChild(img);
     });
@@ -436,8 +447,11 @@ function updateAgentProfileCard(property) {
   
   if (!agentProfileCard) return;
   
-  if (property.agent_user_id) {
-    agentProfileCard.href = `agent profile.html?agent_id=${property.agent_user_id}`;
+  // FIXED: Use agent profile.html with space
+  if (property.agent_user_id || property.agent_id) {
+    const agentId = property.agent_user_id || property.agent_id;
+    agentProfileCard.href = `agent profile.html?agent_id=${agentId}`;
+    console.log('Agent profile link set to:', agentProfileCard.href);
   }
   
   if (agentProfileName) {
@@ -447,7 +461,8 @@ function updateAgentProfileCard(property) {
   
   if (agentProfilePhoto) {
     if (property.agent_photo || property.agent_profile_picture) {
-      agentProfilePhoto.src = `http://127.0.0.1:5000${property.agent_photo || property.agent_profile_picture}`;
+      const photoPath = property.agent_photo || property.agent_profile_picture;
+      agentProfilePhoto.src = `${API_BASE_URL}${photoPath}`;
       agentProfilePhoto.onerror = function() {
         this.src = 'Images/default avatar.png';
       };
@@ -460,7 +475,7 @@ function updateAgentProfileCard(property) {
 // ============================================
 async function loadPropertyReviews(propertyId) {
   try {
-    const response = await fetch(`/api/reviews/${propertyId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/reviews/${propertyId}`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -681,7 +696,7 @@ async function submitReview(propertyId, bookingId) {
   }
   
   try {
-    const response = await fetch('/api/reviews', {
+    const response = await fetch(`${API_BASE_URL}/api/reviews`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -733,7 +748,7 @@ function formatReviewDate(dateString) {
 // ============================================
 async function loadSimilarProperties(propertyId) {
   try {
-    const response = await fetch(`/api/properties/similar/${propertyId}?limit=4`, {
+    const response = await fetch(`${API_BASE_URL}/api/properties/similar/${propertyId}?limit=4`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -767,21 +782,46 @@ function displaySimilarProperties(properties) {
 
 function createPropertyCard(property) {
   const card = document.createElement('a');
-  card.href = `house.html?id=${property.property_id}`;
+  
+  // ✅ FIXED: If property has a bundle_id, link to the bundle page instead
+  // This ensures all properties in a bundle show the complete bundle when clicked
+  if (property.bundle_id) {
+    card.href = `bundle.html?id=${property.bundle_id}`;
+  } else {
+    card.href = `house.html?id=${property.property_id}`;
+  }
+  
   card.className = 'card';
   
   const imageUrl = property.images && property.images.length > 0 
-    ? `http://127.0.0.1:5000${property.images[0]}`
+    ? `${API_BASE_URL}${property.images[0]}`
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
   
   const fullLocation = property.address_line1 
     ? `${property.address_line1}${property.city && !property.address_line1.includes(property.city) ? ', ' + property.city : ''}`
     : property.city || 'Location not specified';
   
+  // Show bundle tag if property is part of a bundle
+  const bundleTag = property.bundle_id ? '<div class="bundle-tag"><i class="fas fa-gift"></i> Bundle</div>' : '';
+  
+  // Determine property type badge
+  let propertyTypeBadge = '';
+  const propType = property.property_type || 'Property';
+  
+  if (propType === 'Airbnb') {
+    propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
+  } else if (propType === 'Commercial') {
+    propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
+  } else {
+    propertyTypeBadge = `<p class="type">${escapeHtml(propType)}</p>`;
+  }
+  
   card.innerHTML = `
-    <div class="card-image" style="background-image:url('${imageUrl}')"></div>
+    <div class="card-image" style="background-image:url('${imageUrl}')">
+      ${bundleTag}
+    </div>
     <p class="location"><i class="fas fa-map-marker-alt" style="color: #FFA500;"></i> ${escapeHtml(fullLocation)}</p>
-    <p class="type">${escapeHtml(property.property_type || 'Property')}</p>
+    ${propertyTypeBadge}
     <p>${property.bedrooms || 0} Bed • ${property.bathrooms || 0} Bath</p>
     <p class="price">Ksh ${formatPrice(property.price)}</p>
     <p class="units-left">Only ${property.units_available || 1} unit${property.units_available !== 1 ? 's' : ''} left</p>

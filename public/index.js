@@ -1,12 +1,10 @@
-// index.js - Complete version with filters integrated
+// index.js - Fixed filter behavior: Desktop always open, Mobile collapsible & sticky
 
-// Store all properties for filtering
 let allProperties = {
   featured: [],
   recommended: []
 };
 
-// Active filters object
 let activeFilters = {
   location: '',
   type: '',
@@ -16,40 +14,104 @@ let activeFilters = {
 };
 
 document.addEventListener('DOMContentLoaded', async function() {
-  
-  // Load featured properties
+  console.log('Page loaded, initializing...');
   await loadFeaturedProperties();
-  
-  // Load recommended properties
   await loadRecommendedProperties();
-  
-  // Check authentication
   await checkAuthentication();
-  
-  // Initialize filters
   initializeFilters();
-  
-  // Initialize search
   initializeSearch();
-  
-  // Check if there's a search query in URL
+  initializeMobileFilterToggle();
   checkURLSearchQuery();
 });
 
-// ============================================
-// INTELLIGENT SEARCH FUNCTIONALITY
-// ============================================
+// ========================================
+// MOBILE FILTER TOGGLE (Only for mobile)
+// ========================================
 
-// Initialize search functionality
+function initializeMobileFilterToggle() {
+  const toggleBtn = document.getElementById('filterToggle');
+  const filterControls = document.querySelector('.filter-controls');
+  const filterHeader = document.querySelector('.filter-header h3');
+  
+  console.log('Initializing mobile filter toggle');
+  
+  if (filterControls) {
+    // Start collapsed on mobile only
+    if (window.innerWidth <= 768) {
+      filterControls.classList.remove('expanded');
+      console.log('Mobile view - filters collapsed');
+    }
+  }
+  
+  // Add click handler to h3 title for mobile only
+  if (filterHeader) {
+    filterHeader.addEventListener('click', function() {
+      if (window.innerWidth <= 768) {
+        toggleFilterMobile();
+      }
+    });
+  }
+}
+
+window.toggleFilterMobile = function() {
+  // Only work on mobile
+  if (window.innerWidth > 768) return;
+  
+  const filterControls = document.querySelector('.filter-controls');
+  const toggleBtn = document.getElementById('filterToggle');
+  const toggleText = document.getElementById('toggleText');
+  
+  console.log('Toggle filter mobile called');
+  
+  if (filterControls && toggleBtn) {
+    const isExpanded = filterControls.classList.contains('expanded');
+    
+    if (isExpanded) {
+      filterControls.classList.remove('expanded');
+      toggleBtn.classList.remove('active');
+      if (toggleText) toggleText.textContent = 'Show Filters';
+      console.log('Collapsed filters');
+    } else {
+      filterControls.classList.add('expanded');
+      toggleBtn.classList.add('active');
+      if (toggleText) toggleText.textContent = 'Hide Filters';
+      console.log('Expanded filters');
+    }
+  }
+};
+
+function collapseFiltersOnMobile() {
+  // Only collapse on mobile
+  if (window.innerWidth > 768) return;
+  
+  const filterControls = document.querySelector('.filter-controls');
+  const toggleBtn = document.getElementById('filterToggle');
+  const toggleText = document.getElementById('toggleText');
+  
+  console.log('Collapsing filters on mobile...');
+  
+  if (filterControls) {
+    filterControls.classList.remove('expanded');
+    console.log('Mobile: Removed expanded class');
+  }
+  if (toggleBtn) {
+    toggleBtn.classList.remove('active');
+  }
+  if (toggleText) {
+    toggleText.textContent = 'Show Filters';
+  }
+}
+
+// ========================================
+// SEARCH FUNCTIONALITY
+// ========================================
+
 function initializeSearch() {
   const searchInput = document.querySelector('.search-container input');
   const searchBtn = document.querySelector('.search-btn');
   
   if (searchBtn && searchInput) {
-    // Search on button click
     searchBtn.addEventListener('click', performSearch);
-    
-    // Search on Enter key
     searchInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         performSearch();
@@ -58,32 +120,19 @@ function initializeSearch() {
   }
 }
 
-// Check if there's a search query in URL
 function checkURLSearchQuery() {
   const urlParams = new URLSearchParams(window.location.search);
   const searchQuery = urlParams.get('search');
   
   if (searchQuery) {
-    // Set the search input value
     const searchInput = document.querySelector('.search-container input');
     if (searchInput) {
       searchInput.value = searchQuery;
     }
-    
-    // Execute the search
     executeSearch(searchQuery);
-    
-    // Scroll to results
-    setTimeout(() => {
-      const featuredHeader = document.querySelector('.featured-header');
-      if (featuredHeader) {
-        featuredHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 500);
   }
 }
 
-// Perform intelligent search
 function performSearch() {
   const searchInput = document.querySelector('.search-container input');
   const searchQuery = searchInput.value.trim().toLowerCase();
@@ -93,48 +142,78 @@ function performSearch() {
     return;
   }
   
-  // Check if we're already on homepage
-  const isHomepage = window.location.pathname.includes('index.html') || 
-                     window.location.pathname === '/' ||
-                     window.location.pathname.endsWith('/');
-  
-  if (isHomepage) {
-    // We're on homepage - perform search directly
-    executeSearch(searchQuery);
-  } else {
-    // We're on another page - redirect to homepage with search query
-    window.location.href = `index.html?search=${encodeURIComponent(searchQuery)}`;
-  }
+  executeSearch(searchQuery);
 }
 
-// Execute search with intelligent keyword extraction
 function executeSearch(searchQuery) {
-  console.log('Searching for:', searchQuery);
-  
-  // Wait for properties to load before searching
   if (allProperties.featured.length === 0 && allProperties.recommended.length === 0) {
-    console.log('Waiting for properties to load...');
     setTimeout(() => executeSearch(searchQuery), 500);
     return;
   }
   
-  // Common Kenyan locations to detect
+  // Parse search query intelligently
+  const detectedFilters = parseSearchQuery(searchQuery);
+  
+  // Apply detected filters
+  if (detectedFilters.location) {
+    document.getElementById('locationFilter').value = detectedFilters.location;
+    activeFilters.location = detectedFilters.location;
+  }
+  
+  if (detectedFilters.type) {
+    document.getElementById('typeFilter').value = detectedFilters.type;
+    activeFilters.type = detectedFilters.type;
+  }
+  
+  if (detectedFilters.price) {
+    document.getElementById('priceFilter').value = detectedFilters.price;
+    activeFilters.price = detectedFilters.price;
+  }
+  
+  if (detectedFilters.bedrooms) {
+    document.getElementById('bedroomsFilter').value = detectedFilters.bedrooms;
+    activeFilters.bedrooms = detectedFilters.bedrooms;
+  }
+  
+  // If no specific filters detected, use as location search
+  if (!detectedFilters.location && !detectedFilters.type && !detectedFilters.price && !detectedFilters.bedrooms) {
+    document.getElementById('locationFilter').value = searchQuery;
+    activeFilters.location = searchQuery;
+  }
+  
+  applyFilters();
+  
+  // Scroll to featured section
+  setTimeout(() => {
+    const featuredHeader = document.querySelector('.featured-header');
+    if (featuredHeader) {
+      featuredHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 300);
+}
+
+function parseSearchQuery(query) {
+  const filters = {
+    location: '',
+    type: '',
+    price: '',
+    bedrooms: ''
+  };
+  
   const locations = [
     'kilimani', 'westlands', 'karen', 'runda', 'lavington', 'parklands',
-    'south b', 'south c', 'kileleshwa', 'upperhill', 'riverside', 'gigiri',
-    'muthaiga', 'spring valley', 'loresho', 'kitisuru', 'nyari', 'rosslyn',
-    'thika', 'ruaka', 'ruiru', 'kiambu', 'ngong', 'rongai', 'syokimau',
-    'mlolongo', 'embakasi', 'kahawa', 'kasarani', 'zimmerman', 'roysambu',
+    'south b', 'south c', 'kileleshwa', 'upperhill', 'upper hill', 'riverside', 
+    'gigiri', 'muthaiga', 'spring valley', 'springvalley', 'loresho', 'kitisuru', 
+    'nyari', 'rosslyn', 'thika', 'ruaka', 'ruiru', 'kiambu', 'ngong', 'rongai', 
+    'syokimau', 'mlolongo', 'embakasi', 'kahawa', 'kasarani', 'zimmerman', 
+    'roysambu', 'donholm', 'buruburu', 'umoja', 'komarock', 'kayole', 'dandora',
     'nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret'
   ];
   
-  // Property types to detect
   const propertyTypes = [
-    'apartment', 'villa', 'condo', 'studio', 'townhouse', 'penthouse',
-    'house', 'flat', 'maisonette', 'bungalow', 'mansion'
+    'apartment', 'villa', 'condo', 'studio', 'townhouse', 'penthouse', 'airbnb', 'commercial'
   ];
   
-  // Price keywords
   const priceKeywords = {
     'cheap': '0-35000',
     'affordable': '0-50000',
@@ -144,7 +223,6 @@ function executeSearch(searchQuery) {
     'premium': '70000-999999999'
   };
   
-  // Bedroom keywords
   const bedroomKeywords = {
     '1 bed': '1',
     '1 bedroom': '1',
@@ -157,127 +235,81 @@ function executeSearch(searchQuery) {
     'three bedroom': '3',
     '4 bed': '4',
     '4 bedroom': '4',
-    'four bedroom': '4',
     'bedsitter': '1',
     'studio': '1'
   };
   
-  // Extract keywords from search query
-  let detectedLocation = '';
-  let detectedType = '';
-  let detectedPrice = '';
-  let detectedBedrooms = '';
+  const normalizedQuery = query.toLowerCase().replace(/[,.-]/g, ' ').trim();
+  const queryWords = normalizedQuery.split(/\s+/);
   
-  // Detect location
   for (let location of locations) {
-    if (searchQuery.includes(location)) {
-      detectedLocation = location;
+    if (normalizedQuery.includes(location)) {
+      filters.location = location;
       break;
     }
-  }
-  
-  // Detect property type
-  for (let type of propertyTypes) {
-    if (searchQuery.includes(type)) {
-      // Capitalize first letter
-      detectedType = type.charAt(0).toUpperCase() + type.slice(1);
-      break;
-    }
-  }
-  
-  // Detect price keywords
-  for (let [keyword, priceRange] of Object.entries(priceKeywords)) {
-    if (searchQuery.includes(keyword)) {
-      detectedPrice = priceRange;
-      break;
-    }
-  }
-  
-  // Detect bedroom count
-  for (let [keyword, count] of Object.entries(bedroomKeywords)) {
-    if (searchQuery.includes(keyword)) {
-      detectedBedrooms = count;
-      break;
-    }
-  }
-  
-  // Apply detected filters
-  const locationInput = document.getElementById('locationFilter');
-  const typeSelect = document.getElementById('typeFilter');
-  const priceSelect = document.getElementById('priceFilter');
-  const bedroomsSelect = document.getElementById('bedroomsFilter');
-  
-  if (detectedLocation && locationInput) {
-    locationInput.value = detectedLocation;
-    activeFilters.location = detectedLocation;
-  }
-  
-  if (detectedType && typeSelect) {
-    typeSelect.value = detectedType;
-    activeFilters.type = detectedType;
-  }
-  
-  if (detectedPrice && priceSelect) {
-    priceSelect.value = detectedPrice;
-    activeFilters.price = detectedPrice;
-  }
-  
-  if (detectedBedrooms && bedroomsSelect) {
-    bedroomsSelect.value = detectedBedrooms;
-    activeFilters.bedrooms = detectedBedrooms;
-  }
-  
-  // If no specific keywords detected, treat entire query as location search
-  if (!detectedLocation && !detectedType && !detectedPrice && !detectedBedrooms && locationInput) {
-    locationInput.value = searchQuery;
-    activeFilters.location = searchQuery;
-  }
-  
-  // Apply the filters
-  applyFilters();
-  
-  // Show search results message
-  const resultsCountDiv = document.getElementById('resultsCount');
-  if (resultsCountDiv) {
-    const filteredCount = filterProperties(allProperties.featured).length + 
-                         filterProperties(allProperties.recommended).length;
     
-    resultsCountDiv.style.display = 'block';
-    resultsCountDiv.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Search results for "${searchQuery}" - Found ${filteredCount} propert${filteredCount !== 1 ? 'ies' : 'y'}`;
+    for (let word of queryWords) {
+      if (location.startsWith(word) && word.length >= 3) {
+        filters.location = location;
+        break;
+      }
+    }
+    
+    if (filters.location) break;
   }
+  
+  for (let type of propertyTypes) {
+    if (query.includes(type)) {
+      filters.type = type.charAt(0).toUpperCase() + type.slice(1);
+      break;
+    }
+  }
+  
+  for (let [keyword, priceRange] of Object.entries(priceKeywords)) {
+    if (query.includes(keyword)) {
+      filters.price = priceRange;
+      break;
+    }
+  }
+  
+  for (let [keyword, count] of Object.entries(bedroomKeywords)) {
+    if (query.includes(keyword)) {
+      filters.bedrooms = count;
+      break;
+    }
+  }
+  
+  return filters;
 }
 
-// ============================================
+// ========================================
 // FILTER FUNCTIONS
-// ============================================
+// ========================================
 
-// Initialize filter event listeners
-
-// Initialize filter event listeners
 function initializeFilters() {
   const applyBtn = document.getElementById('applyFilters');
   const resetBtn = document.getElementById('resetFilters');
   
+  console.log('Initializing filters');
+  
   if (applyBtn) {
-    applyBtn.addEventListener('click', applyFilters);
+    applyBtn.addEventListener('click', function() {
+      console.log('Apply filters clicked');
+      applyFilters();
+    });
   }
   
   if (resetBtn) {
-    resetBtn.addEventListener('click', resetFilters);
+    resetBtn.addEventListener('click', function() {
+      console.log('Reset filters clicked');
+      resetFilters();
+    });
   }
-  
-  // Add change listeners to all filters for real-time updates
-  const filters = ['locationFilter', 'typeFilter', 'priceFilter', 'bedroomsFilter', 'bathroomsFilter'];
-  filters.forEach(filterId => {
-    const filterElement = document.getElementById(filterId);
-    if (filterElement) {
-      filterElement.addEventListener('change', updateActiveFiltersDisplay);
-    }
-  });
 }
 
-// Apply filters function
 function applyFilters() {
+  console.log('Applying filters...');
+  
   // Get filter values
   activeFilters.location = document.getElementById('locationFilter').value;
   activeFilters.type = document.getElementById('typeFilter').value;
@@ -285,40 +317,48 @@ function applyFilters() {
   activeFilters.bedrooms = document.getElementById('bedroomsFilter').value;
   activeFilters.bathrooms = document.getElementById('bathroomsFilter').value;
   
+  console.log('Active filters:', activeFilters);
+  
   // Filter properties
   const filteredFeatured = filterProperties(allProperties.featured);
   const filteredRecommended = filterProperties(allProperties.recommended);
   
-  // Display filtered properties
-  displayFilteredProperties('.featured-cards', filteredFeatured);
-  displayFilteredProperties('.Recommended-cards', filteredRecommended);
+  console.log('Filtered featured:', filteredFeatured.length);
+  console.log('Filtered recommended:', filteredRecommended.length);
   
-  // Update active filters display
+  // Display filtered results
+  displayPropertiesInRows('featured', filteredFeatured);
+  displayPropertiesInRows('recommended', filteredRecommended);
+  
+  // Update UI
   updateActiveFiltersDisplay();
-  
-  // Update results count
   updateResultsCount(filteredFeatured.length + filteredRecommended.length);
   
-  // Smooth scroll to results
-  const featuredHeader = document.querySelector('.featured-header');
-  if (featuredHeader) {
-    featuredHeader.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'nearest' 
-    });
+  // On mobile: collapse filters after applying
+  if (window.innerWidth <= 768) {
+    console.log('Mobile: Collapsing filters after apply');
+    setTimeout(() => {
+      collapseFiltersOnMobile();
+    }, 200);
   }
+  
+  // Scroll to results
+  setTimeout(() => {
+    const featuredHeader = document.querySelector('.featured-header');
+    if (featuredHeader) {
+      featuredHeader.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 400);
 }
 
-// Filter properties based on active filters
 function filterProperties(properties) {
   return properties.filter(property => {
-    // Location filter - search in both city and address_line1
+    // Location filter
     if (activeFilters.location) {
       const searchTerm = activeFilters.location.toLowerCase().trim();
       const city = (property.city || '').toLowerCase();
       const address = (property.address_line1 || '').toLowerCase();
       
-      // Check if search term is found in either city or address
       if (!city.includes(searchTerm) && !address.includes(searchTerm)) {
         return false;
       }
@@ -364,34 +404,36 @@ function filterProperties(properties) {
   });
 }
 
-// Display filtered properties
-function displayFilteredProperties(containerSelector, properties) {
-  const container = document.querySelector(containerSelector);
+function displayPropertiesInRows(section, properties) {
+  const rowId = section === 'featured' ? 'featuredRow1' : 'recommendedRow1';
+  const row = document.getElementById(rowId);
   
-  if (!container) return;
+  if (!row) return;
+  
+  row.innerHTML = '';
   
   if (properties.length === 0) {
-    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9900; font-size: 1.1rem; padding: 40px;">No properties match your filters. Try adjusting your criteria.</p>';
+    row.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9900; font-size: 1.1rem; padding: 40px;">No properties match your filters. Try adjusting your criteria.</p>';
     return;
   }
   
-  container.innerHTML = '';
   properties.forEach(property => {
     const card = createPropertyCard(property);
-    container.appendChild(card);
+    row.appendChild(card);
   });
 }
 
-// Reset filters function
 function resetFilters() {
-  // Clear filter values
+  console.log('Resetting filters');
+  
+  // Clear inputs
   document.getElementById('locationFilter').value = '';
   document.getElementById('typeFilter').value = '';
   document.getElementById('priceFilter').value = '';
   document.getElementById('bedroomsFilter').value = '';
   document.getElementById('bathroomsFilter').value = '';
   
-  // Clear active filters
+  // Reset active filters
   activeFilters = {
     location: '',
     type: '',
@@ -400,11 +442,11 @@ function resetFilters() {
     bathrooms: ''
   };
   
-  // Display all properties
-  displayFilteredProperties('.featured-cards', allProperties.featured);
-  displayFilteredProperties('.Recommended-cards', allProperties.recommended);
+  // Show all properties
+  displayPropertiesInRows('featured', allProperties.featured);
+  displayPropertiesInRows('recommended', allProperties.recommended);
   
-  // Hide active filters display
+  // Hide filter display
   const activeFiltersDiv = document.getElementById('activeFilters');
   const resultsCountDiv = document.getElementById('resultsCount');
   
@@ -412,14 +454,12 @@ function resetFilters() {
   if (resultsCountDiv) resultsCountDiv.style.display = 'none';
 }
 
-// Update active filters display
 function updateActiveFiltersDisplay() {
   const activeFiltersDiv = document.getElementById('activeFilters');
   const filterTagsDiv = document.getElementById('filterTags');
   
   if (!activeFiltersDiv || !filterTagsDiv) return;
   
-  // Check if any filters are active
   const hasActiveFilters = Object.values(activeFilters).some(val => val !== '');
   
   if (!hasActiveFilters) {
@@ -430,7 +470,6 @@ function updateActiveFiltersDisplay() {
   activeFiltersDiv.style.display = 'flex';
   filterTagsDiv.innerHTML = '';
   
-  // Add filter tags
   if (activeFilters.location) {
     addFilterTag('Location', activeFilters.location, 'location');
   }
@@ -439,23 +478,27 @@ function updateActiveFiltersDisplay() {
   }
   if (activeFilters.price) {
     const [min, max] = activeFilters.price.split('-');
-    const priceLabel = max === '999999999' ? `Above Ksh ${Number(min).toLocaleString()}` : `Ksh ${Number(min).toLocaleString()} - ${Number(max).toLocaleString()}`;
+    const priceLabel = max === '999999999' 
+      ? `Above Ksh ${Number(min).toLocaleString()}` 
+      : `Ksh ${Number(min).toLocaleString()} - ${Number(max).toLocaleString()}`;
     addFilterTag('Price', priceLabel, 'price');
   }
   if (activeFilters.bedrooms) {
-    const label = activeFilters.bedrooms === '4' ? '4+ Beds' : `${activeFilters.bedrooms} Bed${activeFilters.bedrooms !== '1' ? 's' : ''}`;
+    const label = activeFilters.bedrooms === '4' 
+      ? '4+ Beds' 
+      : `${activeFilters.bedrooms} Bed${activeFilters.bedrooms !== '1' ? 's' : ''}`;
     addFilterTag('Bedrooms', label, 'bedrooms');
   }
   if (activeFilters.bathrooms) {
-    const label = activeFilters.bathrooms === '3' ? '3+ Baths' : `${activeFilters.bathrooms} Bath${activeFilters.bathrooms !== '1' ? 's' : ''}`;
+    const label = activeFilters.bathrooms === '3' 
+      ? '3+ Baths' 
+      : `${activeFilters.bathrooms} Bath${activeFilters.bathrooms !== '1' ? 's' : ''}`;
     addFilterTag('Bathrooms', label, 'bathrooms');
   }
 }
 
-// Add individual filter tag
 function addFilterTag(label, value, filterKey) {
   const filterTagsDiv = document.getElementById('filterTags');
-  
   if (!filterTagsDiv) return;
   
   const tag = document.createElement('div');
@@ -468,11 +511,9 @@ function addFilterTag(label, value, filterKey) {
   filterTagsDiv.appendChild(tag);
 }
 
-// Remove individual filter (must be global for onclick)
 window.removeFilter = function(filterKey) {
   activeFilters[filterKey] = '';
   
-  // Update the select element
   const filterMap = {
     location: 'locationFilter',
     type: 'typeFilter',
@@ -486,97 +527,60 @@ window.removeFilter = function(filterKey) {
     filterElement.value = '';
   }
   
-  // Reapply filters
   applyFilters();
 };
 
-// Update results count
 function updateResultsCount(count) {
   const resultsCountDiv = document.getElementById('resultsCount');
-  
   if (!resultsCountDiv) return;
   
   resultsCountDiv.style.display = 'block';
   resultsCountDiv.innerHTML = `<i class="fa-solid fa-check-circle"></i> Found ${count} propert${count !== 1 ? 'ies' : 'y'} matching your criteria`;
 }
 
-// ============================================
-// PROPERTY LOADING FUNCTIONS
-// ============================================
+// ========================================
+// LOAD PROPERTIES
+// ========================================
 
-// Function to load featured properties
 async function loadFeaturedProperties() {
   try {
-    const response = await fetch('/api/properties/featured?limit=4', {
+    const response = await fetch(`${API_BASE_URL}/api/properties/featured?limit=50`, {
       method: 'GET',
       credentials: 'include'
     });
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Featured properties:', data);
-      
-      const featuredContainer = document.querySelector('.featured-cards');
       
       if (data.properties && data.properties.length > 0) {
-        // Store properties for filtering
         allProperties.featured = data.properties;
-        
-        // Clear existing content
-        featuredContainer.innerHTML = '';
-        
-        // Add each property
-        data.properties.forEach(property => {
-          const card = createPropertyCard(property);
-          featuredContainer.appendChild(card);
-        });
+        displayPropertiesInRows('featured', data.properties);
       } else {
-        featuredContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No featured properties available at the moment.</p>';
+        document.getElementById('featuredRow1').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No featured properties available.</p>';
       }
-    } else if (response.status === 429) {
-      console.error('Rate limit exceeded. Please wait a moment.');
-      const featuredContainer = document.querySelector('.featured-cards');
-      featuredContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9900;">Server is busy. Please refresh the page in a moment.</p>';
     } else {
       console.error('Failed to load featured properties');
     }
   } catch (error) {
     console.error('Error loading featured properties:', error);
-    const featuredContainer = document.querySelector('.featured-cards');
-    if (featuredContainer) {
-      featuredContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9900;">Unable to load properties. Please try again.</p>';
-    }
   }
 }
 
-// Function to load recommended properties
 async function loadRecommendedProperties() {
   try {
-    const response = await fetch('/api/properties/recommended?limit=8', {
+    const response = await fetch(`${API_BASE_URL}/api/properties/recommended?limit=50`, {
       method: 'GET',
       credentials: 'include'
     });
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Recommended properties:', data);
-      
-      const recommendedContainer = document.querySelector('.Recommended-cards');
       
       if (data.properties && data.properties.length > 0) {
-        // Store properties for filtering
         allProperties.recommended = data.properties;
-        
-        // Clear existing content
-        recommendedContainer.innerHTML = '';
-        
-        // Add each property
-        data.properties.forEach(property => {
-          const card = createPropertyCard(property);
-          recommendedContainer.appendChild(card);
-        });
+        displayPropertiesInRows('recommended', data.properties);
       } else {
-        recommendedContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No recommended properties available at the moment.</p>';
+        document.getElementById('recommendedRow1').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No recommended properties available.</p>';
       }
     } else {
       console.error('Failed to load recommended properties');
@@ -586,29 +590,45 @@ async function loadRecommendedProperties() {
   }
 }
 
-// Function to create property card HTML
 function createPropertyCard(property) {
   const card = document.createElement('a');
-  card.href = `house.html?id=${property.property_id}`;
+  
+  // ✅ FIXED: Check if property is a bundle and link to correct bundle_id
+  const isBundle = property.is_bundle === true || property.bundle_id;
+  card.href = isBundle ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
   card.className = 'card';
   
   const imageUrl = property.images && property.images.length > 0 
-    ? `http://127.0.0.1:5000${property.images[0]}`
+    ? `${API_BASE_URL}${property.images[0]}`
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
   
-  // Show full location
   const fullLocation = property.address_line1 
     ? `${property.address_line1}${property.city && !property.address_line1.includes(property.city) ? ', ' + property.city : ''}`
     : property.city || 'Location not specified';
   
-  // Format bedrooms and bathrooms to show whole numbers
   const bedrooms = Math.floor(property.bedrooms || 0);
   const bathrooms = Math.floor(property.bathrooms || 0);
   
+  // Determine property type badge color and text
+  let propertyTypeBadge = '';
+  const propType = property.property_type || 'Property';
+  
+  if (propType === 'Airbnb') {
+    propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
+  } else if (propType === 'Commercial') {
+    propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
+  } else {
+    propertyTypeBadge = `<p class="type">${propType}</p>`;
+  }
+  
+  // Add bundle tag if property is part of a bundle
+  const bundleTag = isBundle ? '<div class="bundle-tag"><i class="fa-solid fa-gift"></i> Bundle</div>' : '';
+  
   card.innerHTML = `
+    ${bundleTag}
     <div class="card-image" style="background-image:url('${imageUrl}')"></div>
     <p class="location"><i class="fas fa-map-marker-alt" style="color: #FFA500;"></i> ${fullLocation}</p>
-    <p class="type">${property.property_type || 'Property'}</p>
+    ${propertyTypeBadge}
     <p>${bedrooms} Bed • ${bathrooms} Bath</p>
     <p class="price">Ksh ${formatPrice(property.price)}</p>
     <p class="units-left">Only ${property.units_available || 1} unit${property.units_available !== 1 ? 's' : ''} left</p>
@@ -617,19 +637,17 @@ function createPropertyCard(property) {
   return card;
 }
 
-// Helper function to format price
 function formatPrice(price) {
   return Number(price).toLocaleString('en-KE');
 }
 
-// ============================================
-// AUTHENTICATION FUNCTIONS
-// ============================================
+// ========================================
+// AUTHENTICATION
+// ========================================
 
-// Function to check authentication
 async function checkAuthentication() {
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -640,11 +658,8 @@ async function checkAuthentication() {
       if (data.isAuthenticated) {
         updateAccountMenu(data.user);
         
-        // Update favourites badge if user is a regular user
         if (data.user.role === 'user') {
           updateFavouritesBadge();
-          
-          // Update badge every 30 seconds
           setInterval(updateFavouritesBadge, 30000);
         }
       }
@@ -660,7 +675,6 @@ function updateAccountMenu(user) {
   if (dropdownContent) {
     dropdownContent.innerHTML = '';
     
-    // Only show Dashboard link if user is an agent
     if (user.role === 'agent') {
       const dashboardLink = document.createElement('a');
       dashboardLink.href = 'agentdashboard.html';
@@ -668,7 +682,6 @@ function updateAccountMenu(user) {
       dropdownContent.appendChild(dashboardLink);
     }
     
-    // Logout link for all authenticated users
     const logoutLink = document.createElement('a');
     logoutLink.href = '#';
     logoutLink.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Logout';
@@ -682,7 +695,7 @@ function updateAccountMenu(user) {
 
 async function handleLogout() {
   try {
-    const response = await fetch('/api/auth/logout', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
@@ -697,12 +710,9 @@ async function handleLogout() {
   }
 }
 
-// ============================================
-// UPDATE FAVOURITES BADGE WITH UNREAD COUNT
-// ============================================
 async function updateFavouritesBadge() {
   try {
-    const response = await fetch('/api/chat/unread-count', {
+    const response = await fetch(`${API_BASE_URL}/api/chat/unread-count`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -714,12 +724,6 @@ async function updateFavouritesBadge() {
       if (badge && data.success && data.unread_count > 0) {
         badge.textContent = `${data.unread_count} ${data.unread_count === 1 ? 'Reply' : 'Replies'}`;
         badge.style.display = 'inline-block';
-        badge.style.background = '#4caf50';
-        badge.style.color = 'white';
-        badge.style.padding = '0.25rem 0.75rem';
-        badge.style.borderRadius = '12px';
-        badge.style.fontSize = '0.85rem';
-        badge.style.fontWeight = '600';
       } else if (badge) {
         badge.style.display = 'none';
       }

@@ -1,0 +1,430 @@
+/* ========================================
+   AGENT DASHBOARD POPUPS - CLEAN & COMPACT
+   ======================================== */
+
+/* ========== BASE OVERLAY ========== */
+.custom-alert-overlay,
+.confirm-modal-overlay,
+.mpesa-modal-overlay,
+.phone-modal-overlay,
+.loading-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 0, 31, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ========== BASE MODAL BOX ========== */
+.custom-alert-box,
+.confirm-modal-box,
+.mpesa-modal-box,
+.phone-modal-box,
+.loading-modal-box {
+  background: #3b0047;
+  padding: 30px 35px;
+  border-radius: 15px;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  box-shadow: 0 8px 30px rgba(255, 77, 210, 0.4);
+  max-width: 450px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== ALERT BOX ========== */
+.custom-alert-box {
+  text-align: center;
+  max-width: 400px;
+}
+
+.custom-alert-box p {
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.custom-alert-btn {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+}
+
+.custom-alert-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 77, 210, 0.5);
+}
+
+/* ========== NOTIFICATIONS ========== */
+.success-notification,
+.error-notification,
+.info-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  z-index: 10000;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.success-notification {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.error-notification {
+  background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+  box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+}
+
+.info-notification {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  box-shadow: 0 6px 20px rgba(255, 77, 210, 0.4);
+}
+
+/* ========== CONFIRM MODAL ========== */
+.confirm-modal-box {
+  text-align: center;
+}
+
+.confirm-modal-box h3 {
+  color: #ff4dd2;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.confirm-modal-box p {
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  margin: 0 0 25px 0;
+  line-height: 1.5;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.confirm-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  max-width: 150px;
+}
+
+.confirm-btn-primary {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+}
+
+.confirm-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 77, 210, 0.5);
+}
+
+.confirm-btn-secondary {
+  background: transparent;
+  color: #ff4dd2;
+  border: 2px solid #ff4dd2;
+}
+
+.confirm-btn-secondary:hover {
+  background: rgba(255, 77, 210, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ========== M-PESA MODAL ========== */
+.mpesa-modal-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 77, 210, 0.2);
+}
+
+.mpesa-modal-header h3 {
+  color: #4caf50;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.mpesa-modal-content {
+  margin-bottom: 25px;
+}
+
+.mpesa-info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 77, 210, 0.1);
+}
+
+.mpesa-info-label {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.mpesa-info-value {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mpesa-amount {
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.mpesa-amount-label {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+
+.mpesa-amount-value {
+  color: #4caf50;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.mpesa-modal-footer {
+  text-align: center;
+}
+
+.mpesa-modal-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+}
+
+.mpesa-modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 77, 210, 0.5);
+}
+
+/* ========== LOADING MODAL ========== */
+.loading-modal-box {
+  text-align: center;
+  padding: 40px 50px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 77, 210, 0.2);
+  border-top: 4px solid #ff4dd2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-modal-text {
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ========== PHONE INPUT MODAL ========== */
+.phone-modal-header {
+  margin-bottom: 20px;
+}
+
+.phone-modal-header h3 {
+  color: #ff4dd2;
+  margin: 0 0 10px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.phone-modal-header p {
+  color: #aaa;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.phone-input-group {
+  margin-bottom: 20px;
+}
+
+.phone-input-label {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.phone-input-field {
+  width: 100%;
+  padding: 12px 15px;
+  background: #2e0033;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+
+.phone-input-field:focus {
+  outline: none;
+  border-color: #ff4dd2;
+  box-shadow: 0 0 12px rgba(255, 77, 210, 0.3);
+}
+
+.phone-input-field::placeholder {
+  color: #666;
+}
+
+.phone-input-hint {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  display: block;
+}
+
+.phone-modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.phone-modal-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.phone-modal-btn-primary {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  box-shadow: 0 3px 15px rgba(76, 175, 80, 0.3);
+}
+
+.phone-modal-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.5);
+}
+
+.phone-modal-btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.phone-modal-btn-secondary:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .custom-alert-box,
+  .confirm-modal-box,
+  .mpesa-modal-box,
+  .phone-modal-box {
+    padding: 25px;
+    max-width: 90%;
+  }
+
+  .success-notification,
+  .error-notification,
+  .info-notification {
+    max-width: 90%;
+    padding: 14px 20px;
+    font-size: 0.9rem;
+  }
+
+  .loading-modal-box {
+    padding: 35px 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-alert-box,
+  .confirm-modal-box,
+  .mpesa-modal-box,
+  .phone-modal-box {
+    padding: 20px;
+  }
+
+  .mpesa-amount-value {
+    font-size: 1.5rem;
+  }
+}

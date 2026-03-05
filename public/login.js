@@ -1,4 +1,4 @@
-// login.js - Complete with Google and Facebook OAuth
+
 
 // Configuration - REPLACE WITH YOUR ACTUAL IDs
 const GOOGLE_CLIENT_ID = '635748400290-mrjqtbe7nquslqck3apepd4gv45hsva8.apps.googleusercontent.com';
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
       submitButton.disabled = true;
 
       try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ async function handleGoogleLogin(response) {
     }
 
     // Send credential to backend
-    const backendResponse = await fetch('/api/oauth/google', {
+    const backendResponse = await fetch(`${API_BASE_URL}/api/oauth/google`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ if (facebookLoginBtn) {
 async function handleFacebookLogin(accessToken) {
   try {
     // Send access token to backend
-    const response = await fetch('/api/oauth/facebook', {
+    const response = await fetch(`${API_BASE_URL}/api/oauth/facebook`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

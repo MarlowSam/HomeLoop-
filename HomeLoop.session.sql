@@ -1,2 +1,1 @@
-ALTER TABLE properties
-MODIFY COLUMN bathrooms INT;
+SELECT * FROM properties WHERE bundle_id = 1;

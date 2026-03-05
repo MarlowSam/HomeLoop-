@@ -17,15 +17,16 @@ body {
   justify-content: center;
   align-items: center;
   padding: 15px;
+  overflow-y: auto;
 }
 
 /* Login Container */
 .login-container {
   text-align: center;
-  max-width: 380px;
+  max-width: 420px;
   width: 100%;
   background: rgba(59, 0, 71, 0.4);
-  padding: 25px;
+  padding: 25px 30px;
   border-radius: 15px;
   border: 1px solid rgba(255, 77, 210, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -52,35 +53,35 @@ body {
 
 /* Welcome Text */
 .welcome-text {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: #fff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-weight: 700;
 }
 
 .subtitle {
   color: #ccc;
-  font-size: 0.8rem;
-  margin-bottom: 15px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
 }
 
 /* Login Form */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .form-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .form-group label {
-  flex: 0 0 75px;
-  font-size: 0.85rem;
+  flex: 0 0 85px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: white;
   text-align: left;
@@ -88,12 +89,12 @@ body {
 
 .form-group input {
   flex: 1;
-  padding: 8px 10px;
+  padding: 10px 14px;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   background: rgba(46, 0, 51, 0.3);
   color: white;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   outline: none;
   transition: all 0.3s;
 }
@@ -116,12 +117,13 @@ body {
 .forgot-link {
   color: #ff9900;
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
 }
 
 .forgot-link:hover {
   text-decoration: underline;
+  color: #ff4dd2;
 }
 
 /* Login Button */
@@ -129,13 +131,13 @@ body {
   background: white;
   color: #2a002a;
   border: none;
-  padding: 9px 30px;
+  padding: 11px 35px;
   border-radius: 50px;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  margin: 5px auto;
+  margin: 6px auto;
   width: fit-content;
 }
 
@@ -149,9 +151,9 @@ body {
 .divider {
   display: flex;
   align-items: center;
-  margin: 12px 0 10px;
+  margin: 16px 0 14px;
   color: #aaa;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .divider::before,
@@ -163,27 +165,27 @@ body {
 }
 
 .divider span {
-  padding: 0 10px;
+  padding: 0 15px;
 }
 
 /* Social Login Buttons */
 .social-login {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .social-login button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 15px;
+  gap: 10px;
+  padding: 10px 18px;
   border: none;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   cursor: pointer;
   transition: all 0.3s;
   width: 100%;
@@ -197,11 +199,13 @@ body {
 
 .google-btn:hover {
   background: #f2f2f2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .google-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Facebook Button */
@@ -212,20 +216,22 @@ body {
 
 .facebook-btn:hover {
   background: #145dbf;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
 }
 
 .facebook-btn i {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 /* Sign Up Section */
 .signup-section {
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .signup-section p {
   color: #ccc;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
 }
 
 .signup-link {
@@ -241,13 +247,13 @@ body {
 
 /* Terms Section */
 .terms-section {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .terms-section p {
   color: #aaa;
-  font-size: 0.7rem;
-  line-height: 1.4;
+  font-size: 0.72rem;
+  line-height: 1.5;
 }
 
 .terms-link {
@@ -263,126 +269,223 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
   body {
-    padding: 10px;
+    padding: 12px;
   }
 
   .login-container {
-    padding: 20px;
-    max-width: 350px;
+    padding: 22px 25px;
+    max-width: 100%;
   }
 
   .logo-text {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     margin-bottom: 10px;
   }
 
   .welcome-text {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 
   .subtitle {
-    font-size: 0.75rem;
-    margin-bottom: 12px;
+    font-size: 0.88rem;
+    margin-bottom: 18px;
   }
 
-  /* KEEP LABEL AND INPUT SIDE BY SIDE */
   .form-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
+    gap: 10px;
   }
 
   .form-group label {
-    flex: 0 0 70px;
-    font-size: 0.8rem;
+    flex: 0 0 75px;
+    font-size: 0.9rem;
   }
 
   .form-group input {
-    flex: 1;
-    padding: 7px 9px;
-    font-size: 0.8rem;
+    padding: 10px 12px;
+    font-size: 0.9rem;
   }
 
   .login-btn {
-    padding: 8px 25px;
-    font-size: 0.85rem;
+    padding: 10px 32px;
+    font-size: 0.94rem;
   }
 
   .social-login button {
-    padding: 7px 12px;
-    font-size: 0.75rem;
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 
-  .social-login {
-    gap: 7px;
+  .google-btn svg {
+    width: 17px;
+    height: 17px;
   }
 }
 
 @media (max-width: 480px) {
   body {
-    padding: 8px;
+    padding: 10px;
   }
 
   .login-container {
-    padding: 18px;
-    max-width: 100%;
+    padding: 20px 20px;
+  }
+
+  .logo-text {
+    font-size: 1.6rem;
+  }
+
+  .welcome-text {
+    font-size: 1.15rem;
+    margin-bottom: 5px;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+  }
+
+  .login-form {
+    gap: 11px;
+  }
+
+  .form-group {
+    gap: 10px;
+  }
+
+  .form-group label {
+    flex: 0 0 70px;
+    font-size: 0.88rem;
+  }
+
+  .form-group input {
+    padding: 9px 11px;
+    font-size: 0.88rem;
+  }
+
+  .forgot-link {
+    font-size: 0.82rem;
+  }
+
+  .login-btn {
+    padding: 10px 30px;
+    font-size: 0.92rem;
+  }
+
+  .divider {
+    margin: 14px 0 12px;
+    font-size: 0.82rem;
+  }
+
+  .social-login {
+    gap: 9px;
+  }
+
+  .social-login button {
+    padding: 9px 14px;
+    font-size: 0.88rem;
+  }
+
+  .google-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .facebook-btn i {
+    font-size: 0.95rem;
+  }
+
+  .signup-section p {
+    font-size: 0.85rem;
+  }
+
+  .terms-section p {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-container {
+    padding: 18px 16px;
   }
 
   .logo-text {
     font-size: 1.5rem;
-    margin-bottom: 8px;
   }
 
   .welcome-text {
-    font-size: 0.95rem;
-    margin-bottom: 3px;
-  }
-
-  .subtitle {
-    font-size: 0.7rem;
-    margin-bottom: 10px;
-  }
-
-  /* KEEP LABEL AND INPUT SIDE BY SIDE ON MOBILE */
-  .form-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
+    font-size: 1.1rem;
   }
 
   .form-group label {
     flex: 0 0 65px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
   }
 
   .form-group input {
-    flex: 1;
-    padding: 6px 8px;
-    font-size: 0.75rem;
-  }
-
-  .login-btn {
-    padding: 7px 22px;
-    font-size: 0.8rem;
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
 
   .social-login button {
-    padding: 6px 10px;
-    font-size: 0.7rem;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    gap: 8px;
   }
+}
 
-  .google-btn svg {
-    width: 14px;
-    height: 14px;
+/* For very tall screens - ensure container doesn't get too large */
+@media (min-height: 900px) {
+  .login-container {
+    max-height: 90vh;
   }
+}
 
-  .signup-section p {
-    font-size: 0.75rem;
+/* For shorter screens - make it scrollable but compact */
+@media (max-height: 700px) {
+  body {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 15px;
   }
-
-  .terms-section p {
-    font-size: 0.65rem;
+  
+  .login-container {
+    padding: 18px 25px;
+  }
+  
+  .logo-text {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+  
+  .welcome-text {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+  }
+  
+  .login-form {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .divider {
+    margin: 12px 0 10px;
+  }
+  
+  .social-login {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .signup-section {
+    margin-top: 10px;
+  }
+  
+  .terms-section {
+    margin-top: 8px;
   }
 }

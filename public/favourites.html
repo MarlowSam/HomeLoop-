@@ -109,8 +109,7 @@
       if (!dropdownContent) return;
 
       try {
-        const response = await fetch('/api/
-auth/me', {
+        const response = await fetch('/api/auth/me', {
           method: 'GET',
           credentials: 'include'
         });
@@ -127,8 +126,7 @@ auth/me', {
             logoutLink.addEventListener('click', async (e) => {
               e.preventDefault();
               try {
-                await fetch('/api/
-auth/logout', {
+                await fetch('/api/auth/logout', {
                   method: 'POST',
                   credentials: 'include'
                 });
@@ -154,5 +152,10 @@ auth/logout', {
 
     document.addEventListener('DOMContentLoaded', checkLoginStatus);
   </script>
+  <!--  Config file FIRST -->
+  <script src="config.js"></script>
+  
+  <!--  Then favourites.js -->
+  <script src="favourites.js"></script>
 </body>
 </html>

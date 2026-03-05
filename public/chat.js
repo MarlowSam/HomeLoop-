@@ -1,4 +1,5 @@
-// chat.js - Real-time Chat Client with Socket.io (FIXED)
+// chat.js - Real-time Chat Client with Socket.io (MOBILE OPTIMIZED)
+// UPDATED FOR LOCAL AND PRODUCTION
 let socket = null;
 let currentConversationId = null;
 let currentPropertyId = null;
@@ -38,7 +39,7 @@ function showAlert(message) {
 // ============================================
 async function getAuthToken() {
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -57,28 +58,25 @@ async function getAuthToken() {
     return null;
   }
 }
-
-// ============================================
 // INITIALIZE SOCKET CONNECTION
-// ============================================
 async function initializeSocket() {
   if (socketConnectionPromise) {
     return socketConnectionPromise;
   }
-
   const token = await getAuthToken();
   
   console.log('🔍 Checking for token:', token ? 'Found' : 'Not found');
   
   if (!token) {
-    console.error('❌ No authentication token found');
+    console.error('No authentication token found');
     showAlert('Please log in to use the chat feature.');
     return Promise.reject(new Error('No token'));
   }
 
   socketConnectionPromise = new Promise((resolve, reject) => {
     try {
-      socket = io({
+      // Connect to the backend URL (not frontend)
+      socket = io(API_BASE_URL, {
         auth: {
           token: token
         },
@@ -91,26 +89,26 @@ async function initializeSocket() {
 
       socket.on('connect', () => {
         clearTimeout(connectionTimeout);
-        console.log('✅ Connected to chat server');
+        console.log('Connected to chat server');
         isSocketInitialized = true;
         resolve(true);
       });
 
       socket.on('connect_error', (error) => {
         clearTimeout(connectionTimeout);
-        console.error('❌ Connection error:', error.message);
+        console.error('Connection error:', error.message);
         socketConnectionPromise = null;
         reject(error);
       });
 
       socket.on('disconnect', () => {
-        console.log('❌ Disconnected from chat server');
+        console.log('Disconnected from chat server');
         isSocketInitialized = false;
         socketConnectionPromise = null;
       });
 
       socket.on('new_message', (message) => {
-        console.log('📩 New message received:', message);
+        console.log('New message received:', message);
         displayMessage(message);
         
         const chatBody = document.getElementById('chatMessages');
@@ -118,7 +116,6 @@ async function initializeSocket() {
           chatBody.scrollTop = chatBody.scrollHeight;
         }
       });
-
       socket.on('user_typing', (data) => {
         if (data.conversationId === currentConversationId) {
           showTypingIndicator();
@@ -168,7 +165,7 @@ async function openChat(propertyId, agentId) {
       console.log('✅ Socket connected successfully');
     }
 
-    const response = await fetch('/api/chat/conversations', {
+    const response = await fetch(`${API_BASE_URL}/api/chat/conversations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -193,11 +190,21 @@ async function openChat(propertyId, agentId) {
       
       await loadMessages(currentConversationId);
       
-      document.getElementById('chatPopup').style.display = 'flex';
+      // Show chat popup
+      const chatPopup = document.getElementById('chatPopup');
+      chatPopup.style.display = 'flex';
+      
+      // Add animation class for smooth entrance
+      setTimeout(() => {
+        chatPopup.classList.add('chat-visible');
+      }, 10);
       
       markMessagesAsRead(currentConversationId);
       
-      document.getElementById('chatInput').focus();
+      // Focus input on desktop, but not on mobile (prevents keyboard jumping)
+      if (window.innerWidth > 768) {
+        document.getElementById('chatInput').focus();
+      }
     } else {
       throw new Error(data.message || 'Failed to create conversation');
     }
@@ -216,7 +223,7 @@ async function openChat(propertyId, agentId) {
 // ============================================
 async function loadMessages(conversationId) {
   try {
-    const response = await fetch(`/api/chat/conversations/${conversationId}/messages`, {
+    const response = await fetch(`${API_BASE_URL}/api/chat/conversations/${conversationId}/messages`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -240,7 +247,7 @@ async function loadMessages(conversationId) {
       chatBody.scrollTop = chatBody.scrollHeight;
     }
   } catch (error) {
-    console.error(' Error loading messages:', error);
+    console.error('❌ Error loading messages:', error);
   }
 }
 
@@ -295,6 +302,9 @@ function sendMessage() {
   
   input.value = '';
   
+  // Resize textarea back to original size
+  input.style.height = 'auto';
+  
   if (socket && socket.connected) {
     socket.emit('stop_typing', {
       conversationId: currentConversationId
@@ -332,7 +342,7 @@ function showTypingIndicator() {
   const typingDiv = document.createElement('div');
   typingDiv.className = 'message agent-message typing-indicator';
   typingDiv.innerHTML = `
-    <div class="message-content">
+    <div class="message-content typing-dots">
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
@@ -359,7 +369,7 @@ async function markMessagesAsRead(conversationId) {
   });
   
   try {
-    await fetch(`/api/chat/conversations/${conversationId}/read`, {
+    await fetch(`${API_BASE_URL}/api/chat/conversations/${conversationId}/read`, {
       method: 'PUT',
       credentials: 'include'
     });
@@ -373,7 +383,7 @@ async function markMessagesAsRead(conversationId) {
 // ============================================
 async function updateUnreadBadge() {
   try {
-    const response = await fetch('/api/chat/unread-count', {
+    const response = await fetch(`${API_BASE_URL}/api/chat/unread-count`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -415,7 +425,14 @@ function updateAgentOnlineStatus(isOnline) {
 // CLOSE CHAT
 // ============================================
 function closeChat() {
-  document.getElementById('chatPopup').style.display = 'none';
+  const chatPopup = document.getElementById('chatPopup');
+  
+  // Add closing animation
+  chatPopup.classList.remove('chat-visible');
+  
+  setTimeout(() => {
+    chatPopup.style.display = 'none';
+  }, 300);
   
   if (socket && socket.connected && currentConversationId) {
     socket.emit('leave_conversation', currentConversationId);
@@ -424,6 +441,14 @@ function closeChat() {
   currentConversationId = null;
   currentPropertyId = null;
   currentAgentId = null;
+}
+
+// ============================================
+// AUTO-RESIZE TEXTAREA
+// ============================================
+function autoResizeTextarea(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
 }
 
 // ============================================
@@ -450,7 +475,7 @@ function escapeHtml(text) {
 // ============================================
 async function checkAuthentication() {
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
@@ -468,6 +493,19 @@ async function checkAuthentication() {
 }
 
 // ============================================
+// PREVENT BODY SCROLL WHEN CHAT IS OPEN (Mobile)
+// ============================================
+function preventBodyScroll() {
+  if (window.innerWidth <= 768) {
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function allowBodyScroll() {
+  document.body.style.overflow = '';
+}
+
+// ============================================
 // EVENT LISTENERS
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -476,7 +514,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
   const closeBtn = document.getElementById('closeChat');
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeChat);
+    closeBtn.addEventListener('click', () => {
+      closeChat();
+      allowBodyScroll();
+    });
   }
   
   const sendBtn = document.getElementById('sendMessage');
@@ -493,7 +534,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    chatInput.addEventListener('input', handleTyping);
+    chatInput.addEventListener('input', function() {
+      handleTyping();
+      autoResizeTextarea(this);
+    });
   }
   
   const chatAgentBtn = document.getElementById('chatAgentBtn');
@@ -512,8 +556,20 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (propertyId && agentId) {
         openChat(propertyId, agentId);
+        preventBodyScroll();
       } else {
         showAlert('Property or agent information missing');
+      }
+    });
+  }
+  
+  // Close chat when clicking outside on mobile
+  const chatPopup = document.getElementById('chatPopup');
+  if (chatPopup && window.innerWidth <= 768) {
+    chatPopup.addEventListener('click', function(e) {
+      if (e.target === chatPopup) {
+        closeChat();
+        allowBodyScroll();
       }
     });
   }

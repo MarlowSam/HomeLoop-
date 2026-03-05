@@ -1,0 +1,1697 @@
+/* ========================================
+   BUNDLE PACKAGE PAGE - Complete Styling
+   UPDATED: Mobile view improvements
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #1a001f 0%, #2e0033 100%);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========== HEADER (Same as house.html) ========== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 70px;
+  padding: 10px 25px;
+  background: rgba(59, 0, 71, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(255, 77, 210, 0.3);
+  z-index: 1000;
+  border-bottom: 2px solid rgba(255, 77, 210, 0.2);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+  flex-shrink: 0;
+  order: 1;
+}
+
+.logo {
+  display: none;
+}
+
+.logo-container::before {
+  content: 'HomeLoop';
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  text-shadow: 0 2px 20px rgba(255, 77, 210, 0.4);
+  transition: all 0.3s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.logo-container:hover::before {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+.search-container {
+  flex: 1 1 100%;
+  max-width: 100%;
+  margin: 0;
+  display: flex;
+  order: 4;
+  width: 100%;
+}
+
+.search-container input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  border-radius: 10px 0 0 10px;
+  outline: none;
+  background: #2e0033;
+  color: white;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
+}
+
+.search-container input:focus {
+  border-color: #ff4dd2;
+}
+
+.search-container input::placeholder {
+  color: #888;
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.search-btn:hover {
+  transform: translateX(2px);
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.4);
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: nowrap;
+  order: 2;
+  margin-left: auto;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: #ff4dd2;
+  background: rgba(255, 77, 210, 0.1);
+  transform: translateY(-2px);
+}
+
+.favourites {
+  color: #ff9900 !important;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 10000;
+}
+
+.dropdown > a {
+  cursor: pointer;
+}
+
+.dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #3b0047;
+  min-width: 140px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  z-index: 10001;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 77, 210, 0.3);
+  overflow: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.dropdown-content a {
+  color: white;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.dropdown-content a:hover {
+  background: rgba(255, 77, 210, 0.2);
+  padding-left: 20px;
+}
+
+.dropdown:hover .dropdown-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dropdown-content:hover {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ========== BUNDLE CONTAINER ========== */
+.bundle-container {
+  max-width: 1200px;
+  margin: 150px auto 20px;
+  padding: 0 20px;
+}
+
+/* ========== BUNDLE HEADER - COMPACT DESIGN ========== */
+.bundle-header {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.3) 0%, rgba(255, 77, 210, 0.2) 100%);
+  border: 2px solid rgba(255, 153, 0, 0.4);
+  border-radius: 15px;
+  padding: 20px 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 30px rgba(255, 153, 0, 0.3);
+}
+
+.bundle-title {
+  margin-bottom: 15px;
+}
+
+.bundle-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff9900, #ffaa00);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  box-shadow: 0 3px 15px rgba(255, 153, 0, 0.4);
+}
+
+.bundle-title h1 {
+  font-size: 1.6rem;
+  color: #ff69ff;
+  margin: 5px 0 0 0;
+}
+
+.bundle-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 25px;
+}
+
+.viewing-fee-box {
+  background: rgba(138, 43, 226, 0.4);
+  border: 2px solid #ff69ff;
+  border-radius: 12px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.fee-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.fee-amount {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ff9900;
+  text-shadow: 0 0 20px rgba(255, 153, 0, 0.5);
+  margin-bottom: 3px;
+}
+
+.viewing-fee-box small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+}
+
+.bundle-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.btn.book {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff1493 100%);
+  color: white;
+}
+
+.btn.book:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(255, 77, 210, 0.4);
+}
+
+.btn.contact {
+  background: linear-gradient(135deg, #ff9900 0%, #ff6600 100%);
+  color: white;
+}
+
+.btn.contact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(255, 153, 0, 0.4);
+}
+
+/* ========== PROPERTY SECTION ========== */
+.property-section {
+  background: #3b0047;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 77, 210, 0.2);
+}
+
+.property-hero {
+  width: 100%;
+  max-width: 1000px;
+  height: 400px;
+  margin: 0 auto 20px;
+  border-radius: 15px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 8px 25px rgba(255, 77, 210, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.property-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(46, 0, 51, 0.8), transparent);
+}
+
+.property-details {
+  background: #3b0047;
+  padding: 20px 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 77, 210, 0.2);
+}
+
+.property-details .location {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.property-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.airbnb-badge {
+  background: linear-gradient(135deg, #4FC3F7 0%, #29B6F6 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(41, 182, 246, 0.3);
+}
+
+.commercial-badge {
+  background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.property-details .type {
+  font-size: 0.95rem;
+  color: #ccc;
+  margin: 0 0 15px 0;
+}
+
+.property-details .price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ff4dd2;
+  margin: 0 0 8px 0;
+  text-shadow: 0 0 15px rgba(255, 77, 210, 0.4);
+}
+
+.property-details .units-left {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  display: inline-block;
+}
+
+/* ========== HOUSE DESCRIPTION SECTION (MATCHING house.html) ========== */
+.house-description {
+  background: #3b0047;
+  padding: 22px 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 77, 210, 0.2);
+}
+
+.house-description h2 {
+  color: #ff4dd2;
+  margin: 0 0 15px 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.house-description p {
+  color: #e0e0e0;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0 0 18px 0;
+}
+
+/* ========== MEDIA GALLERY (IMAGES + VIDEOS) ========== */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.media-grid img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.media-grid img:hover {
+  transform: scale(1.05);
+  border-color: #ff4dd2;
+  box-shadow: 0 6px 20px rgba(255, 77, 210, 0.4);
+}
+
+.media-grid video {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.media-grid video:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Second video goes below in its own row */
+.media-grid .second-video {
+  grid-column: 1 / -1;
+  max-width: calc(25% - 9px);
+}
+
+/* ========== HOUSE REVIEWS SECTION (FROM house.html) ========== */
+.house-reviews {
+  background: #3b0047;
+  padding: 22px 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 77, 210, 0.2);
+}
+
+.reviews-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 77, 210, 0.3);
+}
+
+.reviews-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #ff4dd2;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reviews-header h2::before {
+  content: '⭐';
+  font-size: 1.3rem;
+}
+
+.overall-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: #fff;
+  background: rgba(255, 77, 210, 0.15);
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 77, 210, 0.3);
+}
+
+.overall-rating .stars {
+  color: #ffc107;
+  font-size: 1.1rem;
+}
+
+.review-item {
+  padding: 15px;
+  margin-bottom: 12px;
+  background: #2e0033;
+  border-radius: 12px;
+  border-left: 3px solid #ff4dd2;
+  transition: all 0.3s ease;
+}
+
+.review-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+  background: #330039;
+}
+
+.review-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #ff9900;
+}
+
+.review-date {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.review-stars {
+  color: #ffc107;
+  margin-bottom: 8px;
+  font-size: 1.05rem;
+}
+
+.review-text {
+  color: #e0e0e0;
+  line-height: 1.7;
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 35px 15px;
+  color: #aaa;
+  background: rgba(255, 77, 210, 0.05);
+  border-radius: 12px;
+  border: 2px dashed rgba(255, 77, 210, 0.3);
+}
+
+.no-reviews p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.see-all-reviews {
+  display: inline-block;
+  margin-top: 15px;
+  color: #ff9900;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(255, 153, 0, 0.15);
+  border: 1px solid rgba(255, 153, 0, 0.3);
+  transition: all 0.3s;
+}
+
+.see-all-reviews:hover {
+  background: rgba(255, 153, 0, 0.25);
+  transform: translateX(4px);
+}
+
+.write-review-btn {
+  margin-top: 15px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+}
+
+.write-review-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 77, 210, 0.5);
+}
+
+/* ========== REVIEW MODAL (FROM house.html) ========== */
+#reviewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 0, 31, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  padding: 0;
+}
+
+.review-modal-content {
+  background: #3b0047;
+  padding: 28px;
+  border-radius: 18px 0 0 18px;
+  width: 420px;
+  max-width: 90vw;
+  height: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: -8px 0 35px rgba(255, 77, 210, 0.4);
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  border-right: none;
+  animation: slideInFromRight 0.3s ease;
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.review-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.review-modal-content::-webkit-scrollbar-thumb {
+  background: #ff4dd2;
+  border-radius: 8px;
+}
+
+.review-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(255, 77, 210, 0.3);
+}
+
+.review-modal-header h2 {
+  margin: 0;
+  color: #ff4dd2;
+  font-size: 1.6rem;
+}
+
+.review-modal-close {
+  background: rgba(255, 77, 210, 0.2);
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #ff4dd2;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.review-modal-close:hover {
+  background: #ff4dd2;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.star-rating {
+  font-size: 30px;
+  cursor: pointer;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.star-rating span {
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.star-rating span:hover {
+  color: #ffc107;
+  transform: scale(1.15);
+}
+
+#reviewForm label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.98rem;
+}
+
+#reviewForm textarea {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  resize: vertical;
+  min-height: 110px;
+  background: #2e0033;
+  color: #fff;
+  transition: all 0.3s;
+}
+
+#reviewForm textarea:focus {
+  outline: none;
+  border-color: #ff4dd2;
+  box-shadow: 0 0 12px rgba(255, 77, 210, 0.3);
+}
+
+#reviewForm textarea::placeholder {
+  color: #888;
+}
+
+#reviewForm button[type="submit"] {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 15px rgba(255, 77, 210, 0.3);
+}
+
+#reviewForm button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 22px rgba(255, 77, 210, 0.5);
+}
+
+/* ========== AGENT PROFILE CARD (FROM house.html) ========== */
+.agent-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px;
+  background: #2e0033;
+  border-radius: 12px;
+  margin-top: 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 77, 210, 0.3);
+}
+
+.agent-profile-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 77, 210, 0.4);
+  border-color: #ff4dd2;
+}
+
+.agent-profile-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ff4dd2;
+  flex-shrink: 0;
+  box-shadow: 0 0 15px rgba(255, 77, 210, 0.5);
+}
+
+.agent-profile-info {
+  flex: 1;
+}
+
+.agent-profile-info strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #ff4dd2;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.agent-profile-info span {
+  color: #aaa;
+  font-size: 0.88rem;
+}
+
+
+/* ========== SIMILAR PROPERTIES SECTION (MATCHING house.html) ========== */
+.more-properties {
+  margin-top: 20px;
+  background: #3b0047;
+  padding: 22px 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 77, 210, 0.2);
+}
+
+.more-properties h2 {
+  color: #ff4dd2;
+  margin: 0 0 18px 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.more-properties .house-cards {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding: 8px 0 15px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #ff4dd2 #2e0033;
+  -webkit-overflow-scrolling: touch;
+}
+
+.more-properties .house-cards::-webkit-scrollbar {
+  height: 8px;
+}
+
+.more-properties .house-cards::-webkit-scrollbar-track {
+  background: #2e0033;
+  border-radius: 8px;
+}
+
+.more-properties .house-cards::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #ff4dd2, #ff9900);
+  border-radius: 8px;
+}
+
+.more-properties .house-cards::-webkit-scrollbar-thumb:hover {
+  background: #ff4dd2;
+}
+
+.card {
+  display: block;
+  background: #2e0033;
+  border-radius: 12px;
+  padding: 0;
+  min-width: 220px;
+  max-width: 220px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 77, 210, 0.2);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 28px rgba(255, 77, 210, 0.4);
+  border-color: #ff4dd2;
+}
+
+.card-image {
+  width: 100%;
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.card-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, rgba(46, 0, 51, 1), transparent);
+}
+
+.card h3 {
+  color: #ff4dd2;
+  margin: 12px 12px 4px 12px;
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 6px 12px;
+  font-size: 0.88rem;
+  color: #ccc;
+}
+
+.card .location {
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.card .type {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.card .price {
+  font-weight: bold;
+  color: #ff4dd2;
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+
+.card .units-left {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin: 8px 12px 12px 12px;
+  display: inline-block;
+}
+
+/* Property type badges for cards - matching house.css style */
+.card .property-type-badge {
+  display: inline-block;
+  padding: 0;
+  margin: 3px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card .airbnb-badge {
+  color: #29B6F6;
+}
+
+.card .commercial-badge {
+  color: #4CAF50;
+}
+
+/* Bundle Tag on Cards - matching house.css */
+.bundle-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 3px 12px rgba(255, 165, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-left: 4px solid #FF8C00;
+}
+
+.bundle-tag::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 4px;
+  border-color: transparent transparent #FF8C00 transparent;
+  transform: translateY(-8px);
+}
+
+.bundle-tag i {
+  font-size: 0.9rem;
+  animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ========== CHAT POPUP ========== */
+.chat-popup {
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  height: 500px;
+  max-height: 80vh;
+  background: #3b0047;
+  border-radius: 18px;
+  box-shadow: 0 8px 35px rgba(255, 77, 210, 0.4);
+  overflow: hidden;
+  z-index: 1000;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+}
+
+.chat-header {
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
+  color: white;
+  padding: 14px 18px;
+  font-weight: bold;
+  font-size: 1.05rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-header button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.chat-header button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.chat-body {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background: #2e0033;
+}
+
+.chat-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+  background: #ff4dd2;
+  border-radius: 8px;
+}
+
+.message {
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: slideIn 0.3s ease;
+  font-size: 0.9rem;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.agent-message {
+  background: linear-gradient(135deg, #ff9900, #ffaa00);
+  color: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.user-message {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-footer {
+  display: flex;
+  padding: 12px;
+  background: #3b0047;
+  border-top: 1px solid rgba(255, 77, 210, 0.2);
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#chatInput {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  background: #2e0033;
+  color: white;
+  font-size: 0.9rem;
+}
+
+#chatInput:focus {
+  outline: none;
+  border-color: #ff4dd2;
+}
+
+#chatInput::placeholder {
+  color: #888;
+}
+
+#sendMessage {
+  background: linear-gradient(135deg, #ff4dd2, #ff9900);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+
+#sendMessage:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 12px rgba(255, 77, 210, 0.4);
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  background: #000;
+  color: white;
+  padding: 35px 0 20px;
+  margin-top: 40px;
+  border-top: 2px solid rgba(255, 77, 210, 0.3);
+  overflow-x: hidden;
+}
+
+.footer-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 25px;
+  padding: 0 20px;
+}
+
+.footer-left {
+  flex: 1 1 250px;
+}
+
+.footer-logo {
+  display: none;
+}
+
+.footer-left::before {
+  content: 'HomeLoop';
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.footer-left:hover::before {
+  filter: brightness(1.2);
+}
+
+.footer-left p {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.footer-links,
+.footer-contact {
+  flex: 1 1 200px;
+}
+
+.footer-links h4,
+.footer-contact h4 {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: #ff4dd2;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li {
+  margin-bottom: 8px;
+}
+
+.footer-links ul li a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.footer-links ul li a:hover {
+  color: #ff4dd2;
+  padding-left: 5px;
+}
+
+.footer-contact p {
+  margin: 6px 0;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.footer-social {
+  margin-top: 12px;
+}
+
+.footer-social a {
+  color: white;
+  margin-right: 15px;
+  font-size: 1.4rem;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.footer-social a:hover {
+  color: #ff4dd2;
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #333;
+  margin-top: 20px;
+  padding: 15px 20px 0;
+  font-size: 0.85rem;
+  color: #888;
+  width: 100%;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1024px) {
+  .nav-links a {
+    font-size: 1.2rem;
+    padding: 8px;
+  }
+  
+  .nav-links a i {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+  
+  .nav-links .nav-text {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ========== HEADER FIXES ========== */
+  .header {
+    padding: 10px 15px;
+    min-height: auto;
+  }
+
+  .logo-container {
+    order: 1;
+    flex: 0 0 auto;
+  }
+  
+  .logo-container::before {
+    font-size: 1.5rem;
+  }
+
+  /* Icons inline with HomeLoop */
+  .nav-links {
+    order: 2;
+    gap: 15px;
+    font-size: 1.15rem;
+    margin-left: auto;
+    flex: 0 0 auto;
+  }
+
+  .nav-links a {
+    padding: 8px;
+    font-size: 1.15rem;
+  }
+  
+  .nav-links a i {
+    font-size: 1.15rem;
+  }
+  
+  /* Hide text, show only icons */
+  .nav-links .nav-text {
+    display: none !important;
+  }
+  
+  /* Search box below on its own row */
+  .search-container {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  /* ========== BUNDLE CONTAINER ========== */
+  .bundle-container {
+    padding: 0 15px;
+    margin: 120px auto 15px; /* Reduced top margin since header is smaller */
+  }
+
+  /* ========== BUNDLE HEADER ========== */
+  .bundle-header {
+    padding: 20px;
+  }
+
+  .bundle-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .bundle-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .viewing-fee-box {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* ========== ACTION BUTTONS - NO OVERFLOW ========== */
+  .bundle-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+  }
+
+  /* ========== PROPERTY SECTIONS - LESS BORDERS ========== */
+  .property-section {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 25px;
+  }
+
+  .property-hero {
+    height: 280px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+  }
+
+  /* Property details - remove excessive borders */
+  .property-details {
+    padding: 18px 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+  }
+
+  .property-details .location {
+    font-size: 1.25rem;
+  }
+
+  .property-details .price {
+    font-size: 1.6rem;
+  }
+
+  /* ========== HOUSE DESCRIPTION - FULL WIDTH, BETTER SPACING ========== */
+  .house-description {
+    padding: 18px 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    /* Remove any width constraints */
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .house-description h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .house-description p {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    /* Better text wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* ========== MEDIA GRID - 2 COLUMNS + VIDEO PLAY BUTTON ========== */
+  .media-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .media-grid img,
+  .media-grid video {
+    height: 140px;
+  }
+  
+  .media-grid .second-video {
+    max-width: 100%;
+    grid-column: auto;
+  }
+
+  /* ========== REVIEWS - REMOVE EXCESSIVE BORDERS ========== */
+  .house-reviews {
+    padding: 18px 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+  }
+
+  .reviews-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .review-item {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  /* ========== SIMILAR PROPERTIES CARDS - MATCHING house.css ========== */
+  .more-properties {
+    padding: 18px 15px;
+    margin-bottom: 15px;
+  }
+
+  .card {
+    min-width: 190px;
+    max-width: 190px;
+  }
+
+  /* Bundle tag sizing */
+  .bundle-tag {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .bundle-tag i {
+    font-size: 0.75rem;
+  }
+  
+  /* Property type badges */
+  .property-type-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+
+  .card .property-type-badge {
+    font-size: 0.7rem;
+  }
+
+  /* ========== CHAT POPUP - FULL SCREEN ========== */
+  .chat-popup {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    top: 0;
+    right: 0;
+    transform: none;
+    border-radius: 0;
+  }
+
+  /* ========== REVIEW MODAL - FULL SCREEN ========== */
+  #reviewModal {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .review-modal-content {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+
+  /* ========== FOOTER ========== */
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 20px;
+  }
+  
+  .footer-bottom {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-container::before {
+    font-size: 1.3rem;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+  
+  .nav-links a {
+    font-size: 1.1rem;
+  }
+  
+  .nav-links a i {
+    font-size: 1.1rem;
+  }
+
+  .bundle-container {
+    margin: 120px auto 15px;
+  }
+
+  .bundle-title h1 {
+    font-size: 1.3rem;
+  }
+
+  .fee-amount {
+    font-size: 1.6rem;
+  }
+
+  .property-hero {
+    height: 240px;
+  }
+
+  .property-details .location {
+    font-size: 1.15rem;
+  }
+
+  .property-details .price {
+    font-size: 1.4rem;
+  }
+
+  .btn {
+    font-size: 0.95rem;
+    padding: 10px 18px;
+  }
+
+  .house-description h2 {
+    font-size: 1.2rem;
+  }
+
+  .house-description p {
+    font-size: 0.88rem;
+  }
+
+  .card {
+    min-width: 170px;
+    max-width: 170px;
+  }
+
+  .property-type-badge {
+    font-size: 0.68rem;
+  }
+
+  .card .property-type-badge {
+    font-size: 0.68rem;
+  }
+  
+  .review-modal-content {
+    padding: 22px;
+  }
+  
+  .star-rating {
+    font-size: 26px;
+  }
+  
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.85rem;
+  }
+  
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+  
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+  
+  .footer-contact p,
+  .footer-links ul li a {
+    font-size: 0.8rem;
+  }
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
