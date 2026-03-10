@@ -309,8 +309,9 @@ document.addEventListener('DOMContentLoaded', function() {
         price: `Ksh ${formatPrice(currentPropertyData.price)}`,
         units_available: currentPropertyData.units_available || 1,
         images: currentPropertyData.images,
+        // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
         img: currentPropertyData.images && currentPropertyData.images.length > 0 
-          ? `${API_BASE_URL}${currentPropertyData.images[0]}`
+          ? currentPropertyData.images[0]
           : null
       };
       
@@ -365,10 +366,10 @@ async function loadPropertyDetails(propertyId) {
 }
 
 function displayPropertyDetails(property) {
-  // Update hero image
+  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
   const heroImage = document.querySelector('.hero-image');
   if (heroImage && property.images && property.images.length > 0) {
-    heroImage.style.backgroundImage = `url('${API_BASE_URL}${property.images[0]}')`;
+    heroImage.style.backgroundImage = `url('${property.images[0]}')`;
   }
   
   // Full location (without pin emoji)
@@ -409,14 +410,14 @@ function displayPropertyDetails(property) {
     }
   }
   
-  // Update gallery
+  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
   const gallery = document.querySelector('.gallery');
   if (gallery && property.images && property.images.length > 1) {
     gallery.innerHTML = '';
     const additionalImages = property.images.slice(1, 4);
     additionalImages.forEach((image, index) => {
       const img = document.createElement('img');
-      img.src = `${API_BASE_URL}${image}`;
+      img.src = image;
       img.alt = `Property image ${index + 2}`;
       gallery.appendChild(img);
     });
@@ -784,7 +785,6 @@ function createPropertyCard(property) {
   const card = document.createElement('a');
   
   // ✅ FIXED: If property has a bundle_id, link to the bundle page instead
-  // This ensures all properties in a bundle show the complete bundle when clicked
   if (property.bundle_id) {
     card.href = `bundle.html?id=${property.bundle_id}`;
   } else {
@@ -793,8 +793,9 @@ function createPropertyCard(property) {
   
   card.className = 'card';
   
+  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
   const imageUrl = property.images && property.images.length > 0 
-    ? `${API_BASE_URL}${property.images[0]}`
+    ? property.images[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
   
   const fullLocation = property.address_line1 

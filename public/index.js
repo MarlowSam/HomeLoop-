@@ -1,4 +1,4 @@
-// index.js - Fixed filter behavior: Desktop always open, Mobile collapsible & sticky
+// index.js - Filter opens/closes by clicking "Filter Properties" header
 
 let allProperties = {
   featured: [],
@@ -20,85 +20,54 @@ document.addEventListener('DOMContentLoaded', async function() {
   await checkAuthentication();
   initializeFilters();
   initializeSearch();
-  initializeMobileFilterToggle();
+  initializeFilterToggle();
   checkURLSearchQuery();
 });
 
 // ========================================
-// MOBILE FILTER TOGGLE (Only for mobile)
+// FILTER TOGGLE - Click "Filter Properties" header to open/close
 // ========================================
 
-function initializeMobileFilterToggle() {
-  const toggleBtn = document.getElementById('filterToggle');
+function initializeFilterToggle() {
+  const filterHeader = document.querySelector('.filter-header');
   const filterControls = document.querySelector('.filter-controls');
-  const filterHeader = document.querySelector('.filter-header h3');
-  
-  console.log('Initializing mobile filter toggle');
-  
+
+  console.log('Initializing filter toggle');
+
+  // Always start hidden
   if (filterControls) {
-    // Start collapsed on mobile only
-    if (window.innerWidth <= 768) {
-      filterControls.classList.remove('expanded');
-      console.log('Mobile view - filters collapsed');
-    }
+    filterControls.classList.remove('expanded');
   }
-  
-  // Add click handler to h3 title for mobile only
+
+  // Click the entire filter header to toggle open/close
   if (filterHeader) {
+    filterHeader.style.cursor = 'pointer';
     filterHeader.addEventListener('click', function() {
-      if (window.innerWidth <= 768) {
-        toggleFilterMobile();
-      }
+      toggleFilter();
     });
   }
 }
 
-window.toggleFilterMobile = function() {
-  // Only work on mobile
-  if (window.innerWidth > 768) return;
-  
+function toggleFilter() {
   const filterControls = document.querySelector('.filter-controls');
-  const toggleBtn = document.getElementById('filterToggle');
-  const toggleText = document.getElementById('toggleText');
-  
-  console.log('Toggle filter mobile called');
-  
-  if (filterControls && toggleBtn) {
-    const isExpanded = filterControls.classList.contains('expanded');
-    
-    if (isExpanded) {
-      filterControls.classList.remove('expanded');
-      toggleBtn.classList.remove('active');
-      if (toggleText) toggleText.textContent = 'Show Filters';
-      console.log('Collapsed filters');
-    } else {
-      filterControls.classList.add('expanded');
-      toggleBtn.classList.add('active');
-      if (toggleText) toggleText.textContent = 'Hide Filters';
-      console.log('Expanded filters');
-    }
-  }
-};
+  if (!filterControls) return;
 
-function collapseFiltersOnMobile() {
-  // Only collapse on mobile
-  if (window.innerWidth > 768) return;
-  
+  const isExpanded = filterControls.classList.contains('expanded');
+
+  if (isExpanded) {
+    filterControls.classList.remove('expanded');
+    console.log('Filters hidden');
+  } else {
+    filterControls.classList.add('expanded');
+    console.log('Filters shown');
+  }
+}
+
+function collapseFilter() {
   const filterControls = document.querySelector('.filter-controls');
-  const toggleBtn = document.getElementById('filterToggle');
-  const toggleText = document.getElementById('toggleText');
-  
-  console.log('Collapsing filters on mobile...');
-  
   if (filterControls) {
     filterControls.classList.remove('expanded');
-    console.log('Mobile: Removed expanded class');
-  }
-  if (toggleBtn) {
-    toggleBtn.classList.remove('active');
-  }
-  if (toggleText) {
-    toggleText.textContent = 'Show Filters';
+    console.log('Filters auto-collapsed');
   }
 }
 
@@ -151,10 +120,8 @@ function executeSearch(searchQuery) {
     return;
   }
   
-  // Parse search query intelligently
   const detectedFilters = parseSearchQuery(searchQuery);
   
-  // Apply detected filters
   if (detectedFilters.location) {
     document.getElementById('locationFilter').value = detectedFilters.location;
     activeFilters.location = detectedFilters.location;
@@ -175,7 +142,6 @@ function executeSearch(searchQuery) {
     activeFilters.bedrooms = detectedFilters.bedrooms;
   }
   
-  // If no specific filters detected, use as location search
   if (!detectedFilters.location && !detectedFilters.type && !detectedFilters.price && !detectedFilters.bedrooms) {
     document.getElementById('locationFilter').value = searchQuery;
     activeFilters.location = searchQuery;
@@ -183,7 +149,6 @@ function executeSearch(searchQuery) {
   
   applyFilters();
   
-  // Scroll to featured section
   setTimeout(() => {
     const featuredHeader = document.querySelector('.featured-header');
     if (featuredHeader) {
@@ -310,7 +275,6 @@ function initializeFilters() {
 function applyFilters() {
   console.log('Applying filters...');
   
-  // Get filter values
   activeFilters.location = document.getElementById('locationFilter').value;
   activeFilters.type = document.getElementById('typeFilter').value;
   activeFilters.price = document.getElementById('priceFilter').value;
@@ -319,30 +283,23 @@ function applyFilters() {
   
   console.log('Active filters:', activeFilters);
   
-  // Filter properties
   const filteredFeatured = filterProperties(allProperties.featured);
   const filteredRecommended = filterProperties(allProperties.recommended);
   
   console.log('Filtered featured:', filteredFeatured.length);
   console.log('Filtered recommended:', filteredRecommended.length);
   
-  // Display filtered results
   displayPropertiesInRows('featured', filteredFeatured);
   displayPropertiesInRows('recommended', filteredRecommended);
   
-  // Update UI
   updateActiveFiltersDisplay();
   updateResultsCount(filteredFeatured.length + filteredRecommended.length);
+
+  // ✅ Always collapse filter after applying
+  setTimeout(() => {
+    collapseFilter();
+  }, 200);
   
-  // On mobile: collapse filters after applying
-  if (window.innerWidth <= 768) {
-    console.log('Mobile: Collapsing filters after apply');
-    setTimeout(() => {
-      collapseFiltersOnMobile();
-    }, 200);
-  }
-  
-  // Scroll to results
   setTimeout(() => {
     const featuredHeader = document.querySelector('.featured-header');
     if (featuredHeader) {
@@ -353,7 +310,6 @@ function applyFilters() {
 
 function filterProperties(properties) {
   return properties.filter(property => {
-    // Location filter
     if (activeFilters.location) {
       const searchTerm = activeFilters.location.toLowerCase().trim();
       const city = (property.city || '').toLowerCase();
@@ -364,12 +320,10 @@ function filterProperties(properties) {
       }
     }
     
-    // Property type filter
     if (activeFilters.type && property.property_type !== activeFilters.type) {
       return false;
     }
     
-    // Price filter
     if (activeFilters.price) {
       const [minPrice, maxPrice] = activeFilters.price.split('-').map(Number);
       const propertyPrice = Number(property.price);
@@ -378,7 +332,6 @@ function filterProperties(properties) {
       }
     }
     
-    // Bedrooms filter
     if (activeFilters.bedrooms) {
       const beds = Number(activeFilters.bedrooms);
       const propertyBeds = Number(property.bedrooms);
@@ -389,7 +342,6 @@ function filterProperties(properties) {
       }
     }
     
-    // Bathrooms filter
     if (activeFilters.bathrooms) {
       const baths = Number(activeFilters.bathrooms);
       const propertyBaths = Number(property.bathrooms);
@@ -426,14 +378,12 @@ function displayPropertiesInRows(section, properties) {
 function resetFilters() {
   console.log('Resetting filters');
   
-  // Clear inputs
   document.getElementById('locationFilter').value = '';
   document.getElementById('typeFilter').value = '';
   document.getElementById('priceFilter').value = '';
   document.getElementById('bedroomsFilter').value = '';
   document.getElementById('bathroomsFilter').value = '';
   
-  // Reset active filters
   activeFilters = {
     location: '',
     type: '',
@@ -442,16 +392,19 @@ function resetFilters() {
     bathrooms: ''
   };
   
-  // Show all properties
   displayPropertiesInRows('featured', allProperties.featured);
   displayPropertiesInRows('recommended', allProperties.recommended);
   
-  // Hide filter display
   const activeFiltersDiv = document.getElementById('activeFilters');
   const resultsCountDiv = document.getElementById('resultsCount');
   
   if (activeFiltersDiv) activeFiltersDiv.style.display = 'none';
   if (resultsCountDiv) resultsCountDiv.style.display = 'none';
+
+  // ✅ Collapse after reset too
+  setTimeout(() => {
+    collapseFilter();
+  }, 200);
 }
 
 function updateActiveFiltersDisplay() {
@@ -593,7 +546,6 @@ async function loadRecommendedProperties() {
 function createPropertyCard(property) {
   const card = document.createElement('a');
   
-  // ✅ FIXED: Check if property is a bundle and link to correct bundle_id
   const isBundle = property.is_bundle === true || property.bundle_id;
   card.href = isBundle ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
   card.className = 'card';
@@ -610,7 +562,6 @@ function createPropertyCard(property) {
   const bedrooms = Math.floor(property.bedrooms || 0);
   const bathrooms = Math.floor(property.bathrooms || 0);
   
-  // Determine property type badge color and text
   let propertyTypeBadge = '';
   const propType = property.property_type || 'Property';
   
@@ -622,7 +573,6 @@ function createPropertyCard(property) {
     propertyTypeBadge = `<p class="type">${propType}</p>`;
   }
   
-  // Add bundle tag if property is part of a bundle
   const bundleTag = isBundle ? '<div class="bundle-tag"><i class="fa-solid fa-gift"></i> Bundle</div>' : '';
   
   card.innerHTML = `

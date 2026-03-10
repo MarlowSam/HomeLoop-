@@ -844,41 +844,12 @@ body.listings-page .featured-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
   }
 
   .filter-header h3 {
     font-size: 1rem;
-    cursor: pointer;
     flex: 1;
-  }
-
-  /* Mobile: Show toggle button */
-  .filter-toggle {
-    display: flex;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    background: rgba(255, 77, 210, 0.15);
-    border: 1px solid rgba(255, 77, 210, 0.3);
-    color: #ff4dd2;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .filter-toggle:hover {
-    background: rgba(255, 77, 210, 0.25);
-    transform: translateY(-2px);
-  }
-
-  .filter-toggle i {
-    transition: transform 0.3s ease;
-  }
-
-  .filter-toggle.active i {
-    transform: rotate(180deg);
   }
 
   /* Mobile: Hide reset button */
@@ -1028,12 +999,11 @@ body.listings-page .featured-header {
     grid-column: 1;
   }
 }
+
 /* ========================================
-   UPDATED PROPERTY TYPE & BUNDLE TAG STYLES
-   Replace the existing badge styles in index.css with these
+   PROPERTY TYPE & BUNDLE TAG STYLES
    ======================================== */
 
-/* Property Type Text (Airbnb = Blue, Commercial = Green) - NO BACKGROUND */
 .property-type-badge {
   display: inline-block;
   padding: 0;
@@ -1052,7 +1022,6 @@ body.listings-page .featured-header {
   color: #4CAF50;
 }
 
-/* Bundle Gift Tag (Top-left corner) - UNCHANGED */
 .bundle-tag {
   position: absolute;
   top: 10px;
@@ -1092,20 +1061,14 @@ body.listings-page .featured-header {
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
-/* Ensure card has position relative for absolute positioning of bundle tag */
 .card {
   position: relative;
 }
 
-/* Mobile adjustments for bundle tag */
 @media (max-width: 768px) {
   .bundle-tag {
     padding: 4px 8px;
@@ -1113,11 +1076,11 @@ body.listings-page .featured-header {
     top: 8px;
     left: 8px;
   }
-  
+
   .bundle-tag i {
     font-size: 0.75rem;
   }
-  
+
   .property-type-badge {
     font-size: 0.7rem;
   }

@@ -1213,8 +1213,9 @@ function createPropertyCardWithInquiry(property, hasInquiry) {
   card.style.position = 'relative';
   
   const images = typeof property.images === 'string' ? JSON.parse(property.images) : property.images;
+  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
   const imageUrl = images && images.length > 0 
-    ? `${API_BASE_URL}${images[0]}`
+    ? images[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
   
   const location = property.address_line1 
