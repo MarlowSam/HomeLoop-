@@ -3,16 +3,12 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import crypto from "crypto";
-import sharp from "sharp";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import { v2 as cloudinary } from "cloudinary";
+import { Readable } from "stream";
 import db from "../db.js";
 import { verifyToken, requireAgent } from '../middleware/auth.js';
 
 const router = express.Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // ==========================================
 // 🔒 SECURITY: File Upload Configuration
@@ -21,102 +17,41 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
 const ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm'];
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  
-  // Check if it's an image
-  if (ALLOWED_IMAGE_TYPES.includes(file.mimetype) && 
-      ALLOWED_IMAGE_EXTENSIONS.includes(ext)) {
+  if (ALLOWED_IMAGE_TYPES.includes(file.mimetype) && ALLOWED_IMAGE_EXTENSIONS.includes(ext)) {
     return cb(null, true);
   }
-  
-  // Check if it's a video
-  if (ALLOWED_VIDEO_TYPES.includes(file.mimetype) && 
-      ALLOWED_VIDEO_EXTENSIONS.includes(ext)) {
+  if (ALLOWED_VIDEO_TYPES.includes(file.mimetype) && ALLOWED_VIDEO_EXTENSIONS.includes(ext)) {
     return cb(null, true);
   }
-  
   return cb(new Error('Invalid file type. Only JPG, PNG, WEBP, MP4, WEBM allowed.'), false);
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    // Separate folders for images and videos
-    if (file.mimetype.startsWith('video/')) {
-      cb(null, "uploads/videos/");
-    } else {
-      cb(null, "uploads/");
-    }
-  },
-  filename: function (req, file, cb) {
-    const randomName = crypto.randomBytes(16).toString('hex');
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `${randomName}${ext}`);
-  },
-});
+// ✅ CHANGED: Use memory storage instead of disk storage
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
   fileFilter,
-  limits: { 
-    fileSize: MAX_VIDEO_SIZE, // Use max video size as the limit
-    files: 15 // Max 10 images + 2 videos per property
+  limits: {
+    fileSize: MAX_VIDEO_SIZE,
+    files: 15
   },
 });
 
-// ==========================================
-// 🔒 SECURITY: Image Processing Middleware
-// ==========================================
-async function processImages(req, res, next) {
-  // When using upload.fields(), req.files is an object: { images: [...], videos: [...] }
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return next();
-  }
-
-  try {
-    // Process only the images field
-    const imageFiles = req.files.images || [];
-    
-    for (const file of imageFiles) {
-      const processedPath = file.path.replace(path.extname(file.path), '_processed.jpg');
-      
-      await sharp(file.path)
-        .jpeg({ quality: 85 })
-        .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
-        .toFile(processedPath);
-      
-      fs.unlinkSync(file.path);
-      fs.renameSync(processedPath, file.path);
-    }
-    
-    // req.files already has the correct structure from multer
-    next();
-  } catch (error) {
-    console.error('Image processing error:', error);
-    
-    // Clean up all uploaded files on error
-    if (req.files) {
-      // Handle both images and videos
-      if (req.files.images) {
-        req.files.images.forEach(file => {
-          if (fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-          }
-        });
-      }
-      if (req.files.videos) {
-        req.files.videos.forEach(file => {
-          if (fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-          }
-        });
-      }
-    }
-    return res.status(400).json({ message: 'Invalid image file' });
-  }
+// ✅ NEW: Upload buffer to Cloudinary helper
+function uploadToCloudinary(buffer, options) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (error) reject(error);
+      else resolve(result);
+    });
+    Readable.from(buffer).pipe(stream);
+  });
 }
 
 // ==========================================
@@ -162,32 +97,31 @@ function validateNumber(num, min = 0, max = 1000) {
 // ==========================================
 // POST: Add New Property (with image & video upload)
 // ==========================================
-router.post("/", 
-  verifyToken, 
-  requireAgent, 
+router.post("/",
+  verifyToken,
+  requireAgent,
   upload.fields([
     { name: 'images', maxCount: 10 },
     { name: 'videos', maxCount: 2 }
   ]),
-  processImages,
   async (req, res) => {
   try {
     console.log("✅ Upload route hit");
     console.log("Received files:", req.files);
     console.log("Received body:", req.body);
 
-    let { 
-      title, 
-      description, 
-      property_type, 
-      listing_type, 
+    let {
+      title,
+      description,
+      property_type,
+      listing_type,
       price,
-      viewing_fee, 
-      bedrooms, 
-      bathrooms,  
+      viewing_fee,
+      bedrooms,
+      bathrooms,
       address_line1,
-      city, 
-      units_available, 
+      city,
+      units_available,
       is_featured,
       is_bundle,
       bundle_id
@@ -232,15 +166,36 @@ router.post("/",
       listing_type = 'rent';
     }
 
-    // Separate images and videos
+    // ✅ CHANGED: Upload to Cloudinary instead of saving to disk
     const imageFiles = req.files?.images || [];
     const videoFiles = req.files?.videos || [];
 
-    const imagePaths = imageFiles.map(file => `/uploads/${file.filename}`);
-    const videoPaths = videoFiles.map(file => `/uploads/videos/${file.filename}`);
+    const imageUploadPromises = imageFiles.map(file =>
+      uploadToCloudinary(file.buffer, {
+        folder: 'homeloop/properties',
+        resource_type: 'image',
+        transformation: [{ quality: 85, width: 2000, height: 2000, crop: 'limit' }]
+      })
+    );
 
-    console.log('Image paths:', imagePaths);
-    console.log('Video paths:', videoPaths);
+    const videoUploadPromises = videoFiles.map(file =>
+      uploadToCloudinary(file.buffer, {
+        folder: 'homeloop/videos',
+        resource_type: 'video'
+      })
+    );
+
+    const [imageResults, videoResults] = await Promise.all([
+      Promise.all(imageUploadPromises),
+      Promise.all(videoUploadPromises)
+    ]);
+
+    // ✅ CHANGED: Store Cloudinary URLs instead of local paths
+    const imagePaths = imageResults.map(r => r.secure_url);
+    const videoPaths = videoResults.map(r => r.secure_url);
+
+    console.log('Image URLs:', imagePaths);
+    console.log('Video URLs:', videoPaths);
 
     const [result] = await db.promise().query(
       `INSERT INTO properties  
@@ -275,23 +230,6 @@ router.post("/",
     });
   } catch (err) {
     console.error("❌ Error uploading property:", err);
-    if (req.files) {
-      // Clean up uploaded files on error
-      if (req.files.images) {
-        req.files.images.forEach(file => {
-          if (fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-          }
-        });
-      }
-      if (req.files.videos) {
-        req.files.videos.forEach(file => {
-          if (fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-          }
-        });
-      }
-    }
     res.status(500).json({ message: "An error occurred while uploading property" });
   }
 });
@@ -413,7 +351,6 @@ router.get("/similar/:id", async (req, res) => {
     
     console.log(`🔍 Finding similar properties for property ID: ${id}`);
     
-    // Get current property details
     const [currentProperty] = await db.promise().query(
       `SELECT property_type, city, price, bedrooms, listing_type FROM properties WHERE property_id = ?`,
       [id]
@@ -539,7 +476,6 @@ router.get("/similar/:id", async (req, res) => {
       console.log(`✅ Strategy 4 (Any property): Added ${anyRows.length} properties. Total: ${rows.length}`);
     }
     
-    // Process and include bundle information
     const properties = rows.map(prop => ({
       ...prop,
       images: typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images,
@@ -552,11 +488,9 @@ router.get("/similar/:id", async (req, res) => {
     res.json({ properties });
   } catch (err) {
     console.error("❌ Error fetching similar properties:", err);
-    
     if (err.message === 'Invalid property ID') {
       return res.status(400).json({ message: err.message });
     }
-    
     res.status(500).json({ message: "Error fetching similar properties" });
   }
 });
@@ -600,14 +534,13 @@ router.get("/:id", async (req, res) => {
     res.json({ property });
   } catch (err) {
     console.error("Error fetching property:", err);
-    
     if (err.message === 'Invalid property ID') {
       return res.status(400).json({ message: err.message });
     }
-    
     res.status(500).json({ message: "Error fetching property" });
   }
 });
+
 // GET: All Properties
 router.get("/", async (req, res) => {
   try {

@@ -1,16 +1,14 @@
-// server.js - WITH BUNDLES ROUTE & VIDEO UPLOAD SUPPORT
-// VERIFIED VERSION WITH PROPER ROUTE REGISTRATION
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
-import fs from "fs";
 import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { v2 as cloudinary } from "cloudinary";
 import db from "./db.js";
 import authRoutes from "./routes/auth.js";
 import propertiesRoutes from "./routes/properties.js";
@@ -36,23 +34,17 @@ console.log('🚀 Starting HomeLoop Server...');
 console.log('📍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 
 // ==========================================
-// CREATE UPLOAD DIRECTORIES IF THEY DON'T EXIST
+// CLOUDINARY CONFIGURATION
 // ==========================================
-const uploadsDir = path.join(__dirname, "uploads");
-const videosDir = path.join(__dirname, "uploads", "videos");
-
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("✅ Created uploads directory");
-}
-
-if (!fs.existsSync(videosDir)) {
-  fs.mkdirSync(videosDir, { recursive: true });
-  console.log("✅ Created uploads/videos directory");
-}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+console.log('✅ Cloudinary configured');
 
 // ==========================================
-// 🔒 SECURITY: HELMET - Security Headers
+// SECURITY: HELMET
 // ==========================================
 app.use(helmet({
   contentSecurityPolicy: isProduction ? {
@@ -61,19 +53,15 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       scriptSrcElem: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
-      mediaSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      imgSrc: ["'self'", "data:", "https:", "http:", "https://res.cloudinary.com"],
+      mediaSrc: ["'self'", "data:", "https:", "http:", "https://res.cloudinary.com"],
+      connectSrc: ["'self'", "ws:", "wss:", "https://homelooptest-123.onrender.com"],
       fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
       objectSrc: ["'none'"],
       frameSrc: ["'none'"],
     },
   } : false,
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   noSniff: true,
   xssFilter: true,
@@ -82,180 +70,120 @@ app.use(helmet({
 }));
 
 // ==========================================
-// 🔒 SECURITY: RATE LIMITER DEFINITIONS
+// RATE LIMITERS
 // ==========================================
-
-// Global API rate limiter
 const apiLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 200,
+  windowMs: 1 * 60 * 1000, max: 200,
   message: { message: "Too many requests. Please slow down." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, legacyHeaders: false,
 });
 
-// Login rate limiter
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
+  windowMs: 15 * 60 * 1000, max: 5,
   message: { message: "Too many login attempts. Try again in 15 minutes." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, legacyHeaders: false,
   skipSuccessfulRequests: true,
 });
 
-// Signup rate limiter
 const signupLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 3,
+  windowMs: 60 * 60 * 1000, max: 3,
   message: { message: "Too many accounts created. Try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, legacyHeaders: false,
 });
 
-// File upload rate limiter (increased for video uploads)
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 20,
+  windowMs: 60 * 60 * 1000, max: 20,
   message: { message: "Upload limit exceeded. Try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, legacyHeaders: false,
 });
 
 // ==========================================
-// CORS Configuration
+// CORS
 // ==========================================
-const allowedOrigins = isProduction 
-  ? [process.env.FRONTEND_URL || "https://homeloop.onrender.com"]
+const allowedOrigins = isProduction
+  ? [
+      process.env.FRONTEND_URL || "https://homelooptest-123.onrender.com",
+      "https://homelooptest-123.onrender.com"
+    ]
   : ["http://127.0.0.1:8000", "http://127.0.0.1:5500", "http://localhost:8000", "http://localhost:5500", "http://localhost:5000"];
 
 console.log('🌐 CORS allowed origins:', allowedOrigins);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // ==========================================
-// 🔒 SECURITY: Body Parser with Size Limits (increased for video)
+// BODY PARSER & COOKIES
 // ==========================================
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // ==========================================
-// 🔒 SECURITY: Serve Static Files Securely
-// ==========================================
-app.use("/uploads", (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Cache-Control', 'public, max-age=31536000');
-  next();
-}, express.static(path.join(__dirname, "uploads")));
-
-// Serve videos directory
-app.use("/uploads/videos", (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Cache-Control', 'public, max-age=31536000');
-  next();
-}, express.static(path.join(__dirname, "uploads", "videos")));
-
-// ==========================================
-// Serve Frontend Static Files
+// SERVE FRONTEND
 // ==========================================
 app.use(express.static(path.join(__dirname, "public")));
 
 // ==========================================
-// 🎯 ROUTES REGISTRATION - MUST COME BEFORE RATE LIMITERS
+// ROUTES
 // ==========================================
 console.log('📝 Registering API routes...');
 
 app.use("/api/auth", authRoutes);
-console.log('✅ Auth routes registered');
-
 app.use("/api/properties", propertiesRoutes);
-console.log('✅ Properties routes registered');
-
 app.use("/api/agents", agentsRoutes);
-console.log('✅ Agents routes registered');
-
 app.use("/api/bookings", bookingsRoutes);
-console.log('✅ Bookings routes registered');
-
 app.use("/api/reviews", reviewsRoutes);
-console.log('✅ Reviews routes registered');
-
 app.use('/api/payments', paymentRoutes);
-console.log('✅ Payment routes registered');
-
 app.use('/api/oauth', oauthRoutes);
-console.log('✅ OAuth routes registered');
-
 app.use('/api/chat', chatRoutes);
-console.log('✅ Chat routes registered');
-
 app.use('/api/bundles', bundlesRoutes);
-console.log('✅ Bundles routes registered');
+
+console.log('✅ All routes registered');
 
 // ==========================================
-// APPLY RATE LIMITERS TO SPECIFIC ROUTES
+// RATE LIMITERS ON SPECIFIC ROUTES
 // ==========================================
 app.use("/api/auth/login", loginLimiter);
 app.use("/api/auth/signup", signupLimiter);
 app.post("/api/properties", uploadLimiter);
 app.put("/api/properties/:id", uploadLimiter);
 app.post("/api/bundles", uploadLimiter);
-
-// General API rate limiter as fallback
 app.use("/api/", apiLimiter);
 
 // ==========================================
-// Home Route
+// HOME ROUTE
 // ==========================================
 app.get("/", (req, res) => {
-  res.send("✅ HomeLoop backend running with video upload & bundle support!");
+  res.send("✅ HomeLoop backend running!");
 });
 
 // ==========================================
-// Catch-all route - Serve index.html for client-side routing
+// CATCH-ALL
 // ==========================================
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // ==========================================
-// 🔒 SECURITY: Global Error Handler
+// GLOBAL ERROR HANDLER
 // ==========================================
 app.use((err, req, res, next) => {
   console.error('❌ Server Error:', err);
-  
   if (isProduction) {
     return res.status(err.status || 500).json({
       message: "An error occurred",
       ...(err.status === 400 && { details: err.message })
     });
   }
-  
-  res.status(err.status || 500).json({
-    message: err.message,
-    stack: err.stack
-  });
+  res.status(err.status || 500).json({ message: err.message, stack: err.stack });
 });
 
 // ==========================================
-// Create HTTP Server and Socket.io
+// SOCKET.IO & HTTP SERVER
 // ==========================================
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins,
-    credentials: true
-  },
+  cors: { origin: allowedOrigins, credentials: true },
   maxHttpBufferSize: 1e6,
   pingTimeout: 60000,
   pingInterval: 25000
@@ -264,20 +192,13 @@ const io = new Server(httpServer, {
 chatHandler(io);
 
 // ==========================================
-// Start Server
+// START SERVER
 // ==========================================
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log('\n🎉 ======================================');
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Socket.io enabled for real-time chat`);
-  console.log(`✅ Video upload support enabled`);
-  console.log(`✅ Bundle package support enabled`);
-  console.log(`🔒 Per-user rate limiting enabled`);
+  console.log(`✅ Cloudinary image storage enabled`);
   console.log(`🔒 Security features enabled`);
-  console.log(`🔒 CSP ${isProduction ? 'ENABLED' : 'DISABLED'} (${isProduction ? 'production' : 'development'} mode)`);
-  console.log('🎉 ======================================\n');
-
   startReviewScheduler();
 });
 
