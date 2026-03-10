@@ -598,8 +598,9 @@ function createPropertyCard(property) {
   card.href = isBundle ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
   card.className = 'card';
   
+  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
   const imageUrl = property.images && property.images.length > 0 
-    ? `${API_BASE_URL}${property.images[0]}`
+    ? property.images[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
   
   const fullLocation = property.address_line1 
