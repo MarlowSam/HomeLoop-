@@ -51,8 +51,8 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrcElem: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.socket.io"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.socket.io"],
       imgSrc: ["'self'", "data:", "https:", "http:", "https://res.cloudinary.com"],
       mediaSrc: ["'self'", "data:", "https:", "http:", "https://res.cloudinary.com"],
       connectSrc: ["'self'", "ws:", "wss:", "https://homelooptest-123.onrender.com"],
@@ -113,9 +113,10 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // ==========================================
 // BODY PARSER & COOKIES
+// ✅ FIXED: Increased limit for file uploads
 // ==========================================
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 // ==========================================
