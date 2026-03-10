@@ -11,6 +11,15 @@ import { verifyToken, requireAgent } from '../middleware/auth.js';
 const router = express.Router();
 
 // ==========================================
+// ✅ FIXED: Cloudinary Configuration
+// ==========================================
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ==========================================
 // 🔒 SECURITY: File Upload Configuration
 // ==========================================
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
