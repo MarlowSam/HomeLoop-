@@ -321,14 +321,25 @@ body {
   }
 }
 
+/* ✅ FIXED: Full screen on mobile - removes empty space */
 @media (max-width: 480px) {
   body {
-    padding: 10px;
-  }
+  padding: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: unset;
+}
 
   .login-container {
-    padding: 20px 20px;
-  }
+  width: 100%;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
   .logo-text {
     font-size: 1.6rem;
@@ -344,10 +355,6 @@ body {
     margin-bottom: 16px;
   }
 
-  .login-form {
-    gap: 11px;
-  }
-
   .form-group {
     gap: 10px;
   }
@@ -358,7 +365,7 @@ body {
   }
 
   .form-group input {
-    padding: 9px 11px;
+    padding: 10px 12px;
     font-size: 0.88rem;
   }
 
@@ -378,11 +385,12 @@ body {
 
   .social-login {
     gap: 9px;
+    margin-bottom: 10px;
   }
 
   .social-login button {
-    padding: 9px 14px;
-    font-size: 0.88rem;
+    padding: 10px 14px;
+    font-size: 0.9rem;
   }
 
   .google-btn svg {
@@ -405,7 +413,7 @@ body {
 
 @media (max-width: 360px) {
   .login-container {
-    padding: 18px 16px;
+    padding: 40px 16px 25px;
   }
 
   .logo-text {
@@ -433,14 +441,12 @@ body {
   }
 }
 
-/* For very tall screens - ensure container doesn't get too large */
 @media (min-height: 900px) {
   .login-container {
     max-height: 90vh;
   }
 }
 
-/* For shorter screens - make it scrollable but compact */
 @media (max-height: 700px) {
   body {
     padding: 10px;

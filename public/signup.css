@@ -409,14 +409,24 @@ body {
   }
 }
 
+/* ✅ FIXED: Full screen on mobile - removes empty space */
 @media (max-width: 480px) {
   body {
-    padding: 10px;
-  }
-
-  .signup-container {
-    padding: 20px 20px;
-  }
+  padding: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: unset;
+}
+ .signup-container {
+  width: 100%;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
   .logo-text {
     font-size: 1.6rem;
@@ -522,7 +532,7 @@ body {
 
 @media (max-width: 360px) {
   .signup-container {
-    padding: 18px 16px;
+    padding: 30px 16px 25px;
   }
 
   .logo-text {
@@ -572,14 +582,12 @@ body {
   }
 }
 
-/* For very tall screens - ensure container doesn't get too large */
 @media (min-height: 900px) {
   .signup-container {
     max-height: 90vh;
   }
 }
 
-/* For shorter screens - make it scrollable but compact */
 @media (max-height: 700px) {
   body {
     padding: 10px;

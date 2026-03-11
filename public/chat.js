@@ -1,5 +1,5 @@
 // chat.js - Real-time Chat Client with Socket.io (MOBILE OPTIMIZED)
-// UPDATED FOR LOCAL AND PRODUCTION
+
 let socket = null;
 let currentConversationId = null;
 let currentPropertyId = null;
@@ -24,14 +24,11 @@ function showAlert(message) {
       <button class="custom-alert-btn">OK</button>
     </div>
   `;
-  
   document.body.appendChild(overlay);
-  
+
   const btn = overlay.querySelector('.custom-alert-btn');
   btn.addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 }
 
 // ============================================
@@ -43,104 +40,77 @@ async function getAuthToken() {
       method: 'GET',
       credentials: 'include'
     });
-    
     if (response.ok) {
       const data = await response.json();
-      console.log('✅ Token retrieved from API');
       currentUserId = data.user.userId;
       return data.token;
-    } else {
-      console.error('❌ Failed to get token from API');
-      return null;
     }
+    return null;
   } catch (error) {
-    console.error('❌ Error fetching token:', error);
+    console.error('Error fetching token:', error);
     return null;
   }
 }
+
+// ============================================
 // INITIALIZE SOCKET CONNECTION
+// ============================================
 async function initializeSocket() {
-  if (socketConnectionPromise) {
-    return socketConnectionPromise;
-  }
+  if (socketConnectionPromise) return socketConnectionPromise;
+
   const token = await getAuthToken();
-  
-  console.log('🔍 Checking for token:', token ? 'Found' : 'Not found');
-  
   if (!token) {
-    console.error('No authentication token found');
     showAlert('Please log in to use the chat feature.');
     return Promise.reject(new Error('No token'));
   }
 
   socketConnectionPromise = new Promise((resolve, reject) => {
     try {
-      // Connect to the backend URL (not frontend)
       socket = io(API_BASE_URL, {
-        auth: {
-          token: token
-        },
+        auth: { token },
         transports: ['websocket', 'polling']
       });
 
-      const connectionTimeout = setTimeout(() => {
-        reject(new Error('Connection timeout'));
-      }, 5000);
+      const connectionTimeout = setTimeout(() => reject(new Error('Connection timeout')), 5000);
 
       socket.on('connect', () => {
         clearTimeout(connectionTimeout);
-        console.log('Connected to chat server');
         isSocketInitialized = true;
         resolve(true);
       });
 
       socket.on('connect_error', (error) => {
         clearTimeout(connectionTimeout);
-        console.error('Connection error:', error.message);
         socketConnectionPromise = null;
         reject(error);
       });
 
       socket.on('disconnect', () => {
-        console.log('Disconnected from chat server');
         isSocketInitialized = false;
         socketConnectionPromise = null;
       });
 
       socket.on('new_message', (message) => {
-        console.log('New message received:', message);
         displayMessage(message);
-        
         const chatBody = document.getElementById('chatMessages');
-        if (chatBody) {
-          chatBody.scrollTop = chatBody.scrollHeight;
-        }
+        if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
       });
+
       socket.on('user_typing', (data) => {
-        if (data.conversationId === currentConversationId) {
-          showTypingIndicator();
-        }
+        if (data.conversationId === currentConversationId) showTypingIndicator();
       });
 
       socket.on('user_stop_typing', (data) => {
-        if (data.conversationId === currentConversationId) {
-          hideTypingIndicator();
-        }
+        if (data.conversationId === currentConversationId) hideTypingIndicator();
       });
 
       socket.on('user_online', (data) => {
-        if (data.conversationId === currentConversationId) {
-          updateAgentOnlineStatus(true);
-        }
+        if (data.conversationId === currentConversationId) updateAgentOnlineStatus(true);
       });
 
-      socket.on('new_message_notification', (data) => {
-        console.log('🔔 New message notification:', data);
-        updateUnreadBadge();
-      });
+      socket.on('new_message_notification', () => updateUnreadBadge());
 
     } catch (error) {
-      console.error('❌ Error initializing socket:', error);
       socketConnectionPromise = null;
       reject(error);
     }
@@ -150,71 +120,94 @@ async function initializeSocket() {
 }
 
 // ============================================
-// OPEN CHAT (from Chat Agent button)
+// OPEN CHAT
 // ============================================
 async function openChat(propertyId, agentId) {
-  console.log('🚀 Opening chat for property:', propertyId, 'agent:', agentId);
-  
+  console.log('Opening chat for property:', propertyId, 'agent:', agentId);
+
   currentPropertyId = propertyId;
   currentAgentId = agentId;
 
   try {
     if (!socket || !socket.connected) {
-      console.log('⏳ Initializing socket connection...');
       await initializeSocket();
-      console.log('✅ Socket connected successfully');
     }
 
     const response = await fetch(`${API_BASE_URL}/api/chat/conversations`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({
-        property_id: propertyId,
-        agent_id: agentId
-      })
+      body: JSON.stringify({ property_id: propertyId, agent_id: agentId })
     });
 
     const data = await response.json();
-    console.log('📝 Conversation response:', data);
-    
+
     if (data.success && data.conversation) {
       currentConversationId = data.conversation.conversation_id;
-      
+
       if (socket && socket.connected) {
         socket.emit('join_conversation', currentConversationId);
-        console.log('✅ Joined conversation:', currentConversationId);
       }
-      
+
       await loadMessages(currentConversationId);
-      
-      // Show chat popup
+
       const chatPopup = document.getElementById('chatPopup');
       chatPopup.style.display = 'flex';
-      
-      // Add animation class for smooth entrance
-      setTimeout(() => {
-        chatPopup.classList.add('chat-visible');
-      }, 10);
-      
+      setTimeout(() => chatPopup.classList.add('chat-visible'), 10);
+
       markMessagesAsRead(currentConversationId);
-      
-      // Focus input on desktop, but not on mobile (prevents keyboard jumping)
+
+      // Focus input on desktop only
       if (window.innerWidth > 768) {
         document.getElementById('chatInput').focus();
       }
+
+      // ✅ Fix chat input visibility on mobile when keyboard opens
+      if (window.innerWidth <= 768) {
+        ensureChatInputVisible();
+      }
+
     } else {
       throw new Error(data.message || 'Failed to create conversation');
     }
   } catch (error) {
-    console.error('❌ Error opening chat:', error);
+    console.error('Error opening chat:', error);
     if (error.message === 'No token') {
       showAlert('Please log in to use the chat feature.');
     } else {
       showAlert('Failed to open chat. Please try again.');
     }
+  }
+}
+
+// ============================================
+// ENSURE CHAT INPUT VISIBLE ON MOBILE
+// ============================================
+function ensureChatInputVisible() {
+  const chatPopup = document.getElementById('chatPopup');
+  const chatFooter = chatPopup ? chatPopup.querySelector('.chat-footer') : null;
+
+  if (!chatFooter) return;
+
+  // Force chat footer to always be at bottom of visible area
+  chatFooter.style.position = 'sticky';
+  chatFooter.style.bottom = '0';
+  chatFooter.style.zIndex = '10';
+  chatFooter.style.background = '#3b0047';
+
+  // When keyboard opens on mobile, adjust chat body height
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (chatPopup && chatPopup.style.display !== 'none' && window.innerWidth <= 768) {
+        const visibleHeight = window.visualViewport.height;
+        chatPopup.style.height = `${visibleHeight}px`;
+
+        const chatBody = document.getElementById('chatMessages');
+        if (chatBody) {
+          setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
+        }
+      }
+    });
   }
 }
 
@@ -227,53 +220,43 @@ async function loadMessages(conversationId) {
       method: 'GET',
       credentials: 'include'
     });
-
     const data = await response.json();
-    console.log('📨 Messages loaded:', data);
-    
+
     if (data.success && data.messages) {
       const chatBody = document.getElementById('chatMessages');
-      
+      // Keep the initial greeting message
       const initialMessage = chatBody.querySelector('.agent-message');
       chatBody.innerHTML = '';
-      if (initialMessage) {
-        chatBody.appendChild(initialMessage);
-      }
-      
-      data.messages.forEach(message => {
-        displayMessage(message);
-      });
-      
+      if (initialMessage) chatBody.appendChild(initialMessage);
+
+      data.messages.forEach(message => displayMessage(message));
       chatBody.scrollTop = chatBody.scrollHeight;
     }
   } catch (error) {
-    console.error('❌ Error loading messages:', error);
+    console.error('Error loading messages:', error);
   }
 }
 
 // ============================================
-// DISPLAY MESSAGE IN CHAT
+// DISPLAY MESSAGE
 // ============================================
 function displayMessage(message) {
   const chatBody = document.getElementById('chatMessages');
-  
   const isOwnMessage = message.sender_id === currentUserId;
-  
+
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${isOwnMessage ? 'user-message' : 'agent-message'}`;
-  
+
   const timestamp = new Date(message.created_at).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit'
   });
-  
+
   messageDiv.innerHTML = `
-    <div class="message-content">
-      ${escapeHtml(message.message_text)}
-    </div>
+    <div class="message-content">${escapeHtml(message.message_text)}</div>
     <div class="message-time">${timestamp}</div>
   `;
-  
+
   chatBody.appendChild(messageDiv);
 }
 
@@ -283,32 +266,20 @@ function displayMessage(message) {
 function sendMessage() {
   const input = document.getElementById('chatInput');
   const messageText = input.value.trim();
-  
-  if (!messageText || !currentConversationId) {
-    return;
-  }
-  
+
+  if (!messageText || !currentConversationId) return;
+
   if (!socket || !socket.connected) {
     showAlert('Not connected to chat server. Please refresh and try again.');
     return;
   }
-  
-  socket.emit('send_message', {
-    conversationId: currentConversationId,
-    messageText: messageText
-  });
-  
-  console.log('📤 Message sent:', messageText);
-  
+
+  socket.emit('send_message', { conversationId: currentConversationId, messageText });
   input.value = '';
-  
-  // Resize textarea back to original size
   input.style.height = 'auto';
-  
+
   if (socket && socket.connected) {
-    socket.emit('stop_typing', {
-      conversationId: currentConversationId
-    });
+    socket.emit('stop_typing', { conversationId: currentConversationId });
   }
 }
 
@@ -317,38 +288,26 @@ function sendMessage() {
 // ============================================
 function handleTyping() {
   if (!currentConversationId || !socket || !socket.connected) return;
-  
-  socket.emit('typing', {
-    conversationId: currentConversationId
-  });
-  
+  socket.emit('typing', { conversationId: currentConversationId });
   clearTimeout(typingTimeout);
-  
   typingTimeout = setTimeout(() => {
     if (socket && socket.connected) {
-      socket.emit('stop_typing', {
-        conversationId: currentConversationId
-      });
+      socket.emit('stop_typing', { conversationId: currentConversationId });
     }
   }, 2000);
 }
 
 function showTypingIndicator() {
   const chatBody = document.getElementById('chatMessages');
-  
   const existing = chatBody.querySelector('.typing-indicator');
   if (existing) existing.remove();
-  
   const typingDiv = document.createElement('div');
   typingDiv.className = 'message agent-message typing-indicator';
   typingDiv.innerHTML = `
     <div class="message-content typing-dots">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
     </div>
   `;
-  
   chatBody.appendChild(typingDiv);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
@@ -362,12 +321,9 @@ function hideTypingIndicator() {
 // MARK MESSAGES AS READ
 // ============================================
 async function markMessagesAsRead(conversationId) {
-  if (!socket || !socket.connected) return;
-  
-  socket.emit('mark_as_read', {
-    conversationId: conversationId
-  });
-  
+  if (socket && socket.connected) {
+    socket.emit('mark_as_read', { conversationId });
+  }
   try {
     await fetch(`${API_BASE_URL}/api/chat/conversations/${conversationId}/read`, {
       method: 'PUT',
@@ -387,9 +343,7 @@ async function updateUnreadBadge() {
       method: 'GET',
       credentials: 'include'
     });
-
     const data = await response.json();
-    
     if (data.success) {
       const badge = document.querySelector('.favourites-badge');
       if (badge) {
@@ -406,18 +360,11 @@ async function updateUnreadBadge() {
   }
 }
 
-// ============================================
-// UPDATE AGENT ONLINE STATUS
-// ============================================
 function updateAgentOnlineStatus(isOnline) {
   const statusIndicator = document.querySelector('.agent-online-status');
   if (statusIndicator) {
-    if (isOnline) {
-      statusIndicator.innerHTML = '🟢 Online';
-      statusIndicator.style.display = 'inline-block';
-    } else {
-      statusIndicator.style.display = 'none';
-    }
+    statusIndicator.innerHTML = isOnline ? '🟢 Online' : '';
+    statusIndicator.style.display = isOnline ? 'inline-block' : 'none';
   }
 }
 
@@ -426,41 +373,31 @@ function updateAgentOnlineStatus(isOnline) {
 // ============================================
 function closeChat() {
   const chatPopup = document.getElementById('chatPopup');
-  
-  // Add closing animation
   chatPopup.classList.remove('chat-visible');
-  
-  setTimeout(() => {
-    chatPopup.style.display = 'none';
-  }, 300);
-  
+
+  // Reset height if was adjusted for keyboard
+  chatPopup.style.height = '';
+
+  setTimeout(() => { chatPopup.style.display = 'none'; }, 300);
+
   if (socket && socket.connected && currentConversationId) {
     socket.emit('leave_conversation', currentConversationId);
   }
-  
+
   currentConversationId = null;
   currentPropertyId = null;
   currentAgentId = null;
 }
 
-// ============================================
-// AUTO-RESIZE TEXTAREA
-// ============================================
 function autoResizeTextarea(textarea) {
   textarea.style.height = 'auto';
   textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  
-  if (parts.length === 2) {
-    return parts.pop().split(';').shift();
-  }
+  if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
 }
 
@@ -470,35 +407,23 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// ============================================
-// CHECK AUTHENTICATION
-// ============================================
 async function checkAuthentication() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET',
       credentials: 'include'
     });
-    
     if (response.ok) {
-      console.log('✅ User is authenticated');
       updateUnreadBadge();
       setInterval(updateUnreadBadge, 30000);
-    } else {
-      console.log('❌ User not authenticated');
     }
   } catch (error) {
     console.error('Error checking authentication:', error);
   }
 }
 
-// ============================================
-// PREVENT BODY SCROLL WHEN CHAT IS OPEN (Mobile)
-// ============================================
 function preventBodyScroll() {
-  if (window.innerWidth <= 768) {
-    document.body.style.overflow = 'hidden';
-  }
+  if (window.innerWidth <= 768) document.body.style.overflow = 'hidden';
 }
 
 function allowBodyScroll() {
@@ -509,9 +434,7 @@ function allowBodyScroll() {
 // EVENT LISTENERS
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-  
-  console.log('🎬 Chat.js loaded');
-  
+
   const closeBtn = document.getElementById('closeChat');
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -519,12 +442,10 @@ document.addEventListener('DOMContentLoaded', function() {
       allowBodyScroll();
     });
   }
-  
+
   const sendBtn = document.getElementById('sendMessage');
-  if (sendBtn) {
-    sendBtn.addEventListener('click', sendMessage);
-  }
-  
+  if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+
   const chatInput = document.getElementById('chatInput');
   if (chatInput) {
     chatInput.addEventListener('keypress', function(e) {
@@ -533,27 +454,34 @@ document.addEventListener('DOMContentLoaded', function() {
         sendMessage();
       }
     });
-    
+
     chatInput.addEventListener('input', function() {
       handleTyping();
       autoResizeTextarea(this);
     });
+
+    // ✅ Scroll chat body to bottom when input is focused on mobile
+    chatInput.addEventListener('focus', function() {
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          const chatBody = document.getElementById('chatMessages');
+          if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+        }, 350);
+      }
+    });
   }
-  
+
   const chatAgentBtn = document.getElementById('chatAgentBtn');
   if (chatAgentBtn) {
     chatAgentBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      
-      console.log('💬 Chat Agent button clicked');
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const propertyId = urlParams.get('id');
-      const agentId = chatAgentBtn.dataset.agentId;
-      
-      console.log('🏠 Property ID:', propertyId);
-      console.log('👨‍💼 Agent ID:', agentId);
-      
+
+      const agentId = this.dataset.agentId;
+
+      // ✅ Use dataset.propertyId if set (bundle.js sets this explicitly)
+      // Otherwise fall back to URL id param (house page)
+      const propertyId = this.dataset.propertyId || new URLSearchParams(window.location.search).get('id');
+
       if (propertyId && agentId) {
         openChat(propertyId, agentId);
         preventBodyScroll();
@@ -562,8 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  // Close chat when clicking outside on mobile
+
   const chatPopup = document.getElementById('chatPopup');
   if (chatPopup && window.innerWidth <= 768) {
     chatPopup.addEventListener('click', function(e) {
@@ -573,9 +500,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  const token = getCookie('token');
-  console.log('🔐 Authentication status:', token ? 'Logged in' : 'Checking...');
-  
+
   checkAuthentication();
 });
