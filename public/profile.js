@@ -25,7 +25,6 @@ function showProfileSuccess(message) {
       ✓ ${message}
     </div>
   `;
-  
   document.body.appendChild(popup);
   setTimeout(() => popup.remove(), 4000);
 }
@@ -54,7 +53,6 @@ function showProfileError(message) {
       ❌ ${message}
     </div>
   `;
-  
   document.body.appendChild(popup);
   setTimeout(() => popup.remove(), 4000);
 }
@@ -68,10 +66,8 @@ function showProfileLoading() {
   popup.innerHTML = `
     <div style="
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(26, 0, 31, 0.9);
       z-index: 999998;
       display: flex;
@@ -85,8 +81,7 @@ function showProfileLoading() {
         text-align: center;
       ">
         <div style="
-          width: 60px;
-          height: 60px;
+          width: 60px; height: 60px;
           border: 5px solid rgba(255, 77, 210, 0.2);
           border-top: 5px solid #ff4dd2;
           border-radius: 50%;
@@ -120,77 +115,53 @@ function hideProfileLoading() {
   if (popup) popup.remove();
 }
 
-// ===== SAVE PROFILE - THE ACTUAL FUNCTION =====
+// ===== SAVE PROFILE =====
 window.saveProfile = async function(event) {
-  // NUCLEAR PREVENTION - catch the event if it exists
   if (event) {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
   }
   
-  console.log('🚀🚀🚀 SAVE PROFILE CALLED! 🚀🚀🚀');
+  console.log('🚀 SAVE PROFILE CALLED');
   
   try {
-    // Set flag to prevent page unload
     window.profileSaveInProgress = true;
-    
-    // CRITICAL: Store that we're on profile section in localStorage
-    try {
-      localStorage.setItem('lastActiveSection', 'profile');
-      localStorage.setItem('profileSaveInProgress', 'true');
-      console.log('✅ Saved to localStorage: profile');
-    } catch (e) {
-      console.error('localStorage error:', e);
-    }
-    
-    // Also set global variable
+    localStorage.setItem('lastActiveSection', 'profile');
+    localStorage.setItem('profileSaveInProgress', 'true');
     window.savedSection = 'profile';
     
     showProfileLoading();
   
-  const formData = new FormData();
-  formData.append('full_name', document.getElementById('fullName').value);
-  formData.append('bio', document.getElementById('bio').value || '');
-  formData.append('years_experience', document.getElementById('experience').value || '0');
-  formData.append('licence_number', document.getElementById('licenseNumber').value || '');
-  formData.append('phone_number', document.getElementById('phone').value);
-  formData.append('whatsapp', document.getElementById('whatsapp')?.value || '');
-  
-  // DON'T send facebook, linkedin, instagram as backend doesn't support them yet
-  // formData.append('facebook', document.getElementById('facebook')?.value || '');
-  // formData.append('linkedin', document.getElementById('linkedin')?.value || '');
-  // formData.append('instagram', document.getElementById('instagram')?.value || '');
-  
-  formData.append('specializations', document.getElementById('specializations')?.value || '');
-  formData.append('areas_of_operation', document.getElementById('areasOfOperation')?.value || '');
-  
-  const photoInput = document.getElementById('photoInput');
-  if (photoInput && photoInput.files.length > 0) {
-    formData.append('profile_picture', photoInput.files[0]);
-    console.log('📸 Profile picture attached');
-  }
+    const formData = new FormData();
+    formData.append('full_name', document.getElementById('fullName').value);
+    formData.append('bio', document.getElementById('bio').value || '');
+    formData.append('years_experience', document.getElementById('experience').value || '0');
+    formData.append('licence_number', document.getElementById('licenseNumber').value || '');
+    formData.append('phone_number', document.getElementById('phone').value);
+    formData.append('whatsapp', document.getElementById('whatsapp')?.value || '');
+    formData.append('specializations', document.getElementById('specializations')?.value || '');
+    formData.append('areas_of_operation', document.getElementById('areasOfOperation')?.value || '');
+    
+    const photoInput = document.getElementById('photoInput');
+    if (photoInput && photoInput.files.length > 0) {
+      formData.append('profile_picture', photoInput.files[0]);
+      console.log('📸 Profile picture attached');
+    }
 
-  try {
-    console.log('🌐 Making fetch request...');
     const response = await fetch(`${API_BASE_URL}/api/agents/profile`, {
       method: 'PUT',
       credentials: 'include',
       body: formData
     });
     
-    console.log('📡 Response received:', response.status);
     hideProfileLoading();
     
     if (response.ok) {
       const result = await response.json();
-      console.log('✅✅✅ Profile saved successfully! ✅✅✅');
-      
-      // Clear the progress flags
       window.profileSaveInProgress = false;
       localStorage.removeItem('profileSaveInProgress');
       
-      // Update the profile picture preview if a new one was uploaded
       if (result.profile_picture) {
         const photoPreview = document.getElementById('photoPreview');
         if (photoPreview) {
@@ -199,57 +170,26 @@ window.saveProfile = async function(event) {
       }
       
       showProfileSuccess('Profile saved successfully!');
-      
-      console.log('🔒 FORCING PROFILE SECTION TO STAY ACTIVE');
-      
-      // CRITICAL: Multiple attempts to force staying on profile
       window.savedSection = 'profile';
       localStorage.setItem('lastActiveSection', 'profile');
       localStorage.setItem('justSavedProfile', 'true');
-      
-      // DON'T try to call showSection - let the page reload and restore naturally
-      console.log('✅ Profile saved - localStorage set for restoration');
-      
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } else {
       const errorData = await response.json();
-      console.error('❌ Save failed:', errorData);
       showProfileError(errorData.message || 'Failed to save profile');
       window.profileSaveInProgress = false;
     }
   } catch (error) {
     hideProfileLoading();
-    console.error('❌ CRITICAL Error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('❌ Error:', error);
     showProfileError('Network error. Please try again.');
     window.profileSaveInProgress = false;
-    
-    // Force stay on profile even on error
     setTimeout(() => {
-      if (typeof showSection === 'function') {
-        showSection('profile');
-      }
+      if (typeof showSection === 'function') showSection('profile');
     }, 100);
   }
   
-  } catch (outerError) {
-    // CATCH ANY ERROR AT ALL
-    console.error('❌ OUTER CATCH - SOMETHING WENT VERY WRONG:', outerError);
-    console.error('Error stack:', outerError.stack);
-    hideProfileLoading();
-    showProfileError('An error occurred. Please try again.');
-    window.profileSaveInProgress = false;
-    
-    // Force stay on profile
-    setTimeout(() => {
-      if (typeof showSection === 'function') {
-        showSection('profile');
-      }
-    }, 100);
-  }
-  
-  // ALWAYS return false
   return false;
 }
 
@@ -257,20 +197,28 @@ window.saveProfile = async function(event) {
 function initializeProfileSection() {
   console.log('🔧 Initializing profile section...');
   
-  // PREVENT ANY PAGE NAVIGATION
   window.addEventListener('beforeunload', function(e) {
     if (window.profileSaveInProgress) {
-      console.log('⚠️ Blocking page unload - profile save in progress!');
       e.preventDefault();
       e.returnValue = '';
       return '';
     }
   });
   
-  // Photo preview
+  // ✅ FIXED: Change Photo button - uses addEventListener, no inline onclick
+  // This is CSP-compliant and works on all browsers
+  const changePhotoBtn = document.getElementById('changePhotoBtn');
   const photoInput = document.getElementById('photoInput');
   const photoPreview = document.getElementById('photoPreview');
+
+  if (changePhotoBtn && photoInput) {
+    changePhotoBtn.addEventListener('click', function() {
+      photoInput.click();
+    });
+    console.log('✅ Change photo button wired up');
+  }
   
+  // Photo preview on file select
   if (photoInput && photoPreview) {
     photoInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -284,18 +232,16 @@ function initializeProfileSection() {
     });
   }
   
-  // Attach save button handler
+  // Save button
   const saveBtn = document.getElementById('saveProfileBtn');
   if (saveBtn) {
-    console.log('✅ Found save button, attaching handler');
     saveBtn.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      e.stopImmediatePropagation();
-      console.log('💾 Save button clicked via event listener');
       saveProfile(e);
       return false;
     });
+    console.log('✅ Save button wired up');
   }
   
   // Preview button
@@ -307,7 +253,38 @@ function initializeProfileSection() {
     });
   }
   
-  console.log('✅ Profile section initialized - save button ready in HTML');
+  console.log('✅ Profile section initialized');
 }
 
-console.log('✅ profile.js loaded');
+// Also fix inline onclicks in bookings section buttons
+// These are handled in dashboardbookings.js but need CSP-safe wiring
+document.addEventListener('DOMContentLoaded', function() {
+  // Refresh bookings button
+  const refreshBtn = document.querySelector('[onclick="loadBookings()"]');
+  if (refreshBtn) {
+    refreshBtn.removeAttribute('onclick');
+    refreshBtn.addEventListener('click', function() {
+      if (typeof loadBookings === 'function') loadBookings();
+    });
+  }
+
+  // Export CSV button
+  const exportBtn = document.querySelector('[onclick="exportBookingsToCSV()"]');
+  if (exportBtn) {
+    exportBtn.removeAttribute('onclick');
+    exportBtn.addEventListener('click', function() {
+      if (typeof exportBookingsToCSV === 'function') exportBookingsToCSV();
+    });
+  }
+
+  // Withdrawal history refresh button
+  const withdrawRefreshBtn = document.querySelector('[onclick="loadWithdrawalHistory()"]');
+  if (withdrawRefreshBtn) {
+    withdrawRefreshBtn.removeAttribute('onclick');
+    withdrawRefreshBtn.addEventListener('click', function() {
+      if (typeof loadWithdrawalHistory === 'function') loadWithdrawalHistory();
+    });
+  }
+});
+
+console.log(' profile.js loaded');
