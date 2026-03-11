@@ -33,11 +33,14 @@ function startNavigation(url) {
 
 
 
-// ✅ TOP LOADING BAR - continues from navigation bar, runs while page data loads
+// ✅ TOP LOADING BAR + CONTENT COVER
+// Bar runs on top, cover hides raw "Loading..." text beneath
 function showTopBar() {
-  const existing = document.getElementById('top-load-bar');
-  if (existing) existing.remove();
+  // Remove any existing
+  document.getElementById('top-load-bar')?.remove();
+  document.getElementById('page-cover')?.remove();
 
+  // Top progress bar
   const bar = document.createElement('div');
   bar.id = 'top-load-bar';
   bar.style.cssText = `
@@ -51,21 +54,39 @@ function showTopBar() {
     border-radius: 0 2px 2px 0;
   `;
   document.body.appendChild(bar);
-  // Start at 30% (as if continuing from navigation)
   setTimeout(() => { bar.style.width = '30%'; }, 20);
   setTimeout(() => { bar.style.width = '70%'; }, 300);
   setTimeout(() => { bar.style.width = '85%'; }, 800);
+
+  // Cover overlay - same colour as page bg, hides Loading... text
+  // Bar sits above it (higher z-index)
+  const cover = document.createElement('div');
+  cover.id = 'page-cover';
+  cover.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: #1a001f;
+    z-index: 9998;
+    transition: opacity 0.35s ease;
+  `;
+  document.body.appendChild(cover);
 }
 
 function completeTopBar() {
+  // Complete the bar
   const bar = document.getElementById('top-load-bar');
-  if (!bar) return;
-  bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.2s';
-  bar.style.width = '100%';
-  setTimeout(() => {
-    bar.style.opacity = '0';
-    setTimeout(() => bar.remove(), 400);
-  }, 200);
+  if (bar) {
+    bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.3s';
+    bar.style.width = '100%';
+    setTimeout(() => { bar.style.opacity = '0'; setTimeout(() => bar.remove(), 400); }, 300);
+  }
+
+  // Fade out the cover to reveal loaded content
+  const cover = document.getElementById('page-cover');
+  if (cover) {
+    cover.style.opacity = '0';
+    setTimeout(() => cover.remove(), 400);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
