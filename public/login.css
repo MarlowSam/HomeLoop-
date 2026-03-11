@@ -1,11 +1,16 @@
 /* ========================================
-   LOGIN PAGE - COMPACT & CLEAN
+   LOGIN PAGE - FULL SCREEN MOBILE
    ======================================== */
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  max-width: 100%;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 body {
@@ -13,6 +18,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: white;
   min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport - accounts for mobile browser bars */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,7 +57,6 @@ body {
   filter: brightness(1.2);
 }
 
-/* Welcome Text */
 .welcome-text {
   font-size: 1.3rem;
   color: #fff;
@@ -104,11 +109,8 @@ body {
   background: rgba(46, 0, 51, 0.5);
 }
 
-.form-group input::placeholder {
-  color: #aaa;
-}
+.form-group input::placeholder { color: #aaa; }
 
-/* Forgot Password */
 .forgot-password {
   text-align: right;
   margin-bottom: 8px;
@@ -126,7 +128,6 @@ body {
   color: #ff4dd2;
 }
 
-/* Login Button */
 .login-btn {
   background: white;
   color: #2a002a;
@@ -147,7 +148,6 @@ body {
   transform: scale(1.05);
 }
 
-/* Divider */
 .divider {
   display: flex;
   align-items: center;
@@ -164,11 +164,8 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.divider span {
-  padding: 0 15px;
-}
+.divider span { padding: 0 15px; }
 
-/* Social Login Buttons */
 .social-login {
   display: flex;
   flex-direction: column;
@@ -191,48 +188,24 @@ body {
   width: 100%;
 }
 
-/* Google Button */
-.google-btn {
-  background: white;
-  color: #444;
-}
-
+.google-btn { background: white; color: #444; }
 .google-btn:hover {
   background: #f2f2f2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+.google-btn svg { width: 18px; height: 18px; }
 
-.google-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Facebook Button */
-.facebook-btn {
-  background: #1877f2;
-  color: white;
-}
-
+.facebook-btn { background: #1877f2; color: white; }
 .facebook-btn:hover {
   background: #145dbf;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+  box-shadow: 0 4px 12px rgba(24,119,242,0.4);
 }
+.facebook-btn i { font-size: 1rem; }
 
-.facebook-btn i {
-  font-size: 1rem;
-}
-
-/* Sign Up Section */
-.signup-section {
-  margin-top: 14px;
-}
-
-.signup-section p {
-  color: #ccc;
-  font-size: 0.88rem;
-}
+.signup-section { margin-top: 14px; }
+.signup-section p { color: #ccc; font-size: 0.88rem; }
 
 .signup-link {
   color: #00bcd4;
@@ -240,258 +213,113 @@ body {
   font-weight: 600;
   transition: all 0.3s;
 }
+.signup-link:hover { color: #ff9900; }
 
-.signup-link:hover {
-  color: #ff9900;
-}
-
-/* Terms Section */
-.terms-section {
-  margin-top: 12px;
-}
-
-.terms-section p {
-  color: #aaa;
-  font-size: 0.72rem;
-  line-height: 1.5;
-}
+.terms-section { margin-top: 12px; }
+.terms-section p { color: #aaa; font-size: 0.72rem; line-height: 1.5; }
 
 .terms-link {
   color: #ff4dd2;
   text-decoration: underline;
   transition: all 0.3s;
 }
+.terms-link:hover { color: #ff9900; }
 
-.terms-link:hover {
-  color: #ff9900;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
+/* ========================================
+   MOBILE - FULL SCREEN, NO EMPTY SPACE
+   ======================================== */
+@media (max-width: 480px) {
   body {
-    padding: 12px;
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   .login-container {
-    padding: 22px 25px;
-    max-width: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 0 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertically center all content */
+    gap: 0;
   }
 
   .logo-text {
-    font-size: 1.7rem;
-    margin-bottom: 10px;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
   }
 
   .welcome-text {
     font-size: 1.2rem;
+    margin-bottom: 4px;
   }
 
   .subtitle {
     font-size: 0.88rem;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
 
-  .form-group {
-    gap: 10px;
-  }
-
-  .form-group label {
-    flex: 0 0 75px;
-    font-size: 0.9rem;
-  }
-
-  .form-group input {
-    padding: 10px 12px;
-    font-size: 0.9rem;
-  }
-
-  .login-btn {
-    padding: 10px 32px;
-    font-size: 0.94rem;
-  }
-
-  .social-login button {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-  }
-
-  .google-btn svg {
-    width: 17px;
-    height: 17px;
-  }
-}
-
-/* ✅ FIXED: Full screen on mobile - removes empty space */
-@media (max-width: 480px) {
-  body {
-  padding: 0;
-  align-items: flex-start;
-  justify-content: flex-start;
-  min-height: unset;
-}
-
-  .login-container {
-  width: 100%;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-  padding: 30px 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-  .logo-text {
-    font-size: 1.6rem;
-  }
-
-  .welcome-text {
-    font-size: 1.15rem;
-    margin-bottom: 5px;
-  }
-
-  .subtitle {
-    font-size: 0.85rem;
-    margin-bottom: 16px;
-  }
-
-  .form-group {
-    gap: 10px;
+  .login-form {
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .form-group label {
-    flex: 0 0 70px;
-    font-size: 0.88rem;
-  }
-
-  .form-group input {
-    padding: 10px 12px;
-    font-size: 0.88rem;
-  }
-
-  .forgot-link {
-    font-size: 0.82rem;
-  }
-
-  .login-btn {
-    padding: 10px 30px;
+    flex: 0 0 80px;
     font-size: 0.92rem;
   }
 
-  .divider {
-    margin: 14px 0 12px;
-    font-size: 0.82rem;
+  .form-group input {
+    padding: 12px 14px;
+    font-size: 0.92rem;
   }
 
-  .social-login {
-    gap: 9px;
-    margin-bottom: 10px;
-  }
+  .forgot-password { margin-bottom: 10px; }
+  .forgot-link { font-size: 0.85rem; }
 
-  .social-login button {
-    padding: 10px 14px;
-    font-size: 0.9rem;
-  }
-
-  .google-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .facebook-btn i {
+  .login-btn {
+    padding: 12px 40px;
     font-size: 0.95rem;
+    margin: 8px auto;
   }
 
-  .signup-section p {
+  .divider {
+    margin: 18px 0 14px;
     font-size: 0.85rem;
   }
 
-  .terms-section p {
-    font-size: 0.7rem;
+  .social-login {
+    gap: 10px;
+    margin-bottom: 16px;
   }
+
+  .social-login button {
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+
+  .google-btn svg { width: 18px; height: 18px; }
+  .facebook-btn i { font-size: 1rem; }
+
+  .signup-section { margin-top: 16px; }
+  .signup-section p { font-size: 0.88rem; }
+
+  .terms-section { margin-top: 12px; }
+  .terms-section p { font-size: 0.75rem; }
 }
 
 @media (max-width: 360px) {
-  .login-container {
-    padding: 40px 16px 25px;
-  }
-
-  .logo-text {
-    font-size: 1.5rem;
-  }
-
-  .welcome-text {
-    font-size: 1.1rem;
-  }
-
-  .form-group label {
-    flex: 0 0 65px;
-    font-size: 0.85rem;
-  }
-
-  .form-group input {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-
-  .social-login button {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    gap: 8px;
-  }
-}
-
-@media (min-height: 900px) {
-  .login-container {
-    max-height: 90vh;
-  }
-}
-
-@media (max-height: 700px) {
-  body {
-    padding: 10px;
-    align-items: flex-start;
-    padding-top: 15px;
-  }
-  
-  .login-container {
-    padding: 18px 25px;
-  }
-  
-  .logo-text {
-    font-size: 1.6rem;
-    margin-bottom: 8px;
-  }
-  
-  .welcome-text {
-    font-size: 1.15rem;
-    margin-bottom: 4px;
-  }
-  
-  .subtitle {
-    font-size: 0.85rem;
-    margin-bottom: 14px;
-  }
-  
-  .login-form {
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .divider {
-    margin: 12px 0 10px;
-  }
-  
-  .social-login {
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .signup-section {
-    margin-top: 10px;
-  }
-  
-  .terms-section {
-    margin-top: 8px;
-  }
+  .login-container { padding: 0 18px; }
+  .logo-text { font-size: 1.6rem; }
+  .welcome-text { font-size: 1.1rem; }
+  .form-group label { flex: 0 0 72px; font-size: 0.88rem; }
+  .form-group input { padding: 10px 12px; font-size: 0.88rem; }
+  .social-login button { padding: 10px 14px; font-size: 0.88rem; gap: 8px; }
 }
