@@ -164,8 +164,16 @@ window.saveProfile = async function(event) {
       
       if (result.profile_picture) {
         const photoPreview = document.getElementById('photoPreview');
+        console.log('📸 profile_picture from API:', result.profile_picture);
         if (photoPreview) {
-          photoPreview.src = `${API_BASE_URL}${result.profile_picture}`;
+          // If it's already a full URL (Cloudinary), use as-is; otherwise prepend API_BASE_URL
+          const photoUrl = result.profile_picture.startsWith('http')
+            ? result.profile_picture
+            : `${API_BASE_URL}${result.profile_picture}`;
+          console.log('📸 Setting photo to:', photoUrl);
+          photoPreview.src = photoUrl;
+          // Force reload in case browser cached the old image
+          photoPreview.src = photoUrl + '?t=' + Date.now();
         }
       }
       
@@ -193,10 +201,61 @@ window.saveProfile = async function(event) {
   return false;
 }
 
+
+// ===== LOAD CURRENT PROFILE PHOTO ON PAGE LOAD =====
+async function loadCurrentProfilePhoto() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('👤 Current user data:', data);
+
+      const photoPreview = document.getElementById('photoPreview');
+
+      if (photoPreview && data.user && data.user.profile_picture) {
+        const pic = data.user.profile_picture;
+        const photoUrl = pic.startsWith('http') ? pic : `${API_BASE_URL}${pic}`;
+        console.log('📸 Loading existing photo:', photoUrl);
+        photoPreview.src = photoUrl;
+        photoPreview.onerror = function() {
+          this.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        };
+      }
+
+      // Also pre-fill form fields if data exists
+      if (data.user) {
+        const u = data.user;
+        const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+        set('fullName', u.full_name);
+        set('bio', u.bio);
+        set('experience', u.years_experience);
+        set('licenseNumber', u.licence_number);
+        set('phone', u.phone_number);
+        set('whatsapp', u.whatsapp);
+        set('specializations', u.specializations);
+        set('areasOfOperation', u.areas_of_operation);
+        set('email', u.email);
+        set('facebook', u.facebook);
+        set('linkedin', u.linkedin);
+        set('instagram', u.instagram);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading profile data:', error);
+  }
+}
+
 // ===== INITIALIZATION =====
 function initializeProfileSection() {
   console.log('🔧 Initializing profile section...');
-  
+
+  // ✅ Load current photo and form data from API
+  loadCurrentProfilePhoto();
+
   window.addEventListener('beforeunload', function(e) {
     if (window.profileSaveInProgress) {
       e.preventDefault();
@@ -287,4 +346,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-console.log(' profile.js loaded');
+console.log('✅ profile.js loaded');
