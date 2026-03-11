@@ -31,11 +31,48 @@ function startNavigation(url) {
   setTimeout(() => { window.location.href = url; }, 750);
 }
 
+
+// ✅ TOP LOADING BAR
+function showTopBar() {
+  const existing = document.getElementById('top-load-bar');
+  if (existing) existing.remove();
+  const bar = document.createElement('div');
+  bar.id = 'top-load-bar';
+  bar.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #ff4dd2, #ff9900);
+    z-index: 99999;
+    transition: width 0.4s ease;
+    border-radius: 0 2px 2px 0;
+  `;
+  document.body.appendChild(bar);
+  setTimeout(() => { bar.style.width = '30%'; }, 20);
+  setTimeout(() => { bar.style.width = '70%'; }, 300);
+  setTimeout(() => { bar.style.width = '85%'; }, 800);
+}
+
+function completeTopBar() {
+  const bar = document.getElementById('top-load-bar');
+  if (!bar) return;
+  bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.2s';
+  bar.style.width = '100%';
+  setTimeout(() => {
+    bar.style.opacity = '0';
+    setTimeout(() => bar.remove(), 400);
+  }, 200);
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
+  showTopBar();
+
   const urlParams = new URLSearchParams(window.location.search);
   const bundleId = urlParams.get('id');
 
   if (!bundleId) {
+    completeTopBar();
     showStyledAlert('Bundle not found', 'error');
     window.location.href = 'index.html';
     return;
@@ -43,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   checkLoginStatus();
   await loadBundleData(bundleId);
+  completeTopBar();
 
   // ✅ Clean URL after loading so it shows /bundle.html instead of /bundle.html?id=5
   history.replaceState({ bundleId }, document.title, window.location.pathname);
@@ -333,17 +371,22 @@ function createPropertySection(property, propertyNumber) {
   agentProfileCard.className = 'agent-profile-card';
   agentProfileCard.id = `agentCard-${property.property_id}`;
 
+  // ✅ Always show icon - photo replaces it if available
+  const agentIconFallback = document.createElement('div');
+  agentIconFallback.className = 'agent-profile-icon-fallback';
+  agentIconFallback.innerHTML = '<i class="fa-solid fa-circle-user" style="font-size:52px;color:#ff4dd2;"></i>';
+
   const agentProfilePhoto = document.createElement('img');
   agentProfilePhoto.className = 'agent-profile-photo';
   agentProfilePhoto.alt = 'Agent';
-  agentProfilePhoto.src = 'Images/default avatar.png';
+  agentProfilePhoto.style.display = 'none'; // Hidden until loaded
+  agentProfilePhoto.onload = function() {
+    this.style.display = 'block';
+    agentIconFallback.style.display = 'none';
+  };
   agentProfilePhoto.onerror = function() {
     this.style.display = 'none';
-    // Show icon fallback
-    const icon = document.createElement('div');
-    icon.className = 'agent-profile-icon-fallback';
-    icon.innerHTML = '<i class="fa-solid fa-user-circle" style="font-size:48px;color:#ff4dd2;"></i>';
-    this.parentElement.insertBefore(icon, this);
+    agentIconFallback.style.display = 'block';
   };
 
   const agentProfileInfo = document.createElement('div');
@@ -358,6 +401,7 @@ function createPropertySection(property, propertyNumber) {
 
   agentProfileInfo.appendChild(agentProfileName);
   agentProfileInfo.appendChild(agentProfileSubtext);
+  agentProfileCard.appendChild(agentIconFallback);
   agentProfileCard.appendChild(agentProfilePhoto);
   agentProfileCard.appendChild(agentProfileInfo);
 

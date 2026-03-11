@@ -31,7 +31,47 @@ function startNavigation(url) {
   setTimeout(() => { window.location.href = url; }, 750);
 }
 
+
+
+// ✅ TOP LOADING BAR - continues from navigation bar, runs while page data loads
+function showTopBar() {
+  const existing = document.getElementById('top-load-bar');
+  if (existing) existing.remove();
+
+  const bar = document.createElement('div');
+  bar.id = 'top-load-bar';
+  bar.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #ff4dd2, #ff9900);
+    z-index: 99999;
+    transition: width 0.4s ease;
+    border-radius: 0 2px 2px 0;
+  `;
+  document.body.appendChild(bar);
+  // Start at 30% (as if continuing from navigation)
+  setTimeout(() => { bar.style.width = '30%'; }, 20);
+  setTimeout(() => { bar.style.width = '70%'; }, 300);
+  setTimeout(() => { bar.style.width = '85%'; }, 800);
+}
+
+function completeTopBar() {
+  const bar = document.getElementById('top-load-bar');
+  if (!bar) return;
+  bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.2s';
+  bar.style.width = '100%';
+  setTimeout(() => {
+    bar.style.opacity = '0';
+    setTimeout(() => bar.remove(), 400);
+  }, 200);
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
+  // ✅ Show top bar immediately - continues the feel from navigation
+  showTopBar();
+
   const urlParams = new URLSearchParams(window.location.search);
   const propertyId = urlParams.get('id');
   const writeReview = urlParams.get('write_review');
@@ -39,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   const openChatParam = urlParams.get('openChat');
 
   if (!propertyId) {
+    completeTopBar();
     showStyledAlert('Property not found', 'error');
     window.location.href = 'index.html';
     return;
@@ -49,6 +90,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   await loadPropertyDetails(propertyId);
   await loadPropertyReviews(propertyId);
   await loadSimilarProperties(propertyId);
+
+  // ✅ All data loaded - complete the bar
+  completeTopBar();
 
   if (writeReview === 'true' && bookingId) {
     setTimeout(() => showReviewForm(bookingId), 500);
@@ -323,6 +367,9 @@ function displayPropertyDetails(property) {
   }
 
   updateAgentProfileCard(property);
+
+  // ✅ Clean URL - remove ?id=XX from address bar
+  history.replaceState({ propertyId: property.property_id }, document.title, window.location.pathname);
 
   const bookBtn = document.querySelector('.btn.book');
   if (bookBtn) {
