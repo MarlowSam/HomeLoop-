@@ -329,7 +329,66 @@ async function loadPropertyDetails(propertyId) {
   }
 }
 
+
+function updateSEOMeta(property) {
+  const location = property.address_line1
+    ? `${property.address_line1}, ${property.city}`
+    : property.city || 'Nairobi';
+
+  const title = `${property.bedrooms} Bed ${property.property_type} in ${location} - Ksh ${Number(property.price).toLocaleString('en-KE')} | HomeLoop`;
+  const description = `${property.bedrooms} bedroom ${property.property_type} in ${location} for Ksh ${Number(property.price).toLocaleString('en-KE')}/month. ${property.units_available} unit(s) available. View photos and contact agent on HomeLoop.`;
+  const image = property.images && property.images.length > 0 ? property.images[0] : '';
+  const url = `https://homelooptest-123.onrender.com/house.html`;
+
+  document.title = title;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+  document.getElementById('ogTitle')?.setAttribute('content', title);
+  document.getElementById('ogDescription')?.setAttribute('content', description);
+  document.getElementById('ogImage')?.setAttribute('content', image);
+  document.getElementById('ogUrl')?.setAttribute('content', url);
+  document.getElementById('canonicalUrl')?.setAttribute('href', url);
+
+  // Schema markup for this property
+  const existing = document.getElementById('propertySchema');
+  if (existing) existing.remove();
+
+  const schema = document.createElement('script');
+  schema.id = 'propertySchema';
+  schema.type = 'application/ld+json';
+  schema.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "name": title,
+    "description": description,
+    "url": url,
+    "image": image,
+    "offers": {
+      "@type": "Offer",
+      "price": property.price,
+      "priceCurrency": "KES",
+      "availability": property.units_available > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": property.address_line1 || '',
+      "addressLocality": property.city || 'Nairobi',
+      "addressCountry": "KE"
+    },
+    "numberOfRooms": property.bedrooms,
+    "floorSize": {
+      "@type": "QuantitativeValue",
+      "value": property.bedrooms,
+      "unitText": "bedrooms"
+    }
+  });
+  document.head.appendChild(schema);
+}
+
 function displayPropertyDetails(property) {
+  updateSEOMeta(property);
+
   // ✅ Cloudinary URLs are already complete
   const heroImage = document.querySelector('.hero-image');
   if (heroImage && property.images && property.images.length > 0) {

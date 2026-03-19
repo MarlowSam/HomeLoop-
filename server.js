@@ -34,7 +34,7 @@ console.log('🚀 Starting HomeLoop Server...');
 console.log('📍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 
 // ==========================================
-// CLOUDINARY CONFIGURATION
+// CLOUDINARY
 // ==========================================
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -44,7 +44,7 @@ cloudinary.config({
 console.log('✅ Cloudinary configured');
 
 // ==========================================
-// SECURITY: HELMET
+// HELMET
 // ==========================================
 app.use(helmet({
   contentSecurityPolicy: isProduction ? {
@@ -113,20 +113,19 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // ==========================================
 // BODY PARSER & COOKIES
-// ✅ FIXED: Increased limit for file uploads
 // ==========================================
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 // ==========================================
-// SERVE FRONTEND
+// STATIC FILES
 // ==========================================
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 
 // ==========================================
-// ROUTES
+// API ROUTES
 // ==========================================
 console.log('📝 Registering API routes...');
 
@@ -151,6 +150,95 @@ app.post("/api/properties", uploadLimiter);
 app.put("/api/properties/:id", uploadLimiter);
 app.post("/api/bundles", uploadLimiter);
 app.use("/api/", apiLimiter);
+
+// ==========================================
+// ROBOTS.TXT
+// ==========================================
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(
+`User-agent: *
+Allow: /
+Allow: /house.html
+Allow: /bundle.html
+Allow: /agentprofile.html
+Allow: /index.html
+
+Disallow: /agentdashboard.html
+Disallow: /login.html
+Disallow: /signup.html
+Disallow: /favourites.html
+Disallow: /book-visit.html
+Disallow: /api/
+
+Sitemap: https://homelooptest-123.onrender.com/sitemap.xml`
+  );
+});
+
+// ==========================================
+// SITEMAP.XML
+// ==========================================
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const baseUrl = 'https://homelooptest-123.onrender.com';
+
+    const [properties] = await db.promise().query(
+      `SELECT property_id, updated_at FROM properties WHERE status = 'active' ORDER BY updated_at DESC`
+    );
+
+    const [bundles] = await db.promise().query(
+      `SELECT bundle_id, updated_at FROM bundles ORDER BY updated_at DESC`
+    );
+
+    const staticPages = [
+      { url: '/',              priority: '1.0', changefreq: 'daily'   },
+      { url: '/listings.html', priority: '0.8', changefreq: 'daily'   },
+      { url: '/about.html',    priority: '0.5', changefreq: 'monthly' },
+      { url: '/help.html',     priority: '0.4', changefreq: 'monthly' },
+    ];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    for (const page of staticPages) {
+      xml += `
+  <url>
+    <loc>${baseUrl}${page.url}</loc>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`;
+    }
+
+    for (const p of properties) {
+      const lastmod = new Date(p.updated_at).toISOString().split('T')[0];
+      xml += `
+  <url>
+    <loc>${baseUrl}/house.html?id=${p.property_id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
+    }
+
+    for (const b of bundles) {
+      const lastmod = new Date(b.updated_at).toISOString().split('T')[0];
+      xml += `
+  <url>
+    <loc>${baseUrl}/bundle.html?id=${b.bundle_id}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    }
+
+    xml += '\n</urlset>';
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (err) {
+    console.error('❌ Sitemap error:', err);
+    res.status(500).send('Error generating sitemap');
+  }
+});
 
 // ==========================================
 // HOME ROUTE
@@ -203,5 +291,17 @@ httpServer.listen(PORT, () => {
   console.log(`🔒 Security features enabled`);
   startReviewScheduler();
 });
+
+// ==========================================
+// DB KEEP-ALIVE - prevents Aiven from powering off
+// ==========================================
+setInterval(async () => {
+  try {
+    await db.promise().query('SELECT 1');
+    console.log('✅ DB keep-alive ping sent');
+  } catch (err) {
+    console.error('❌ DB keep-alive failed:', err.message);
+  }
+}, 4 * 60 * 60 * 1000);
 
 export default app;

@@ -22,17 +22,17 @@
 
     <nav class="nav-links">
       <div class="dropdown">
-        <a href="#"><i class="fa-solid fa-user"></i> Account</a>
+        <a href="#"><i class="fa-solid fa-user"></i><span class="nav-text"> Account</span></a>
         <div class="dropdown-content">
           <a href="login.html">Login</a>
           <a href="signup.html">Signup</a>
         </div>
       </div>
 
-      <a href="help.html"><i class="fa-solid fa-circle-question"></i> Help</a>
+      <a href="help.html"><i class="fa-solid fa-circle-question"></i><span class="nav-text"> Help</span></a>
       
       <a href="favourites.html" class="favourites" style="position: relative; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-heart"></i> Favourites
+        <i class="fa-solid fa-heart"></i><span class="nav-text"> Favourites</span>
         <span class="favourites-badge" style="display: none; background: #ff4444; color: white; padding: 0.25rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
           0 Replies
         </span>
@@ -49,7 +49,6 @@
   <!-- Favourites Cards Container -->
   <section class="favourites-container">
     <div class="featured-cards" id="favouritesContainer">
-      <!-- Cards will be loaded dynamically by favourites.js -->
       <p style="text-align: center; grid-column: 1/-1; padding: 2rem; color: #ccc;">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
         Loading your favourites...
@@ -59,84 +58,71 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-left">
-        <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
-        <p>Find your dream home with verified listings and trusted agents.</p>
-      </div>
-      <div class="footer-links">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="/index.HTML">Home</a></li>
-          <li><a href="/index.HTML">Listings</a></li>
-          <li><a href="/about.html">About</a></li>
-          <li><a href="help.html#support"><i class="fa-solid fa-phone"></i> Contact Us</a></li>
-        </ul>
-      </div>
-      <div class="footer-links">
-        <h4>Support</h4>
-        <ul>
-          <li><a href="FAQS.html">FAQs</a></li>
-          <li><a href="help.html">Help</a></li>
-          <li><a href="terms.html">Terms</a></li>
-          <li><a href="Privacy Policy.html">Privacy Policy</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-contact">
-        <h4>Contact</h4>
-        <p>Email: info@homeloop.com</p>
-        <p>Phone: +254 792 508 999</p>
-        <p>Address: Nairobi, Kenya</p>
-        <div class="footer-social">
-          <a href="#"><i class="fab fa-facebook"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-linkedin"></i></a>
+    <div class="footer-wrapper">
+      <div class="footer-container">
+        <div class="footer-left">
+          <img src="images/logo.png" alt="HomeLoop Logo" class="footer-logo">
+          <p>Find your dream home with verified listings and trusted agents.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/index.HTML">Home</a></li>
+            <li><a href="/index.HTML">Listings</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="help.html#support">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="FAQS.html">FAQs</a></li>
+            <li><a href="help.html">Help</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="Privacy Policy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p>Email: info@homeloop.com</p>
+          <p>Phone: +254 792 508 999</p>
+          <p>Address: Nairobi, Kenya</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+      <div class="footer-bottom">
+        <p>&copy; 2025 HomeLoop. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
+  <script src="config.js"></script>
   <script src="favourites.js"></script>
   <script>
-    // Check login status for dropdown
     async function checkLoginStatus() {
       const dropdownContent = document.querySelector('.dropdown-content');
       if (!dropdownContent) return;
-
       try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
+        const response = await fetch('/api/auth/me', { method: 'GET', credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           dropdownContent.innerHTML = '';
-          
           if (data.isAuthenticated) {
             const logoutLink = document.createElement('a');
             logoutLink.href = '#';
             logoutLink.textContent = 'Logout';
-            
             logoutLink.addEventListener('click', async (e) => {
               e.preventDefault();
               try {
-                await fetch('/api/auth/logout', {
-                  method: 'POST',
-                  credentials: 'include'
-                });
+                await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
                 window.location.href = 'login.html';
-              } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = 'login.html';
-              }
+              } catch (error) { window.location.href = 'login.html'; }
             });
-            
             dropdownContent.appendChild(logoutLink);
           } else {
             const loginLink = document.createElement('a');
@@ -145,17 +131,9 @@
             dropdownContent.appendChild(loginLink);
           }
         }
-      } catch (error) {
-        console.error('Error checking login status:', error);
-      }
+      } catch (error) { console.error('Error checking login status:', error); }
     }
-
     document.addEventListener('DOMContentLoaded', checkLoginStatus);
   </script>
-  <!--  Config file FIRST -->
-  <script src="config.js"></script>
-  
-  <!--  Then favourites.js -->
-  <script src="favourites.js"></script>
 </body>
 </html>

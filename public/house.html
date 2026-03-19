@@ -3,13 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>House Details - HomeLoop</title>
+  <title>Property Details - HomeLoop</title>
+  <meta name="description" content="View property details, photos and contact the agent on HomeLoop Kenya.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" id="canonicalUrl" href="https://homelooptest-123.onrender.com/house.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="HomeLoop">
+  <meta property="og:title" id="ogTitle" content="Property Details - HomeLoop">
+  <meta property="og:description" id="ogDescription" content="View property details on HomeLoop Kenya.">
+  <meta property="og:image" id="ogImage" content="">
+  <meta property="og:url" id="ogUrl" content="https://homelooptest-123.onrender.com/house.html">
+
   <link rel="stylesheet" href="house.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- Header -->
   <header class="header">
     <div class="logo-container">
       <img src="images/logo.png" alt="HomeLoop Logo" class="logo">
@@ -41,11 +52,8 @@
   </header>
 
   <main class="house-details-container">
-
-    <!-- Hero Image -->
     <div class="hero-image" style="background-image:url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80')"></div>
 
-    <!-- House Quick Info -->
     <div class="house-details">
       <p class="location">Loading...</p>
       <p class="type">Loading...</p>
@@ -53,7 +61,6 @@
       <p class="units-left">Loading...</p>
       <p class="viewing-fee" style="display: none;">Loading...</p>
 
-      <!-- Action Buttons - Now with swipe container -->
       <div class="actions-container">
         <div class="actions"> 
           <a href="bookvisit.html" class="btn book"><i class="fa-solid fa-calendar-check"></i> Book Visit</a>
@@ -64,18 +71,12 @@
       </div>
     </div>
 
-    <!-- House Details Section -->
     <div class="house-description">
       <h2>House Details</h2>
       <p>Loading property details...</p>
-      
-      <!-- Gallery -->
-      <div class="gallery">
-        <!-- Images will be loaded here by JavaScript -->
-      </div>
+      <div class="gallery"></div>
     </div>
 
-    <!-- House Reviews Section -->
     <div class="house-reviews">
       <div class="reviews-header">
         <h2>House Reviews</h2>
@@ -93,7 +94,6 @@
 
       <a href="#" class="see-all-reviews" id="seeAllReviews" style="display: none;">See All Reviews</a>
 
-      <!-- Agent Profile Card -->
       <a href="agent profile.html" class="agent-profile-card" id="agentProfileCard">
         <img src="Images/default avatar.png" alt="Agent" class="agent-profile-photo" id="agentProfilePhoto">
         <div class="agent-profile-info">
@@ -103,17 +103,12 @@
       </a>
     </div>
 
-    <!-- Similar Properties -->
     <div class="more-properties">
       <h2>Similar Properties</h2>
-      <div class="house-cards">
-        <!-- Similar properties will be loaded here by JavaScript -->
-      </div>
+      <div class="house-cards"></div>
     </div>
-
   </main>
 
-  <!-- Footer - Fixed to prevent overflow -->
   <footer class="footer">
     <div class="footer-wrapper">
       <div class="footer-container">
@@ -127,7 +122,7 @@
             <li><a href="/index.HTML">Home</a></li>
             <li><a href="/index.HTML">Listings</a></li>
             <li><a href="/about.html">About</a></li>
-            <li><a href="help.html#support"><i class="fa-solid fa-phone"></i> Contact Us</a></li>
+            <li><a href="help.html#support">Contact Us</a></li>
           </ul>
         </div>
         <div class="footer-links">
@@ -139,7 +134,6 @@
             <li><a href="Privacy Policy.html">Privacy Policy</a></li>
           </ul>
         </div>
-
         <div class="footer-contact">
           <h4>Contact</h4>
           <p>Email: info@homeloop.com</p>
@@ -159,37 +153,26 @@
     </div>
   </footer>
 
-  <!-- Chat Popup - Will open full screen on small devices -->
   <div id="chatPopup" class="chat-popup">
     <div class="chat-header">
       <span><i class="fa-solid fa-comments"></i> Chat with Agent</span>
       <button id="closeChat">&times;</button>
     </div>
-
     <div class="chat-body" id="chatMessages">
       <div class="agent-message message">
         👋 Hello! You're asking about this property. How can I help?
       </div>
     </div>
-
     <div class="chat-footer">
       <input type="text" id="chatInput" placeholder="Type your message..." />
       <button id="sendMessage"><i class="fa-solid fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- CRITICAL: Scripts must load in this exact order -->
-  
-  <!-- 1. Socket.io CDN FIRST -->
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-  
-  <!-- 2. Config file with API_BASE_URL -->
   <script src="config.js"></script>
-  
-  <!-- 3. Then all other scripts (order doesn't matter after config) -->
   <script src="favourites.js"></script>
   <script src="house.js"></script>
   <script src="chat.js"></script>
-
 </body>
 </html>

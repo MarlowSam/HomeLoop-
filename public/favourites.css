@@ -16,14 +16,14 @@ body {
   min-height: 100vh;
 }
 
-/* ========== HEADER ========== */
+/* ========== HEADER - MATCHES HOUSE.HTML ========== */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   min-height: 70px;
-  padding: 0 25px;
+  padding: 10px 25px;
   background: rgba(59, 0, 71, 0.95);
   backdrop-filter: blur(10px);
   display: flex;
@@ -32,15 +32,17 @@ body {
   box-shadow: 0 4px 20px rgba(255, 77, 210, 0.3);
   z-index: 1000;
   border-bottom: 2px solid rgba(255, 77, 210, 0.2);
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 10px 0;
+  padding: 0;
   flex-shrink: 0;
+  order: 1;
 }
 
 .logo {
@@ -69,10 +71,12 @@ body {
 }
 
 .search-container {
-  flex: 1;
-  max-width: 500px;
-  margin: 0 25px;
+  flex: 1 1 100%;
+  max-width: 100%;
+  margin: 0;
   display: flex;
+  order: 4;
+  width: 100%;
 }
 
 .search-container input {
@@ -117,6 +121,8 @@ body {
   gap: 20px;
   align-items: center;
   flex-wrap: nowrap;
+  order: 2;
+  margin-left: auto;
 }
 
 .nav-links a {
@@ -139,6 +145,23 @@ body {
   transform: translateY(-2px);
 }
 
+/* Hide text labels on tablet/mobile - matches house.html */
+@media (max-width: 1024px) {
+  .nav-links a {
+    font-size: 1.2rem;
+    padding: 8px;
+  }
+
+  .nav-links a i {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .nav-links .nav-text {
+    display: none;
+  }
+}
+
 .favourites {
   color: #ff9900 !important;
 }
@@ -146,6 +169,7 @@ body {
 .dropdown {
   position: relative;
   display: inline-block;
+  z-index: 10000;
 }
 
 .dropdown > a {
@@ -159,9 +183,9 @@ body {
   top: calc(100% + 8px);
   right: 0;
   background: #3b0047;
-  min-width: 180px;
+  min-width: 140px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+  z-index: 10001;
   border-radius: 12px;
   border: 1px solid rgba(255, 77, 210, 0.3);
   overflow: hidden;
@@ -170,26 +194,21 @@ body {
 
 .dropdown-content a {
   color: white;
-  padding: 12px 18px;
+  padding: 10px 16px;
   text-decoration: none;
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all 0.3s;
   white-space: nowrap;
 }
 
 .dropdown-content a:hover {
   background: rgba(255, 77, 210, 0.2);
-  padding-left: 22px;
+  padding-left: 20px;
 }
 
 .dropdown:hover .dropdown-content,
 .dropdown .dropdown-content:hover {
-  visibility: visible;
-  opacity: 1;
-}
-
-.dropdown-content:hover {
   visibility: visible;
   opacity: 1;
 }
@@ -262,7 +281,7 @@ body {
   padding: 0;
 }
 
-/* ========== PROPERTY CARD - EXACT MATCH TO HOUSE.HTML ========== */
+/* ========== PROPERTY CARD ========== */
 .card {
   display: block;
   background: #2e0033;
@@ -339,7 +358,7 @@ body {
   display: inline-block;
 }
 
-/* ========== REPLY STATUS BADGES - REDESIGNED ========== */
+/* ========== REPLY STATUS BADGES ========== */
 .reply-status-badge {
   display: inline-flex;
   align-items: center;
@@ -356,7 +375,6 @@ body {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Green badge - Agent replied (View Reply) */
 .reply-status-badge.green {
   background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
@@ -368,14 +386,12 @@ body {
   animation: bounce 1s ease-in-out infinite;
 }
 
-/* Orange badge - Waiting for agent reply (Pending Reply) */
 .reply-status-badge.orange {
   background: linear-gradient(135deg, #ff9900 0%, #ffb347 100%);
   color: white;
   border-color: rgba(255, 153, 0, 0.5);
 }
 
-/* Hover effects */
 .card:hover .reply-status-badge {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -391,7 +407,6 @@ body {
   border-color: #ff9900;
 }
 
-/* Pulse glow animation for green badge */
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(76, 175, 80, 0.7);
@@ -401,29 +416,9 @@ body {
   }
 }
 
-/* Bounce animation for icon */
 @keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-/* ========== RESPONSIVE - MOBILE FIX ========== */
-@media (max-width: 768px) {
-  .hero {
-    padding: 100px 15px 30px;
-    margin-top: 80px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero {
-    padding: 80px 15px 25px;
-    margin-top: 90px;
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 /* ========== NO FAVOURITES MESSAGE ========== */
@@ -435,13 +430,19 @@ body {
   font-size: 1.1rem;
 }
 
-/* ========== FOOTER ========== */
+/* ========== FOOTER - MATCHES HOUSE.HTML ========== */
 .footer {
   background: #000;
   color: white;
-  padding: 35px 20px 20px;
+  padding: 35px 0 20px;
   margin-top: 60px;
   border-top: 2px solid rgba(255, 77, 210, 0.3);
+  overflow-x: hidden;
+}
+
+.footer-wrapper {
+  width: 100%;
+  overflow: hidden;
 }
 
 .footer-container {
@@ -451,6 +452,7 @@ body {
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto 25px;
+  padding: 0 20px;
 }
 
 .footer-left {
@@ -546,9 +548,10 @@ body {
   text-align: center;
   border-top: 1px solid #333;
   margin-top: 20px;
-  padding-top: 15px;
+  padding: 15px 20px 0;
   font-size: 0.85rem;
   color: #888;
+  width: 100%;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
@@ -559,42 +562,60 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* Header matches house.html mobile */
   .header {
-    min-height: auto;
     padding: 10px 15px;
-    flex-wrap: wrap;
+  }
+
+  .logo-container {
+    order: 1;
   }
 
   .logo-container::before {
     font-size: 1.5rem;
   }
 
-  .search-container {
-    order: 3;
-    width: 100%;
-    margin: 10px 0 0 0;
-    max-width: 100%;
-  }
-
   .nav-links {
-    gap: 10px;
-    font-size: 0.85rem;
+    order: 2;
+    gap: 15px;
+    font-size: 1.15rem;
+    margin-left: auto;
   }
 
   .nav-links a {
-    padding: 6px 8px;
+    padding: 8px;
+    font-size: 1.15rem;
   }
 
+  .nav-links a i {
+    font-size: 1.15rem;
+  }
+
+  /* Icons only on mobile - hide all text labels */
+  .nav-links .nav-text {
+    display: none !important;
+  }
+
+  .search-container {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  /* Hero */
   .hero {
-    padding: 100px 15px 30px;
+    padding: 140px 15px 30px;
   }
 
   .hero h1 {
     font-size: 2rem;
   }
 
+  /* Cards - 2 columns on mobile */
   .featured-cards {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
@@ -604,23 +625,20 @@ body {
 
   .reply-status-badge {
     font-size: 0.75rem;
-    padding: 6px 12px;
+    padding: 6px 10px;
+    margin: 8px 10px 10px;
   }
 
+  /* Footer - 2x2 grid matches house.html */
   .footer-container {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 20px;
   }
 
-  .footer-left,
-  .footer-links,
-  .footer-contact {
-    flex: 1 1 auto;
-  }
-
-  .footer-left::before {
-    font-size: 1.3rem;
+  .footer-bottom {
+    grid-column: 1 / -1;
   }
 }
 
@@ -630,19 +648,28 @@ body {
   }
 
   .nav-links {
-    gap: 8px;
+    gap: 12px;
   }
 
-  .nav-links a span {
-    display: none;
+  .nav-links a {
+    font-size: 1.1rem;
+  }
+
+  .nav-links a i {
+    font-size: 1.1rem;
+  }
+
+  .hero {
+    padding: 140px 15px 25px;
   }
 
   .hero h1 {
     font-size: 1.6rem;
   }
 
+  /* Keep 2 columns on very small screens */
   .featured-cards {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
@@ -650,8 +677,38 @@ body {
     height: 110px;
   }
 
+  .card .location {
+    font-size: 0.82rem;
+  }
+
+  .card .price {
+    font-size: 0.95rem;
+  }
+
   .reply-status-badge {
     font-size: 0.7rem;
-    padding: 5px 10px;
+    padding: 5px 8px;
+    margin: 6px 8px 8px;
+  }
+
+  /* Footer stays 2x2 */
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.85rem;
+  }
+
+  .footer-left::before {
+    font-size: 1.3rem;
+  }
+
+  .footer-links h4,
+  .footer-contact h4 {
+    font-size: 1rem;
+  }
+
+  .footer-contact p,
+  .footer-links ul li a {
+    font-size: 0.8rem;
   }
 }
