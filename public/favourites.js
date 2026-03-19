@@ -1,46 +1,56 @@
-// favourites.js - Complete Favorites System with Chat Integration
-// UPDATED FOR LOCAL AND PRODUCTION
+// favourites.js - Optimised with single API call
 
 document.addEventListener('DOMContentLoaded', async function() {
   await loadFavouritesAndInquiries();
 });
-// LOAD FAVORITES + INQUIRIES WITH REPLY STATUS
+
+// ============================================
+// LOAD FAVOURITES - SINGLE API CALL
+// ============================================
 async function loadFavouritesAndInquiries() {
   const container = document.getElementById('favouritesContainer');
-  
   if (!container) return;
-  
+
   container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 2rem; color: #ccc;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>Loading your favourites...</p>';
-  
+
   try {
-    const convResponse = await fetch(`${API_BASE_URL}/api/chat/conversations`, {
+    // Single API call instead of multiple sequential calls
+    const response = await fetch(`${API_BASE_URL}/api/favourites/summary`, {
       method: 'GET',
       credentials: 'include'
     });
-    
+
     let inquiredProperties = [];
-    if (convResponse.ok) {
-      const convData = await convResponse.json();
-      inquiredProperties = await getInquiredPropertiesDetails(convData.conversations || []);
+
+    if (response.ok) {
+      const data = await response.json();
+      inquiredProperties = (data.properties || []).map(p => ({
+        ...p,
+        location: p.address_line1 || p.city || 'Location not specified',
+        type: p.property_type || 'Property',
+        price: `Ksh ${Number(p.price).toLocaleString('en-KE')}`,
+        img: p.images && p.images.length > 0
+          ? (p.images[0].startsWith('http') ? p.images[0] : `${API_BASE_URL}${p.images[0]}`)
+          : null,
+        hasInquiry: true,
+        hasUnread: p.unread_count > 0,
+        hasAgentReplied: !!p.agent_has_replied
+      }));
     }
-    
+
+    // Merge with local favourites (saved hearts without inquiries)
     const localFavorites = JSON.parse(localStorage.getItem('favourites')) || [];
-    
     const allProperties = [...inquiredProperties];
-    
+
     localFavorites.forEach(fav => {
-      const alreadyExists = allProperties.some(p => 
+      const alreadyExists = allProperties.some(p =>
         (p.property_id || p.id) === (fav.property_id || fav.id)
       );
       if (!alreadyExists) {
-        allProperties.push({
-          ...fav,
-          hasInquiry: false,
-          hasUnread: false
-        });
+        allProperties.push({ ...fav, hasInquiry: false, hasUnread: false });
       }
     });
-    
+
     if (allProperties.length === 0) {
       container.innerHTML = `
         <p style="text-align: center; grid-column: 1/-1; padding: 3rem 2rem; color: #ccc;">
@@ -51,7 +61,8 @@ async function loadFavouritesAndInquiries() {
       `;
       return;
     }
-    
+
+    // Sort: unread first, then inquired, then local saves
     allProperties.sort((a, b) => {
       if (a.hasUnread && !b.hasUnread) return -1;
       if (!a.hasUnread && b.hasUnread) return 1;
@@ -59,69 +70,19 @@ async function loadFavouritesAndInquiries() {
       if (!a.hasInquiry && b.hasInquiry) return 1;
       return 0;
     });
-    
+
     container.innerHTML = '';
     allProperties.forEach(property => {
       const card = createPropertyCard(property);
       container.appendChild(card);
     });
-    
+
     updateFavoritesBadge(allProperties.filter(p => p.hasUnread).length);
-    
+
   } catch (error) {
-    console.error('Error loading favorites:', error);
-    container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #ff4d4d; padding: 2rem;">Error loading favorites. Please refresh the page.</p>';
+    console.error('Error loading favourites:', error);
+    container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #ff4d4d; padding: 2rem;">Error loading favourites. Please refresh the page.</p>';
   }
-}
-// GET INQUIRED PROPERTIES WITH FULL DETAILS
-async function getInquiredPropertiesDetails(conversations) {
-  const properties = [];
-  
-  for (const conv of conversations) {
-    try {
-      const propResponse = await fetch(`${API_BASE_URL}/api/properties/${conv.property_id}`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (propResponse.ok) {
-        const propData = await propResponse.json();
-        const property = propData.property;
-        
-        const messagesResponse = await fetch(`${API_BASE_URL}/api/chat/conversations/${conv.conversation_id}/messages`, {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        let hasAgentReplied = false;
-        if (messagesResponse.ok) {
-          const messagesData = await messagesResponse.json();
-          const messages = messagesData.messages || [];
-          
-          hasAgentReplied = messages.some(msg => msg.sender_id === conv.agent_id);
-        }
-        
-        properties.push({
-          ...property,
-          property_id: property.property_id,
-          location: property.address_line1 || property.city || 'Location not specified',
-          type: property.property_type || 'Property',
-          price: `Ksh ${Number(property.price).toLocaleString('en-KE')}`,
-          img: property.images && property.images.length > 0 
-            ? `${API_BASE_URL}${property.images[0]}`
-            : null,
-          hasInquiry: true,
-          hasUnread: conv.unread_count > 0,
-          hasAgentReplied: hasAgentReplied,
-          conversationId: conv.conversation_id
-        });
-      }
-    } catch (error) {
-      console.error('Error loading property details:', error);
-    }
-  }
-  
-  return properties;
 }
 
 // ============================================
@@ -130,20 +91,18 @@ async function getInquiredPropertiesDetails(conversations) {
 function createPropertyCard(property) {
   const card = document.createElement('a');
   card.className = 'card';
-  
-  if (property.hasUnread) {
-    card.href = `house.html?id=${property.property_id}&openChat=true`;
-  } else if (property.hasInquiry) {
+
+  if (property.hasInquiry) {
     card.href = `house.html?id=${property.property_id}&openChat=true`;
   } else {
     card.href = `house.html?id=${property.property_id}`;
   }
-  
-  const imageUrl = property.img || 
-    (property.images && property.images.length > 0 
-      ? `${API_BASE_URL}${property.images[0]}`
+
+  const imageUrl = property.img ||
+    (property.images && property.images.length > 0
+      ? (property.images[0].startsWith('http') ? property.images[0] : `${API_BASE_URL}${property.images[0]}`)
       : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60');
-  
+
   let statusHtml = '';
   if (property.hasInquiry) {
     if (property.hasUnread) {
@@ -152,7 +111,7 @@ function createPropertyCard(property) {
       statusHtml = `<div class="reply-status-badge orange"><i class="fa-solid fa-clock"></i> Pending Reply</div>`;
     }
   }
-  
+
   card.innerHTML = `
     <div class="card-image" style="background-image:url('${imageUrl}')"></div>
     <p class="location">${escapeHtml(property.location || property.address_line1 || property.city || 'Location not specified')}</p>
@@ -162,16 +121,15 @@ function createPropertyCard(property) {
     <p class="units-left">Only ${property.units_available || 1} unit${(property.units_available || 1) !== 1 ? 's' : ''} left</p>
     ${statusHtml}
   `;
-  
+
   return card;
 }
 
 // ============================================
-// UPDATE FAVORITES BADGE IN HEADER
+// UPDATE FAVOURITES BADGE IN HEADER
 // ============================================
 function updateFavoritesBadge(unreadCount) {
   const badge = document.querySelector('.favourites-badge');
-  
   if (badge) {
     if (unreadCount > 0) {
       badge.textContent = `${unreadCount} ${unreadCount === 1 ? 'Reply' : 'Replies'}`;
@@ -193,11 +151,11 @@ function updateFavoritesBadge(unreadCount) {
 // ============================================
 async function addToFavourites(property) {
   let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
-  
-  const exists = favourites.some(fav => 
+
+  const exists = favourites.some(fav =>
     (fav.property_id || fav.id) === (property.property_id || property.id)
   );
-  
+
   if (!exists) {
     favourites.push({
       property_id: property.property_id || property.id,
@@ -208,14 +166,14 @@ async function addToFavourites(property) {
       bathrooms: property.bathrooms || 0,
       price: property.price,
       units_available: property.units_available || 1,
-      img: property.img || (property.images && property.images.length > 0 
-        ? `${API_BASE_URL}${property.images[0]}`
+      img: property.img || (property.images && property.images.length > 0
+        ? (property.images[0].startsWith('http') ? property.images[0] : `${API_BASE_URL}${property.images[0]}`)
         : null)
     });
     localStorage.setItem('favourites', JSON.stringify(favourites));
     return true;
   }
-  
+
   return false;
 }
 
@@ -224,13 +182,13 @@ async function addToFavourites(property) {
 // ============================================
 function removeFromFavourites(propertyId) {
   let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
-  
-  favourites = favourites.filter(fav => 
+
+  favourites = favourites.filter(fav =>
     (fav.property_id || fav.id) !== propertyId
   );
-  
+
   localStorage.setItem('favourites', JSON.stringify(favourites));
-  
+
   if (window.location.pathname.includes('favourites')) {
     loadFavouritesAndInquiries();
   }

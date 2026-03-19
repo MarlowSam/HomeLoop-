@@ -19,6 +19,7 @@ import paymentRoutes from './routes/payments.js';
 import oauthRoutes from './routes/oauth.js';
 import chatRoutes from './routes/chat.js';
 import bundlesRoutes from './routes/bundles.js';
+import favouritesRoutes from './routes/favourites.js';
 import chatHandler from './socket/chatHandler.js';
 import { startReviewScheduler } from "./services/reviewScheduler.js";
 
@@ -138,6 +139,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/bundles', bundlesRoutes);
+app.use('/api/favourites', favouritesRoutes);
 
 console.log('✅ All routes registered');
 
@@ -293,7 +295,7 @@ httpServer.listen(PORT, () => {
 });
 
 // ==========================================
-// DB KEEP-ALIVE - prevents Aiven from powering off
+// DB KEEP-ALIVE
 // ==========================================
 setInterval(async () => {
   try {
