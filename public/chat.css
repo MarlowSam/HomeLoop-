@@ -1,25 +1,20 @@
 /* ============================================
-   CHAT POPUP - FULLSCREEN
+   CHAT POPUP — FULLSCREEN, matches dashboard style
    ============================================ */
 
 .chat-popup {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh; /* dynamic viewport height — handles mobile browser chrome */
-  background: #3b0047;
+  height: 100dvh;
+  background: #1a001f;
   border-radius: 0;
   box-shadow: none;
   overflow: hidden;
   flex-direction: column;
   z-index: 9999;
-}
-
-/* Slide-in animation */
-.chat-popup {
   transform: translateY(100%);
   transition: transform 0.3s ease;
 }
@@ -29,10 +24,10 @@
 }
 
 /* ============================================
-   CHAT HEADER
+   HEADER
    ============================================ */
 .chat-header {
-  background: linear-gradient(to right, #e91e8c, #ff6b35);
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
   color: #fff;
   padding: 16px 20px;
   display: flex;
@@ -43,7 +38,7 @@
 
 .chat-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -51,12 +46,12 @@
 }
 
 .chat-header .close-btn {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: #fff;
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
+  font-size: 22px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -67,10 +62,9 @@
 }
 
 .chat-header .close-btn:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.35);
 }
 
-/* Agent online status */
 .agent-online-status {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.85);
@@ -78,72 +72,45 @@
 }
 
 /* ============================================
-   CHAT BODY (messages area)
+   MESSAGES AREA
+   ✅ KEY FIX: flex: 1 + min-height: 0 + overflow-y: auto
+   This makes the messages area take all available
+   space between header and footer, and scroll internally.
+   The footer is then naturally pushed to the bottom.
    ============================================ */
-.chat-body {
+#chatMessages {
   flex: 1;
   padding: 16px;
   overflow-y: auto;
-  background: #3b0047;
+  background: #1a001f;
   color: white;
-  min-height: 0; /* critical: allows flex child to scroll properly */
-  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  min-height: 0;          /* critical — allows flex child to shrink & scroll */
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+
+#chatMessages::-webkit-scrollbar { width: 6px; }
+#chatMessages::-webkit-scrollbar-track { background: transparent; }
+#chatMessages::-webkit-scrollbar-thumb {
+  background: rgba(255, 77, 210, 0.3);
+  border-radius: 10px;
 }
 
 /* ============================================
-   MESSAGE BUBBLES
+   GREETING BUBBLE
    ============================================ */
-.message {
-  margin: 8px 0;
-  max-width: 78%;
-  clear: both;
-  display: flex;
-  flex-direction: column;
-}
-
-.user-message {
-  align-self: flex-end;
-  margin-left: auto;
-}
-
-.agent-message {
+.greeting-bubble {
   align-self: flex-start;
-  margin-right: auto;
-}
-
-.message-content {
-  padding: 10px 14px;
-  border-radius: 18px;
-  font-size: 15px;
-  line-height: 1.4;
-  word-break: break-word;
-}
-
-.user-message .message-content {
-  background: linear-gradient(135deg, #e91e8c, #ff6b35);
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-
-.agent-message .message-content {
+  max-width: 78%;
+  padding: 12px 16px;
+  border-radius: 20px 20px 20px 4px;
   background: #f5a623;
   color: #fff;
-  border-bottom-left-radius: 4px;
-}
-
-.message-time {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: 4px;
-  padding: 0 4px;
-}
-
-.user-message .message-time {
-  text-align: right;
-}
-
-.agent-message .message-time {
-  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 /* ============================================
@@ -153,7 +120,6 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 10px 14px;
 }
 
 .typing-dots .dot {
@@ -173,66 +139,72 @@
 }
 
 /* ============================================
-   CHAT FOOTER (input area)
+   FOOTER — pinned to bottom
+   ✅ flex-shrink: 0 prevents it ever being pushed off screen
    ============================================ */
 .chat-footer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: #3b0047;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0; /* never shrink — always stays visible */
-  position: sticky;
-  bottom: 0;
+  background: #2d0036;
+  border-top: 1px solid rgba(255, 77, 210, 0.2);
+  flex-shrink: 0;   /* never shrink */
+  width: 100%;
 }
 
-.chat-footer textarea,
-.chat-footer input[type="text"] {
+.chat-footer input[type="text"],
+#chatInput {
   flex: 1;
   padding: 12px 16px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 24px;
-  outline: none;
-  font-size: 15px;
-  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 77, 210, 0.3);
+  border-radius: 25px;
+  font-size: 0.95rem;
+  background: #3b0047;
   color: #fff;
+  outline: none;
+  min-width: 0;
   resize: none;
   max-height: 120px;
   line-height: 1.4;
-  transition: border-color 0.2s ease;
+  font-family: inherit;
   -webkit-appearance: none;
+  transition: border-color 0.2s ease;
 }
 
-.chat-footer textarea::placeholder,
-.chat-footer input[type="text"]::placeholder {
+.chat-footer input[type="text"]:focus,
+#chatInput:focus {
+  border-color: #ff4dd2;
+}
+
+.chat-footer input[type="text"]::placeholder,
+#chatInput::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.chat-footer textarea:focus,
-.chat-footer input[type="text"]:focus {
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.chat-footer .send-btn {
-  width: 46px;
-  height: 46px;
-  background: linear-gradient(135deg, #e91e8c, #ff6b35);
+/* Send button */
+.chat-footer .send-btn,
+#sendMessage {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
   border: none;
-  border-radius: 50%;
+  border-radius: 25px;
   color: #fff;
-  font-size: 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
   flex-shrink: 0;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
 }
 
-.chat-footer .send-btn:active {
-  transform: scale(0.92);
+.chat-footer .send-btn:active,
+#sendMessage:active {
   opacity: 0.85;
+  transform: scale(0.97);
 }
 
 /* ============================================
@@ -249,8 +221,8 @@
 }
 
 .custom-alert-box {
-  background: #2a0033;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #2d0036;
+  border: 1px solid rgba(255, 77, 210, 0.3);
   border-radius: 16px;
   padding: 28px 24px;
   max-width: 320px;
@@ -267,7 +239,7 @@
 
 .custom-alert-btn {
   padding: 10px 32px;
-  background: linear-gradient(135deg, #e91e8c, #ff6b35);
+  background: linear-gradient(135deg, #ff4dd2, #ff9900);
   color: #fff;
   border: none;
   border-radius: 24px;
@@ -277,12 +249,12 @@
 }
 
 /* ============================================
-   CONTACT AGENT BUTTON (trigger)
+   TRIGGER BUTTON
    ============================================ */
-#contactAgentBtn,
-#chatAgentBtn {
+#chatAgentBtn,
+#contactAgentBtn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #e91e8c, #ff6b35);
+  background: linear-gradient(135deg, #ff4dd2, #ff9900);
   color: white;
   border: none;
   border-radius: 8px;
@@ -292,8 +264,8 @@
   transition: opacity 0.2s ease;
 }
 
-#contactAgentBtn:hover,
-#chatAgentBtn:hover {
+#chatAgentBtn:hover,
+#contactAgentBtn:hover {
   opacity: 0.88;
 }
 
@@ -302,7 +274,7 @@
    ============================================ */
 .favourites-badge {
   display: none;
-  background: linear-gradient(135deg, #e91e8c, #ff6b35);
+  background: linear-gradient(135deg, #ff4dd2, #ff9900);
   color: #fff;
   font-size: 12px;
   font-weight: 600;
