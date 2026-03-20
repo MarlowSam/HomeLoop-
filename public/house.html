@@ -17,6 +17,7 @@
   <meta property="og:url" id="ogUrl" content="https://homelooptest-123.onrender.com/house.html">
 
   <link rel="stylesheet" href="house.css">
+  <link rel="stylesheet" href="chat.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -153,20 +154,47 @@
     </div>
   </footer>
 
+  <!-- ============================================
+       CHAT POPUP — dashboard-matching structure
+       ============================================ -->
   <div id="chatPopup" class="chat-popup">
+
+    <!-- Header -->
     <div class="chat-header">
-      <span><i class="fa-solid fa-comments"></i> Chat with Agent</span>
-      <button id="closeChat">&times;</button>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.4);flex-shrink:0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div>
+          <h3 style="margin:0;color:white;font-size:1.1rem;font-weight:600;">Chat with Agent</h3>
+          <span class="agent-online-status"></span>
+        </div>
+      </div>
+      <button id="closeChat" class="close-btn">&times;</button>
     </div>
-    <div class="chat-body" id="chatMessages">
-      <div class="agent-message message">
+
+    <!-- Messages -->
+    <div id="chatMessages">
+      <div class="greeting-bubble">
         👋 Hello! You're asking about this property. How can I help?
       </div>
     </div>
+
+    <!-- Footer -->
     <div class="chat-footer">
-      <input type="text" id="chatInput" placeholder="Type your message..." />
-      <button id="sendMessage"><i class="fa-solid fa-paper-plane"></i></button>
+      <input type="text" id="chatInput" placeholder="Type your reply..." />
+      <button id="sendMessage">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Send
+      </button>
     </div>
+
   </div>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
