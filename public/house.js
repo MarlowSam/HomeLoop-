@@ -1,4 +1,4 @@
-// house.js - Property Details Page with Chat Integration & Reviews
+// house.js - Property Details Page with Chat Integration, Reviews & Videos
 
 let currentPropertyData = null;
 
@@ -11,16 +11,11 @@ function startNavigation(url) {
     bar = document.createElement('div');
     bar.id = 'navLoadBar';
     bar.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      width: 0%;
+      position: fixed; top: 0; left: 0;
+      height: 3px; width: 0%;
       background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
-      z-index: 99999;
-      transition: width 0.6s ease;
-      box-shadow: 0 0 8px rgba(255, 77, 210, 0.6);
-      pointer-events: none;
+      z-index: 99999; transition: width 0.6s ease;
+      box-shadow: 0 0 8px rgba(255,77,210,0.6); pointer-events: none;
     `;
     document.body.appendChild(bar);
   }
@@ -31,26 +26,17 @@ function startNavigation(url) {
   setTimeout(() => { window.location.href = url; }, 750);
 }
 
-
-
-// ✅ TOP LOADING BAR + CONTENT COVER
-// Bar runs on top, cover hides raw "Loading..." text beneath
 function showTopBar() {
-  // Remove any existing
   document.getElementById('top-load-bar')?.remove();
   document.getElementById('page-cover')?.remove();
 
-  // Top progress bar
   const bar = document.createElement('div');
   bar.id = 'top-load-bar';
   bar.style.cssText = `
-    position: fixed;
-    top: 0; left: 0;
-    height: 3px;
-    width: 0%;
+    position: fixed; top: 0; left: 0;
+    height: 3px; width: 0%;
     background: linear-gradient(90deg, #ff4dd2, #ff9900);
-    z-index: 99999;
-    transition: width 0.4s ease;
+    z-index: 99999; transition: width 0.4s ease;
     border-radius: 0 2px 2px 0;
   `;
   document.body.appendChild(bar);
@@ -58,30 +44,23 @@ function showTopBar() {
   setTimeout(() => { bar.style.width = '70%'; }, 300);
   setTimeout(() => { bar.style.width = '85%'; }, 800);
 
-  // Cover overlay - same colour as page bg, hides Loading... text
-  // Bar sits above it (higher z-index)
   const cover = document.createElement('div');
   cover.id = 'page-cover';
   cover.style.cssText = `
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: #1a001f;
-    z-index: 9998;
-    transition: opacity 0.35s ease;
+    z-index: 9998; transition: opacity 0.35s ease;
   `;
   document.body.appendChild(cover);
 }
 
 function completeTopBar() {
-  // Complete the bar
   const bar = document.getElementById('top-load-bar');
   if (bar) {
     bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.3s';
     bar.style.width = '100%';
     setTimeout(() => { bar.style.opacity = '0'; setTimeout(() => bar.remove(), 400); }, 300);
   }
-
-  // Fade out the cover to reveal loaded content
   const cover = document.getElementById('page-cover');
   if (cover) {
     cover.style.opacity = '0';
@@ -90,7 +69,6 @@ function completeTopBar() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  // ✅ Show top bar immediately - continues the feel from navigation
   showTopBar();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -112,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async function() {
   await loadPropertyReviews(propertyId);
   await loadSimilarProperties(propertyId);
 
-  // ✅ All data loaded - complete the bar
   completeTopBar();
 
   if (writeReview === 'true' && bookingId) {
@@ -128,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================
-// CHECK LOGIN STATUS FOR DROPDOWN
+// CHECK LOGIN STATUS
 // ============================================
 async function checkLoginStatus() {
   const dropdownContent = document.querySelector('.dropdown-content');
@@ -136,12 +113,9 @@ async function checkLoginStatus() {
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      method: 'GET',
-      credentials: 'include'
+      method: 'GET', credentials: 'include'
     });
-
     dropdownContent.innerHTML = '';
-
     if (response.ok) {
       const data = await response.json();
       if (data.isAuthenticated) {
@@ -150,9 +124,7 @@ async function checkLoginStatus() {
         logoutLink.textContent = 'Logout';
         logoutLink.addEventListener('click', async (e) => {
           e.preventDefault();
-          try {
-            await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
-          } catch (err) { console.error(err); }
+          try { await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' }); } catch (err) { console.error(err); }
           window.location.href = 'login.html';
         });
         dropdownContent.appendChild(logoutLink);
@@ -169,37 +141,29 @@ async function checkLoginStatus() {
 }
 
 // ============================================
-// STYLED ALERT - OK button uses addEventListener (fixes mobile)
+// STYLED ALERT
 // ============================================
 function showStyledAlert(message, type = 'success') {
-  // Remove any existing alert first
   document.querySelectorAll('.styled-alert-box, .alert-backdrop').forEach(el => el.remove());
 
   const backdrop = document.createElement('div');
   backdrop.className = 'alert-backdrop';
   backdrop.style.cssText = `
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(26, 0, 31, 0.85);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
+    background: rgba(26,0,31,0.85); backdrop-filter: blur(4px); z-index: 9999;
   `;
 
   const alertDiv = document.createElement('div');
   alertDiv.className = 'styled-alert-box';
   alertDiv.style.cssText = `
-    position: fixed;
-    top: 50%; left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    background: #3b0047;
-    color: white;
-    padding: 24px 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(255, 77, 210, 0.4);
-    border: 2px solid rgba(255, 77, 210, 0.3);
-    z-index: 10000;
-    text-align: center;
-    min-width: 280px;
-    max-width: 90%;
+    background: #3b0047; color: white;
+    padding: 24px 30px; border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(255,77,210,0.4);
+    border: 2px solid rgba(255,77,210,0.3);
+    z-index: 10000; text-align: center;
+    min-width: 280px; max-width: 90%;
   `;
 
   const msgDiv = document.createElement('div');
@@ -210,52 +174,33 @@ function showStyledAlert(message, type = 'success') {
   okBtn.textContent = 'OK';
   okBtn.style.cssText = `
     background: linear-gradient(135deg, #ff4dd2 0%, #ff9900 100%);
-    color: white; border: none;
-    padding: 10px 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    min-width: 80px;
+    color: white; border: none; padding: 10px 30px;
+    border-radius: 8px; cursor: pointer; font-weight: 700;
+    font-size: 1rem; min-width: 80px;
     -webkit-tap-highlight-color: transparent;
   `;
 
   alertDiv.appendChild(msgDiv);
   alertDiv.appendChild(okBtn);
-
   document.body.appendChild(backdrop);
   document.body.appendChild(alertDiv);
 
-  // ✅ addEventListener instead of inline onclick - fixes mobile
-  okBtn.addEventListener('click', () => {
-    alertDiv.remove();
-    backdrop.remove();
-  });
-  backdrop.addEventListener('click', () => {
-    alertDiv.remove();
-    backdrop.remove();
-  });
+  okBtn.addEventListener('click', () => { alertDiv.remove(); backdrop.remove(); });
+  backdrop.addEventListener('click', () => { alertDiv.remove(); backdrop.remove(); });
 }
 
 // ============================================
-// FAVOURITES NOTIFICATION (Small Toast)
+// FAVOURITES NOTIFICATION
 // ============================================
 function showFavouriteNotification(message, type = 'success') {
   const notification = document.createElement('div');
   notification.style.cssText = `
-    position: fixed;
-    top: 90px; right: 20px;
+    position: fixed; top: 90px; right: 20px;
     background: ${type === 'success' ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' : 'linear-gradient(135deg, #ff4d4d 0%, #ff1744 100%)'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 10px;
+    color: white; padding: 12px 20px; border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    z-index: 10001;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    z-index: 10001; font-weight: 600; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 10px;
   `;
   notification.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'check' : 'times'}-circle"></i><span>${message}</span>`;
   document.body.appendChild(notification);
@@ -284,10 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
         price: `Ksh ${formatPrice(currentPropertyData.price)}`,
         units_available: currentPropertyData.units_available || 1,
         images: currentPropertyData.images,
-        // ✅ Cloudinary URLs are already complete
-        img: currentPropertyData.images && currentPropertyData.images.length > 0
-          ? currentPropertyData.images[0]
-          : null
+        img: currentPropertyData.images && currentPropertyData.images.length > 0 ? currentPropertyData.images[0] : null
       };
       let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
       const exists = favourites.some(fav => (fav.property_id || fav.id) === propertyToSave.property_id);
@@ -312,8 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadPropertyDetails(propertyId) {
   try {
     const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
-      method: 'GET',
-      credentials: 'include'
+      method: 'GET', credentials: 'include'
     });
     if (response.ok) {
       const data = await response.json();
@@ -329,14 +270,13 @@ async function loadPropertyDetails(propertyId) {
   }
 }
 
-
 function updateSEOMeta(property) {
   const location = property.address_line1
     ? `${property.address_line1}, ${property.city}`
     : property.city || 'Nairobi';
 
   const title = `${property.bedrooms} Bed ${property.property_type} in ${location} - Ksh ${Number(property.price).toLocaleString('en-KE')} | HomeLoop`;
-  const description = `${property.bedrooms} bedroom ${property.property_type} in ${location} for Ksh ${Number(property.price).toLocaleString('en-KE')}/month. ${property.units_available} unit(s) available. View photos and contact agent on HomeLoop.`;
+  const description = `${property.bedrooms} bedroom ${property.property_type} in ${location} for Ksh ${Number(property.price).toLocaleString('en-KE')}/month. ${property.units_available} unit(s) available.`;
   const image = property.images && property.images.length > 0 ? property.images[0] : '';
   const url = `https://homelooptest-123.onrender.com/house.html`;
 
@@ -348,7 +288,6 @@ function updateSEOMeta(property) {
   document.getElementById('ogUrl')?.setAttribute('content', url);
   document.getElementById('canonicalUrl')?.setAttribute('href', url);
 
-  // Schema markup for this property
   const existing = document.getElementById('propertySchema');
   if (existing) existing.remove();
 
@@ -366,9 +305,7 @@ function updateSEOMeta(property) {
       "@type": "Offer",
       "price": property.price,
       "priceCurrency": "KES",
-      "availability": property.units_available > 0
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock"
+      "availability": property.units_available > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     },
     "address": {
       "@type": "PostalAddress",
@@ -376,12 +313,7 @@ function updateSEOMeta(property) {
       "addressLocality": property.city || 'Nairobi',
       "addressCountry": "KE"
     },
-    "numberOfRooms": property.bedrooms,
-    "floorSize": {
-      "@type": "QuantitativeValue",
-      "value": property.bedrooms,
-      "unitText": "bedrooms"
-    }
+    "numberOfRooms": property.bedrooms
   });
   document.head.appendChild(schema);
 }
@@ -389,7 +321,7 @@ function updateSEOMeta(property) {
 function displayPropertyDetails(property) {
   updateSEOMeta(property);
 
-  // ✅ Cloudinary URLs are already complete
+  // Hero image
   const heroImage = document.querySelector('.hero-image');
   if (heroImage && property.images && property.images.length > 0) {
     heroImage.style.backgroundImage = `url('${property.images[0]}')`;
@@ -425,7 +357,7 @@ function displayPropertyDetails(property) {
     descriptionElement.innerHTML = descriptionText.trim() ? descriptionText : 'No additional information provided.';
   }
 
-  // ✅ Gallery - Cloudinary URLs already complete
+  // Gallery images
   const gallery = document.querySelector('.gallery');
   if (gallery && property.images && property.images.length > 1) {
     gallery.innerHTML = '';
@@ -437,7 +369,35 @@ function displayPropertyDetails(property) {
     });
   }
 
-  // ✅ Set BOTH agentId AND propertyId so chat.js uses correct IDs
+  // Videos — same as bundle.html
+  const houseDescSection = document.querySelector('.house-description');
+  if (houseDescSection && property.videos && property.videos.length > 0) {
+    houseDescSection.querySelector('.video-section')?.remove();
+
+    const videoSection = document.createElement('div');
+    videoSection.className = 'video-section';
+    videoSection.innerHTML = `
+      <h3><i class="fa-solid fa-video"></i> Property Videos</h3>
+      <div class="videos-grid"></div>
+    `;
+
+    const videosGrid = videoSection.querySelector('.videos-grid');
+    property.videos.slice(0, 2).forEach((videoUrl) => {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      const source = document.createElement('source');
+      source.src = videoUrl;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      video.insertAdjacentText('beforeend', 'Your browser does not support the video tag.');
+      videosGrid.appendChild(video);
+    });
+
+    houseDescSection.appendChild(videoSection);
+  }
+
+  // Chat button
   if (property.agent_user_id) {
     const chatAgentBtn = document.getElementById('chatAgentBtn');
     if (chatAgentBtn) {
@@ -446,40 +406,81 @@ function displayPropertyDetails(property) {
     }
   }
 
+  // ✅ Build agent profile card with icon fallback — same as bundle.html
   updateAgentProfileCard(property);
 
-  // ✅ Clean URL - remove ?id=XX from address bar
+  // Clean URL
   history.replaceState({ propertyId: property.property_id }, document.title, window.location.pathname);
 
   const bookBtn = document.querySelector('.btn.book');
-  if (bookBtn) {
-    bookBtn.href = `book-visit.html?property_id=${property.property_id}`;
-  }
+  if (bookBtn) bookBtn.href = `book-visit.html?property_id=${property.property_id}`;
 }
 
+// ============================================
+// AGENT PROFILE CARD — with icon fallback
+// Matches bundle.html exactly
+// ============================================
 function updateAgentProfileCard(property) {
   const agentProfileCard = document.getElementById('agentProfileCard');
-  const agentProfilePhoto = document.getElementById('agentProfilePhoto');
-  const agentProfileName = document.getElementById('agentProfileName');
-
   if (!agentProfileCard) return;
 
-  if (property.agent_user_id || property.agent_id) {
-    const agentId = property.agent_user_id || property.agent_id;
-    agentProfileCard.href = `agent profile.html?agent_id=${agentId}`;
+  // Set link
+  const agentId = property.agent_user_id || property.agent_id;
+  if (agentId) agentProfileCard.href = `agent profile.html?agent_id=${agentId}`;
+
+  // Clear existing content and rebuild — same structure as bundle.html
+  agentProfileCard.innerHTML = '';
+
+  // ✅ Icon fallback — shown by default, hidden when photo loads
+  const iconFallback = document.createElement('div');
+  iconFallback.className = 'agent-profile-icon-fallback';
+  iconFallback.style.cssText = `
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 3px solid #ff4dd2;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background: rgba(255, 77, 210, 0.1);
+  `;
+  iconFallback.innerHTML = '<i class="fa-solid fa-circle-user" style="font-size:42px;color:#ff4dd2;"></i>';
+
+  // ✅ Photo — hidden until successfully loaded
+  const photo = document.createElement('img');
+  photo.className = 'agent-profile-photo';
+  photo.alt = 'Agent';
+  photo.style.display = 'none';
+  photo.onload = function() {
+    this.style.display = 'block';
+    iconFallback.style.display = 'none';
+  };
+  photo.onerror = function() {
+    this.style.display = 'none';
+    iconFallback.style.display = 'flex';
+  };
+
+  // Set photo src if available
+  const photoPath = property.agent_photo || property.agent_profile_picture;
+  if (photoPath) {
+    photo.src = `${API_BASE_URL}${photoPath}`;
   }
 
-  if (agentProfileName) {
-    agentProfileName.textContent = property.agency_name || property.agent_full_name || property.agent_name || "View Agent's Profile";
-  }
+  // Info
+  const info = document.createElement('div');
+  info.className = 'agent-profile-info';
 
-  if (agentProfilePhoto && (property.agent_photo || property.agent_profile_picture)) {
-    const photoPath = property.agent_photo || property.agent_profile_picture;
-    agentProfilePhoto.src = `${API_BASE_URL}${photoPath}`;
-    agentProfilePhoto.onerror = function() {
-      this.src = 'Images/default avatar.png';
-    };
-  }
+  const name = document.createElement('strong');
+  name.id = 'agentProfileName';
+  name.textContent = property.agency_name || property.agent_full_name || property.agent_name || "View Agent's Profile";
+
+  const sub = document.createElement('span');
+  sub.textContent = 'See more properties from this agent';
+
+  info.appendChild(name);
+  info.appendChild(sub);
+
+  agentProfileCard.appendChild(iconFallback);
+  agentProfileCard.appendChild(photo);
+  agentProfileCard.appendChild(info);
 }
 
 // ============================================
@@ -488,8 +489,7 @@ function updateAgentProfileCard(property) {
 async function loadPropertyReviews(propertyId) {
   try {
     const response = await fetch(`${API_BASE_URL}/api/reviews/${propertyId}`, {
-      method: 'GET',
-      credentials: 'include'
+      method: 'GET', credentials: 'include'
     });
     if (response.ok) {
       const data = await response.json();
@@ -508,7 +508,6 @@ function displayReviews(reviews) {
   const seeAllLink = document.getElementById('seeAllReviews');
   const overallStars = document.getElementById('overallStars');
   const overallRating = document.getElementById('overallRating');
-
   if (!reviewsList) return;
 
   if (reviews && reviews.length > 0) {
@@ -516,13 +515,9 @@ function displayReviews(reviews) {
     const roundedRating = Math.round(avgRating * 10) / 10;
     if (overallStars) overallStars.textContent = generateStars(avgRating);
     if (overallRating) overallRating.textContent = `(${roundedRating} / 5 from ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'})`;
-
     reviewsList.innerHTML = '';
-    reviews.slice(0, 4).forEach(review => {
-      reviewsList.appendChild(createReviewItem(review));
-    });
+    reviews.slice(0, 4).forEach(review => reviewsList.appendChild(createReviewItem(review)));
     addWriteReviewButton();
-
     if (seeAllLink) {
       seeAllLink.style.display = reviews.length > 4 ? 'inline-block' : 'none';
       if (reviews.length > 4) seeAllLink.textContent = `See All ${reviews.length} Reviews`;
@@ -539,7 +534,6 @@ function displayReviews(reviews) {
 function addWriteReviewButton() {
   const reviewsList = document.getElementById('reviewsList');
   if (!reviewsList || document.getElementById('writeReviewBtn')) return;
-
   const writeBtn = document.createElement('button');
   writeBtn.id = 'writeReviewBtn';
   writeBtn.className = 'write-review-btn';
@@ -573,7 +567,6 @@ function showReviewForm(bookingId = null) {
 
   const modal = document.createElement('div');
   modal.id = 'reviewModal';
-
   modal.innerHTML = `
     <div class="review-modal-content">
       <div class="review-modal-header">
@@ -584,11 +577,8 @@ function showReviewForm(bookingId = null) {
         <div style="margin-bottom: 18px;">
           <label>Your Rating *</label>
           <div class="star-rating">
-            <span data-rating="1">☆</span>
-            <span data-rating="2">☆</span>
-            <span data-rating="3">☆</span>
-            <span data-rating="4">☆</span>
-            <span data-rating="5">☆</span>
+            <span data-rating="1">☆</span><span data-rating="2">☆</span>
+            <span data-rating="3">☆</span><span data-rating="4">☆</span><span data-rating="5">☆</span>
           </div>
           <input type="hidden" id="ratingValue" required>
         </div>
@@ -600,7 +590,6 @@ function showReviewForm(bookingId = null) {
       </form>
     </div>
   `;
-
   document.body.appendChild(modal);
 
   modal.querySelector('.review-modal-close').addEventListener('click', () => modal.remove());
@@ -610,13 +599,8 @@ function showReviewForm(bookingId = null) {
   const ratingInput = modal.querySelector('#ratingValue');
 
   stars.forEach(star => {
-    star.addEventListener('mouseover', function() {
-      updateStarDisplay(stars, parseInt(this.dataset.rating), false);
-    });
-    star.addEventListener('click', function() {
-      ratingInput.value = this.dataset.rating;
-      updateStarDisplay(stars, parseInt(this.dataset.rating), true);
-    });
+    star.addEventListener('mouseover', function() { updateStarDisplay(stars, parseInt(this.dataset.rating), false); });
+    star.addEventListener('click', function() { ratingInput.value = this.dataset.rating; updateStarDisplay(stars, parseInt(this.dataset.rating), true); });
   });
 
   modal.querySelector('.star-rating').addEventListener('mouseleave', function() {
@@ -631,20 +615,14 @@ function showReviewForm(bookingId = null) {
 
 function updateStarDisplay(stars, rating, filled) {
   stars.forEach((star, index) => {
-    if (index < rating) {
-      star.textContent = '⭐';
-      star.style.color = '#ffc107';
-    } else {
-      star.textContent = '☆';
-      star.style.color = filled ? '#666' : '#ffc107';
-    }
+    if (index < rating) { star.textContent = '⭐'; star.style.color = '#ffc107'; }
+    else { star.textContent = '☆'; star.style.color = filled ? '#666' : '#ffc107'; }
   });
 }
 
 async function submitReview(propertyId, bookingId) {
   const rating = document.getElementById('ratingValue').value;
   const comment = document.getElementById('reviewComment').value;
-
   if (!rating) { showStyledAlert('Please select a rating', 'error'); return; }
   if (!comment.trim()) { showStyledAlert('Please write a review', 'error'); return; }
 
@@ -653,12 +631,7 @@ async function submitReview(propertyId, bookingId) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({
-        property_id: propertyId,
-        booking_id: bookingId,
-        rating: parseInt(rating),
-        comment: comment.trim()
-      })
+      body: JSON.stringify({ property_id: propertyId, booking_id: bookingId, rating: parseInt(rating), comment: comment.trim() })
     });
     const data = await response.json();
     if (response.ok) {
@@ -681,9 +654,8 @@ function generateStars(rating) {
 }
 
 function formatReviewDate(dateString) {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  } catch { return dateString; }
+  try { return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+  catch { return dateString; }
 }
 
 // ============================================
@@ -692,8 +664,7 @@ function formatReviewDate(dateString) {
 async function loadSimilarProperties(propertyId) {
   try {
     const response = await fetch(`${API_BASE_URL}/api/properties/similar/${propertyId}?limit=4`, {
-      method: 'GET',
-      credentials: 'include'
+      method: 'GET', credentials: 'include'
     });
     if (response.ok) {
       const data = await response.json();
@@ -707,7 +678,6 @@ async function loadSimilarProperties(propertyId) {
 function displaySimilarProperties(properties) {
   const container = document.querySelector('.more-properties .house-cards');
   if (!container) return;
-
   if (properties && properties.length > 0) {
     container.innerHTML = '';
     properties.forEach(property => container.appendChild(createPropertyCard(property)));
@@ -722,7 +692,6 @@ function createPropertyCard(property) {
   card.href = href;
   card.className = 'card';
 
-  // ✅ Cloudinary URLs already complete
   const imageUrl = property.images && property.images.length > 0
     ? property.images[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
@@ -735,18 +704,12 @@ function createPropertyCard(property) {
 
   let propertyTypeBadge = '';
   const propType = property.property_type || 'Property';
-  if (propType === 'Airbnb') {
-    propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
-  } else if (propType === 'Commercial') {
-    propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
-  } else {
-    propertyTypeBadge = `<p class="type">${escapeHtml(propType)}</p>`;
-  }
+  if (propType === 'Airbnb') propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
+  else if (propType === 'Commercial') propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
+  else propertyTypeBadge = `<p class="type">${escapeHtml(propType)}</p>`;
 
   card.innerHTML = `
-    <div class="card-image" style="background-image:url('${imageUrl}')">
-      ${bundleTag}
-    </div>
+    <div class="card-image" style="background-image:url('${imageUrl}')">${bundleTag}</div>
     <p class="location"><i class="fas fa-map-marker-alt" style="color:#FFA500;"></i> ${escapeHtml(fullLocation)}</p>
     ${propertyTypeBadge}
     <p>${property.bedrooms || 0} Bed • ${property.bathrooms || 0} Bath</p>
@@ -754,21 +717,14 @@ function createPropertyCard(property) {
     <p class="units-left">Only ${property.units_available || 1} unit${property.units_available !== 1 ? 's' : ''} left</p>
   `;
 
-  // ✅ Loading bar on click
-  card.addEventListener('click', function(e) {
-    e.preventDefault();
-    startNavigation(this.href);
-  });
-
+  card.addEventListener('click', function(e) { e.preventDefault(); startNavigation(this.href); });
   return card;
 }
 
 // ============================================
 // HELPERS
 // ============================================
-function formatPrice(price) {
-  return Number(price).toLocaleString('en-KE');
-}
+function formatPrice(price) { return Number(price).toLocaleString('en-KE'); }
 
 function escapeHtml(text) {
   if (!text) return '';
