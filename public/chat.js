@@ -1,4 +1,4 @@
-// chat.js - Real-time Chat Client with Socket.io (MOBILE OPTIMIZED)
+// chat.js - Real-time Chat Client with Socket.io (MOBILE FULLSCREEN)
 
 let socket = null;
 let currentConversationId = null;
@@ -155,16 +155,14 @@ async function openChat(propertyId, agentId) {
       chatPopup.style.display = 'flex';
       setTimeout(() => chatPopup.classList.add('chat-visible'), 10);
 
+      // Prevent background scroll when chat is open
+      document.body.style.overflow = 'hidden';
+
       markMessagesAsRead(currentConversationId);
 
-      // Focus input on desktop only
+      // Focus input on desktop only to avoid keyboard jump on mobile
       if (window.innerWidth > 768) {
         document.getElementById('chatInput').focus();
-      }
-
-      // ✅ Fix chat input visibility on mobile when keyboard opens
-      if (window.innerWidth <= 768) {
-        ensureChatInputVisible();
       }
 
     } else {
@@ -181,37 +179,6 @@ async function openChat(propertyId, agentId) {
 }
 
 // ============================================
-// ENSURE CHAT INPUT VISIBLE ON MOBILE
-// ============================================
-function ensureChatInputVisible() {
-  const chatPopup = document.getElementById('chatPopup');
-  const chatFooter = chatPopup ? chatPopup.querySelector('.chat-footer') : null;
-
-  if (!chatFooter) return;
-
-  // Force chat footer to always be at bottom of visible area
-  chatFooter.style.position = 'sticky';
-  chatFooter.style.bottom = '0';
-  chatFooter.style.zIndex = '10';
-  chatFooter.style.background = '#3b0047';
-
-  // When keyboard opens on mobile, adjust chat body height
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-      if (chatPopup && chatPopup.style.display !== 'none' && window.innerWidth <= 768) {
-        const visibleHeight = window.visualViewport.height;
-        chatPopup.style.height = `${visibleHeight}px`;
-
-        const chatBody = document.getElementById('chatMessages');
-        if (chatBody) {
-          setTimeout(() => { chatBody.scrollTop = chatBody.scrollHeight; }, 100);
-        }
-      }
-    });
-  }
-}
-
-// ============================================
 // LOAD MESSAGE HISTORY
 // ============================================
 async function loadMessages(conversationId) {
@@ -224,7 +191,6 @@ async function loadMessages(conversationId) {
 
     if (data.success && data.messages) {
       const chatBody = document.getElementById('chatMessages');
-      // Keep the initial greeting message
       const initialMessage = chatBody.querySelector('.agent-message');
       chatBody.innerHTML = '';
       if (initialMessage) chatBody.appendChild(initialMessage);
@@ -375,8 +341,8 @@ function closeChat() {
   const chatPopup = document.getElementById('chatPopup');
   chatPopup.classList.remove('chat-visible');
 
-  // Reset height if was adjusted for keyboard
-  chatPopup.style.height = '';
+  // Restore background scroll
+  document.body.style.overflow = '';
 
   setTimeout(() => { chatPopup.style.display = 'none'; }, 300);
 
@@ -389,6 +355,9 @@ function closeChat() {
   currentAgentId = null;
 }
 
+// ============================================
+// HELPERS
+// ============================================
 function autoResizeTextarea(textarea) {
   textarea.style.height = 'auto';
   textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
@@ -422,25 +391,14 @@ async function checkAuthentication() {
   }
 }
 
-function preventBodyScroll() {
-  if (window.innerWidth <= 768) document.body.style.overflow = 'hidden';
-}
-
-function allowBodyScroll() {
-  document.body.style.overflow = '';
-}
-
 // ============================================
 // EVENT LISTENERS
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
   const closeBtn = document.getElementById('closeChat');
   if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      closeChat();
-      allowBodyScroll();
-    });
+    closeBtn.addEventListener('click', () => closeChat());
   }
 
   const sendBtn = document.getElementById('sendMessage');
@@ -448,20 +406,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const chatInput = document.getElementById('chatInput');
   if (chatInput) {
-    chatInput.addEventListener('keypress', function(e) {
+    chatInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
       }
     });
 
-    chatInput.addEventListener('input', function() {
+    chatInput.addEventListener('input', function () {
       handleTyping();
       autoResizeTextarea(this);
     });
 
-    // ✅ Scroll chat body to bottom when input is focused on mobile
-    chatInput.addEventListener('focus', function() {
+    // Scroll to bottom when keyboard opens on mobile
+    chatInput.addEventListener('focus', function () {
       if (window.innerWidth <= 768) {
         setTimeout(() => {
           const chatBody = document.getElementById('chatMessages');
@@ -473,30 +431,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const chatAgentBtn = document.getElementById('chatAgentBtn');
   if (chatAgentBtn) {
-    chatAgentBtn.addEventListener('click', function(e) {
+    chatAgentBtn.addEventListener('click', function (e) {
       e.preventDefault();
 
       const agentId = this.dataset.agentId;
-
-      // ✅ Use dataset.propertyId if set (bundle.js sets this explicitly)
-      // Otherwise fall back to URL id param (house page)
       const propertyId = this.dataset.propertyId || new URLSearchParams(window.location.search).get('id');
 
       if (propertyId && agentId) {
         openChat(propertyId, agentId);
-        preventBodyScroll();
       } else {
         showAlert('Property or agent information missing');
-      }
-    });
-  }
-
-  const chatPopup = document.getElementById('chatPopup');
-  if (chatPopup && window.innerWidth <= 768) {
-    chatPopup.addEventListener('click', function(e) {
-      if (e.target === chatPopup) {
-        closeChat();
-        allowBodyScroll();
       }
     });
   }
