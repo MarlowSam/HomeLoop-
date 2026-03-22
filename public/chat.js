@@ -9,6 +9,9 @@ let isSocketInitialized = false;
 let socketConnectionPromise = null;
 let currentUserId = null;
 
+// ✅ Track message IDs we've already rendered to prevent duplicates
+const renderedMessageIds = new Set();
+
 // ============================================
 // LOGIN REQUIRED TOAST POPUP
 // ============================================
@@ -54,13 +57,10 @@ function showLoginToast() {
   `;
 
   document.body.appendChild(toast);
-
-  // Slide in
   requestAnimationFrame(() => requestAnimationFrame(() => {
     toast.style.transform = 'translateX(-50%) translateY(0)';
   }));
 
-  // Auto dismiss after 5s
   setTimeout(() => {
     const el = document.getElementById('loginToast');
     if (el) {
@@ -149,6 +149,13 @@ async function initializeSocket() {
       });
 
       socket.on('new_message', (message) => {
+        // ✅ Only render if this message wasn't already added optimistically
+        // Messages sent by the current user are already shown — skip them
+        // Messages from others (agent replies) should always be shown
+        if (String(message.sender_id) === String(currentUserId)) {
+          // Own message — already appended optimistically, skip
+          return;
+        }
         appendUserMessage(message);
         const chatBody = document.getElementById('chatMessages');
         if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
@@ -183,6 +190,9 @@ async function initializeSocket() {
 async function openChat(propertyId, agentId) {
   currentPropertyId = propertyId;
   currentAgentId = agentId;
+
+  // Clear rendered IDs when opening a new chat
+  renderedMessageIds.clear();
 
   try {
     if (!socket || !socket.connected) {
@@ -243,12 +253,17 @@ async function loadMessages(conversationId) {
 
     if (data.success && data.messages) {
       const chatBody = document.getElementById('chatMessages');
-      // Preserve greeting bubble
       const greeting = chatBody.querySelector('.greeting-bubble');
       chatBody.innerHTML = '';
       if (greeting) chatBody.appendChild(greeting);
 
-      data.messages.forEach(msg => appendUserMessage(msg));
+      // ✅ Track all loaded message IDs so socket won't re-render them
+      renderedMessageIds.clear();
+      data.messages.forEach(msg => {
+        if (msg.message_id) renderedMessageIds.add(msg.message_id);
+        appendUserMessage(msg);
+      });
+
       chatBody.scrollTop = chatBody.scrollHeight;
     }
   } catch (error) {
@@ -258,7 +273,6 @@ async function loadMessages(conversationId) {
 
 // ============================================
 // APPEND A SINGLE MESSAGE BUBBLE
-// Identical styling to dashboard
 // ============================================
 function appendUserMessage(message) {
   const chatBody = document.getElementById('chatMessages');
@@ -309,7 +323,7 @@ function appendUserMessage(message) {
 }
 
 // ============================================
-// SEND MESSAGE — optimistic append
+// SEND MESSAGE — optimistic append, no socket echo
 // ============================================
 function sendMessage() {
   const input = document.getElementById('chatInput');
@@ -321,6 +335,7 @@ function sendMessage() {
     return;
   }
 
+  // ✅ Append immediately — socket new_message will be ignored for own messages
   appendUserMessage({
     sender_id: currentUserId,
     sender_name: 'You',
@@ -436,6 +451,7 @@ function closeChat() {
   currentConversationId = null;
   currentPropertyId = null;
   currentAgentId = null;
+  renderedMessageIds.clear();
 }
 
 // ============================================
