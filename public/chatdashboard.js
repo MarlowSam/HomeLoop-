@@ -1,8 +1,5 @@
 // chatdashboard.js - Chat and Inquiry Management
 
-// ✅ Inquiry popup ONLY fires when a new message arrives via socket
-// NOT on page load, NOT when closing chat
-
 async function checkForInquiries() {
   // Silent badge update only — never shows popup
   try {
@@ -18,7 +15,7 @@ async function checkForInquiries() {
   }
 }
 
-// Called on page load — updates badge only, NO popup
+// Called on page load — badge only, NO popup
 async function checkForInquiriesOnLoad() {
   await checkForInquiries();
 }
@@ -35,9 +32,8 @@ function updateInquiryBadge(count) {
   }
 }
 
-// ✅ Only called when a new socket message arrives from a client
+// ✅ Only called when a NEW message arrives via socket
 function showInquiryNotification(count) {
-  // Don't stack duplicate modals
   if (document.getElementById('inquiryNotificationModal')) return;
 
   const modal = document.createElement('div');
@@ -202,7 +198,6 @@ async function openChatWindow(conversationId, propertyId) {
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
 
-    // Render existing messages
     messages.forEach(msg => appendAgentMessage(msg, currentUserId));
     const msgContainer = document.getElementById('agentChatMessages');
     if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
@@ -211,7 +206,6 @@ async function openChatWindow(conversationId, propertyId) {
       setTimeout(() => { if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight; }, 350);
     });
 
-    // ✅ Close — silent badge only, NO popup
     document.getElementById('closeAgentChat').onclick = async () => {
       overlay.remove();
       document.body.style.overflow = '';
@@ -231,7 +225,6 @@ async function openChatWindow(conversationId, propertyId) {
   }
 }
 
-// ✅ Appends a single message bubble — never clears the chat
 function appendAgentMessage(message, currentUserId) {
   const container = document.getElementById('agentChatMessages');
   if (!container) return;
@@ -264,13 +257,11 @@ function appendAgentMessage(message, currentUserId) {
   container.appendChild(wrapper);
 }
 
-// ✅ Optimistic send — appends immediately, NO reload, NO blank flash
 async function sendAgentMessage(conversationId, propertyId, currentUserId) {
   const input = document.getElementById('agentChatInput');
   const messageText = input.value.trim();
   if (!messageText) return;
 
-  // Append immediately — user sees message instantly
   appendAgentMessage({
     sender_id: currentUserId,
     sender_name: 'You',
@@ -291,7 +282,6 @@ async function sendAgentMessage(conversationId, propertyId, currentUserId) {
     });
 
     if (response.ok) {
-      // ✅ Silent background updates only — no reload, no flash
       markAgentMessagesAsRead(conversationId);
       checkForInquiries();
       const agentId = await getCurrentAgentId();
@@ -317,33 +307,37 @@ async function markAgentMessagesAsRead(conversationId) {
 }
 
 // ============================================
-// SOCKET LISTENER FOR NEW MESSAGES
-// ✅ This is where the inquiry popup fires — ONLY when a
-//    new message arrives from a client via socket while
-//    the agent dashboard is open and chat is NOT open
+// SOCKET — new inquiry popup ONLY when a new
+// message arrives from a client via socket
 // ============================================
-function initAgentSocketNotifications() {
-  // Only set up once
+async function initAgentSocketNotifications() {
   if (window._agentSocketInitialized) return;
   window._agentSocketInitialized = true;
 
-  // Connect a lightweight socket just for notifications
-  // (reuse if already available from another module)
-  const token = document.cookie.match(/token=([^;]+)/)?.[1];
-  if (!token) return;
-
   try {
+    // ✅ Get token via API (same as auth me — uses httpOnly cookie)
+    const authRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      method: 'GET', credentials: 'include'
+    });
+    if (!authRes.ok) return;
+    const authData = await authRes.json();
+    const token = authData.token;
+    if (!token) return;
+
     const notifSocket = io(API_BASE_URL, {
       auth: { token },
       transports: ['websocket', 'polling']
     });
 
-    notifSocket.on('new_message_notification', async () => {
-      // Only show popup if the full-screen chat is NOT currently open
-      const chatOpen = !!document.getElementById('agentChatOverlay');
-      if (chatOpen) return;
+    notifSocket.on('connect', () => {
+      console.log('✅ Agent notification socket connected');
+    });
 
-      // Fetch current count and show popup
+    // ✅ New message from a client — show popup ONLY if chat is not open
+    notifSocket.on('new_message_notification', async () => {
+      const chatOpen = !!document.getElementById('agentChatOverlay');
+      if (chatOpen) return; // Agent is already in the chat, no need for popup
+
       try {
         const response = await fetch(`${API_BASE_URL}/api/chat/agent/inquiry-count`, {
           method: 'GET', credentials: 'include'
@@ -361,12 +355,16 @@ function initAgentSocketNotifications() {
       }
     });
 
+    notifSocket.on('connect_error', (err) => {
+      console.error('Agent notification socket error:', err.message);
+    });
+
   } catch (e) {
     console.error('Agent socket notification init error:', e);
   }
 }
 
-// Auto-init when script loads on agent dashboard
+// Auto-init
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initAgentSocketNotifications);
 } else {

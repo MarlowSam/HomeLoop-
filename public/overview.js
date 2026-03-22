@@ -1,76 +1,103 @@
 // overview.js - Overview Section Management
 
-async function loadDashboardData() {
-  try {
-    console.log('📊 Loading dashboard stats...');
-    
-    const agentId = await getLoggedInAgentId();
-    if (!agentId) {
-      console.error('No agent ID found');
-      return;
-    }
+// ============================================
+// SHOW SKELETON LOADERS IMMEDIATELY
+// Called before any data is fetched
+// ============================================
+function showOverviewSkeletons() {
+  const statBoxes = document.querySelectorAll('#overview .stat-box strong');
+  statBoxes.forEach(el => {
+    el.innerHTML = `
+      <span style="
+        display: inline-block;
+        width: 60px; height: 32px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.08) 25%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 6px;
+        vertical-align: middle;
+      "></span>
+    `;
+  });
 
-    // Fetch listings count
-    try {
-      const listingsResponse = await fetch(`${API_BASE_URL}/api/properties/agent/${agentId}`, {
-        credentials: 'include'
-      });
-      
-      if (listingsResponse.ok) {
-        const listings = await listingsResponse.json();
-        const totalListings = listings.length;
-        const featuredListings = listings.filter(l => l.is_featured).length;
-        
-        // Update overview stats
-        const totalListingsEl = document.querySelector('#overview .stat-box:nth-child(1) strong');
-        const featuredListingsEl = document.querySelector('#overview .stat-box:nth-child(3) strong');
-        
-        if (totalListingsEl) totalListingsEl.textContent = totalListings;
-        if (featuredListingsEl) featuredListingsEl.textContent = featuredListings;
-        
-        console.log(`✅ Listings stats updated: ${totalListings} total, ${featuredListings} featured`);
-      } else {
-        console.error('Listings response not OK:', listingsResponse.status);
+  // Add shimmer keyframes once
+  if (!document.getElementById('shimmerStyle')) {
+    const style = document.createElement('style');
+    style.id = 'shimmerStyle';
+    style.textContent = `
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
       }
-    } catch (error) {
-      console.error('Error loading listings:', error);
-    }
-
-    // Fetch bookings count - FIXED ENDPOINT
-    try {
-      const bookingsResponse = await fetch(`${API_BASE_URL}/api/bookings?agent_id=${agentId}`, {
-        credentials: 'include'
-      });
-      
-      if (bookingsResponse.ok) {
-        const data = await bookingsResponse.json();
-        const totalBookings = data.count || 0;
-        
-        // Update overview stats
-        const totalBookingsEl = document.querySelector('#overview .stat-box:nth-child(2) strong');
-        if (totalBookingsEl) totalBookingsEl.textContent = totalBookings;
-        
-        console.log(`✅ Bookings stats updated: ${totalBookings} total`);
-      } else {
-        console.error('Bookings response not OK:', bookingsResponse.status);
-        const errorText = await bookingsResponse.text();
-        console.error('Error response:', errorText);
-      }
-    } catch (error) {
-      console.error('Error loading bookings:', error);
-    }
-
-    console.log('✅ Dashboard stats loaded');
-    
-  } catch (error) {
-    console.error('❌ Error in loadDashboardData:', error);
+    `;
+    document.head.appendChild(style);
   }
 }
 
-// Placeholder for inquiry check
-async function checkForInquiries() {
-  console.log('📬 Checking for inquiries...');
-  // Add your inquiry checking logic here if needed
+// ============================================
+// LOAD DASHBOARD DATA
+// ✅ Parallel fetches — both run at same time
+// ✅ Skeletons shown immediately, replaced with real data
+// ============================================
+async function loadDashboardData() {
+  try {
+    console.log('📊 Loading dashboard stats...');
+
+    // Show skeletons right away so hardcoded HTML numbers disappear
+    showOverviewSkeletons();
+
+    const agentId = await getLoggedInAgentId();
+    if (!agentId) {
+      console.error('No agent ID found');
+      // Show zeros instead of leaving skeletons
+      setOverviewStat(0, 0, 0);
+      return;
+    }
+
+    // ✅ Fetch listings and bookings in PARALLEL — not sequentially
+    const [listingsResult, bookingsResult] = await Promise.allSettled([
+      fetch(`${API_BASE_URL}/api/properties/agent/${agentId}`, { credentials: 'include' }),
+      fetch(`${API_BASE_URL}/api/bookings?agent_id=${agentId}`, { credentials: 'include' })
+    ]);
+
+    // Process listings
+    let totalListings = 0;
+    let featuredListings = 0;
+    if (listingsResult.status === 'fulfilled' && listingsResult.value.ok) {
+      const listings = await listingsResult.value.json();
+      totalListings = listings.length || 0;
+      featuredListings = listings.filter(l => l.is_featured).length || 0;
+    } else {
+      console.error('Listings fetch failed');
+    }
+
+    // Process bookings
+    let totalBookings = 0;
+    if (bookingsResult.status === 'fulfilled' && bookingsResult.value.ok) {
+      const data = await bookingsResult.value.json();
+      totalBookings = data.count || 0;
+    } else {
+      console.error('Bookings fetch failed');
+    }
+
+    // Update stats
+    setOverviewStat(totalListings, totalBookings, featuredListings);
+    console.log(`✅ Stats: ${totalListings} listings, ${totalBookings} bookings, ${featuredListings} featured`);
+
+  } catch (error) {
+    console.error('❌ Error in loadDashboardData:', error);
+    setOverviewStat(0, 0, 0);
+  }
+}
+
+function setOverviewStat(total, bookings, featured) {
+  const totalListingsEl = document.querySelector('#overview .stat-box:nth-child(1) strong');
+  const totalBookingsEl = document.querySelector('#overview .stat-box:nth-child(2) strong');
+  const featuredListingsEl = document.querySelector('#overview .stat-box:nth-child(3) strong');
+
+  if (totalListingsEl) totalListingsEl.textContent = total;
+  if (totalBookingsEl) totalBookingsEl.textContent = bookings;
+  if (featuredListingsEl) featuredListingsEl.textContent = featured;
 }
 
 console.log('✅ overview.js loaded');
