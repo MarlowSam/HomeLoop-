@@ -206,12 +206,14 @@ async function openChatWindow(conversationId, propertyId) {
       setTimeout(() => { if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight; }, 350);
     });
 
+    // ✅ Close — silent badge only, no popup, correct function name
     document.getElementById('closeAgentChat').onclick = async () => {
       overlay.remove();
       document.body.style.overflow = '';
       await checkForInquiries();
-      const agentId = await getCurrentAgentId();
-      if (agentId) await loadAgentPropertiesWithInquiries(agentId);
+      if (typeof loadAgentProperties === 'function') {
+        await loadAgentProperties();
+      }
     };
 
     document.getElementById('agentSendMessage').onclick = () => sendAgentMessage(conversationId, propertyId, currentUserId);
@@ -257,6 +259,7 @@ function appendAgentMessage(message, currentUserId) {
   container.appendChild(wrapper);
 }
 
+// ✅ Optimistic send — no reload, no blank flash, correct function name
 async function sendAgentMessage(conversationId, propertyId, currentUserId) {
   const input = document.getElementById('agentChatInput');
   const messageText = input.value.trim();
@@ -284,8 +287,10 @@ async function sendAgentMessage(conversationId, propertyId, currentUserId) {
     if (response.ok) {
       markAgentMessagesAsRead(conversationId);
       checkForInquiries();
-      const agentId = await getCurrentAgentId();
-      if (agentId) loadAgentPropertiesWithInquiries(agentId);
+      // ✅ Correct function name from listings.js
+      if (typeof loadAgentProperties === 'function') {
+        loadAgentProperties();
+      }
     } else {
       const err = await response.json();
       showErrorModal('Failed to send: ' + (err.message || 'Unknown error'));
@@ -315,7 +320,7 @@ async function initAgentSocketNotifications() {
   window._agentSocketInitialized = true;
 
   try {
-    // ✅ Get token via API (same as auth me — uses httpOnly cookie)
+    // ✅ Get token via API — correct way with httpOnly cookies
     const authRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET', credentials: 'include'
     });
@@ -333,10 +338,10 @@ async function initAgentSocketNotifications() {
       console.log('✅ Agent notification socket connected');
     });
 
-    // ✅ New message from a client — show popup ONLY if chat is not open
+    // ✅ Only fires popup when a new message arrives AND chat is not open
     notifSocket.on('new_message_notification', async () => {
       const chatOpen = !!document.getElementById('agentChatOverlay');
-      if (chatOpen) return; // Agent is already in the chat, no need for popup
+      if (chatOpen) return;
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/chat/agent/inquiry-count`, {
@@ -346,9 +351,7 @@ async function initAgentSocketNotifications() {
           const data = await response.json();
           const count = data.inquiry_count || 0;
           updateInquiryBadge(count);
-          if (count > 0) {
-            showInquiryNotification(count);
-          }
+          if (count > 0) showInquiryNotification(count);
         }
       } catch (e) {
         console.error('Notification fetch error:', e);

@@ -20,6 +20,7 @@ import oauthRoutes from './routes/oauth.js';
 import chatRoutes from './routes/chat.js';
 import bundlesRoutes from './routes/bundles.js';
 import favouritesRoutes from './routes/favourites.js';
+import agentDashboardRoutes from './routes/agentdashboard.js';
 import chatHandler from './socket/chatHandler.js';
 import { startReviewScheduler } from "./services/reviewScheduler.js";
 
@@ -140,6 +141,7 @@ app.use('/api/oauth', oauthRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/bundles', bundlesRoutes);
 app.use('/api/favourites', favouritesRoutes);
+app.use('/api/agent/dashboard', agentDashboardRoutes); // ✅ New single-query dashboard summary
 
 console.log('✅ All routes registered');
 

@@ -2,7 +2,6 @@
 
 // ============================================
 // SHOW SKELETON LOADERS IMMEDIATELY
-// Called before any data is fetched
 // ============================================
 function showOverviewSkeletons() {
   const statBoxes = document.querySelectorAll('#overview .stat-box strong');
@@ -20,7 +19,6 @@ function showOverviewSkeletons() {
     `;
   });
 
-  // Add shimmer keyframes once
   if (!document.getElementById('shimmerStyle')) {
     const style = document.createElement('style');
     style.id = 'shimmerStyle';
@@ -36,54 +34,38 @@ function showOverviewSkeletons() {
 
 // ============================================
 // LOAD DASHBOARD DATA
-// ✅ Parallel fetches — both run at same time
-// ✅ Skeletons shown immediately, replaced with real data
+// ✅ Single API call — replaces 3 separate fetches
+//    (listings, bookings, inquiry count)
+// ✅ Skeletons shown immediately
 // ============================================
 async function loadDashboardData() {
+  showOverviewSkeletons();
+
   try {
-    console.log('📊 Loading dashboard stats...');
+    const response = await fetch(`${API_BASE_URL}/api/agent/dashboard/summary`, {
+      method: 'GET',
+      credentials: 'include'
+    });
 
-    // Show skeletons right away so hardcoded HTML numbers disappear
-    showOverviewSkeletons();
+    if (response.ok) {
+      const data = await response.json();
 
-    const agentId = await getLoggedInAgentId();
-    if (!agentId) {
-      console.error('No agent ID found');
-      // Show zeros instead of leaving skeletons
+      setOverviewStat(
+        data.total_listings,
+        data.total_bookings,
+        data.featured_listings
+      );
+
+      // Also update the inquiry badge from the same response
+      if (typeof updateInquiryBadge === 'function') {
+        updateInquiryBadge(data.unread_inquiry_count || 0);
+      }
+
+      console.log(`✅ Dashboard stats loaded — ${data.total_listings} listings, ${data.total_bookings} bookings, ${data.featured_listings} featured, ${data.unread_inquiry_count} inquiries`);
+    } else {
+      console.error('Dashboard summary fetch failed:', response.status);
       setOverviewStat(0, 0, 0);
-      return;
     }
-
-    // ✅ Fetch listings and bookings in PARALLEL — not sequentially
-    const [listingsResult, bookingsResult] = await Promise.allSettled([
-      fetch(`${API_BASE_URL}/api/properties/agent/${agentId}`, { credentials: 'include' }),
-      fetch(`${API_BASE_URL}/api/bookings?agent_id=${agentId}`, { credentials: 'include' })
-    ]);
-
-    // Process listings
-    let totalListings = 0;
-    let featuredListings = 0;
-    if (listingsResult.status === 'fulfilled' && listingsResult.value.ok) {
-      const listings = await listingsResult.value.json();
-      totalListings = listings.length || 0;
-      featuredListings = listings.filter(l => l.is_featured).length || 0;
-    } else {
-      console.error('Listings fetch failed');
-    }
-
-    // Process bookings
-    let totalBookings = 0;
-    if (bookingsResult.status === 'fulfilled' && bookingsResult.value.ok) {
-      const data = await bookingsResult.value.json();
-      totalBookings = data.count || 0;
-    } else {
-      console.error('Bookings fetch failed');
-    }
-
-    // Update stats
-    setOverviewStat(totalListings, totalBookings, featuredListings);
-    console.log(`✅ Stats: ${totalListings} listings, ${totalBookings} bookings, ${featuredListings} featured`);
-
   } catch (error) {
     console.error('❌ Error in loadDashboardData:', error);
     setOverviewStat(0, 0, 0);
