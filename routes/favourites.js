@@ -21,7 +21,12 @@ router.get('/summary', verifyToken, async (req, res) => {
         p.images,
         c.conversation_id,
         c.agent_id,
-        c.unread_count,
+        (
+          SELECT COUNT(*) FROM messages m2 
+          WHERE m2.conversation_id = c.conversation_id 
+          AND m2.sender_id != ? 
+          AND m2.is_read = FALSE
+        ) AS unread_count,
         EXISTS (
           SELECT 1 FROM messages m 
           WHERE m.conversation_id = c.conversation_id 
@@ -30,10 +35,9 @@ router.get('/summary', verifyToken, async (req, res) => {
       FROM conversations c
       JOIN properties p ON p.property_id = c.property_id
       WHERE c.buyer_id = ?
-      ORDER BY c.unread_count DESC, c.last_message_at DESC
-    `, [userId]);
+      ORDER BY unread_count DESC, c.last_message_at DESC
+    `, [userId, userId]);
 
-    // Parse images if stored as JSON string
     const properties = rows.map(row => ({
       ...row,
       images: typeof row.images === 'string' ? JSON.parse(row.images) : (row.images || [])
