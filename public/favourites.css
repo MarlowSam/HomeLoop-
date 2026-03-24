@@ -358,6 +358,27 @@ body {
   display: inline-block;
 }
 
+/* ========== PROPERTY TYPE BADGES ========== */
+.airbnb-badge {
+  color: #29B6F6 !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.commercial-badge {
+  color: #4CAF50 !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Blue BUNDLE type — matches Airbnb style */
+.bundle-type {
+  color: #29B6F6 !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
 /* ========== REPLY STATUS BADGES ========== */
 .reply-status-badge {
   display: inline-flex;
@@ -562,7 +583,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  /* Header matches house.html mobile */
   .header {
     padding: 10px 15px;
   }
@@ -591,7 +611,6 @@ body {
     font-size: 1.15rem;
   }
 
-  /* Icons only on mobile - hide all text labels */
   .nav-links .nav-text {
     display: none !important;
   }
@@ -604,7 +623,6 @@ body {
     max-width: 100%;
   }
 
-  /* Hero */
   .hero {
     padding: 140px 15px 30px;
   }
@@ -613,7 +631,6 @@ body {
     font-size: 2rem;
   }
 
-  /* Cards - 2 columns on mobile */
   .featured-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -629,7 +646,6 @@ body {
     margin: 8px 10px 10px;
   }
 
-  /* Footer - 2x2 grid matches house.html */
   .footer-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -667,7 +683,6 @@ body {
     font-size: 1.6rem;
   }
 
-  /* Keep 2 columns on very small screens */
   .featured-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -691,7 +706,6 @@ body {
     margin: 6px 8px 8px;
   }
 
-  /* Footer stays 2x2 */
   .footer-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;

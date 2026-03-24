@@ -62,6 +62,10 @@
           <a href="#" id="chatAgentBtn" class="btn contact">
             <i class="fa-solid fa-message"></i> Chat Agent
           </a>
+          <!-- ✅ Add to Favourites button -->
+          <a href="#" id="addBundleFavBtn" class="favourite">
+            <i class="fa-solid fa-heart"></i> Add to Favourites
+          </a>
         </div>
       </div>
     </div>
@@ -115,12 +119,8 @@
     </div>
   </footer>
 
-  <!-- ============================================
-       CHAT POPUP — dashboard-matching structure
-       ============================================ -->
+  <!-- Chat Popup -->
   <div id="chatPopup" class="chat-popup">
-
-    <!-- Header -->
     <div class="chat-header">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="width:44px;height:44px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.4);flex-shrink:0;">
@@ -136,15 +136,11 @@
       </div>
       <button id="closeChat" class="close-btn">&times;</button>
     </div>
-
-    <!-- Messages -->
     <div id="chatMessages">
       <div class="greeting-bubble">
         👋 Hello! You're asking about this bundle package. How can I help?
       </div>
     </div>
-
-    <!-- Footer -->
     <div class="chat-footer">
       <input type="text" id="chatInput" placeholder="Type your reply..." />
       <button id="sendMessage">
@@ -155,7 +151,6 @@
         Send
       </button>
     </div>
-
   </div>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>

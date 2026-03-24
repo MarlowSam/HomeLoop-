@@ -3,6 +3,64 @@
 let currentPropertyData = null;
 
 // ============================================
+// LOGIN REQUIRED TOAST
+// ============================================
+function showLoginToastForReview() {
+  const existing = document.getElementById('loginToastReview');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'loginToastReview';
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: linear-gradient(135deg, #2d0042 0%, #1a0028 100%);
+    border: 1px solid rgba(255, 77, 210, 0.4);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(255, 77, 210, 0.3);
+    z-index: 99999;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 92vw;
+  `;
+
+  toast.innerHTML = `
+    <div style="width:38px;height:38px;background:rgba(255,77,210,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid rgba(255,77,210,0.4);">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ff4dd2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+    <div style="flex:1;">
+      <div style="color:#fff;font-size:0.88rem;font-weight:600;margin-bottom:7px;">Please log in to leave a review</div>
+      <div style="display:flex;gap:8px;">
+        <a href="login.html" style="color:#fff;background:linear-gradient(135deg,#ff4dd2,#ff9900);padding:5px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;text-decoration:none;">Log In</a>
+        <a href="signup.html" style="color:#ff4dd2;border:1px solid rgba(255,77,210,0.5);padding:5px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;text-decoration:none;">Sign Up</a>
+      </div>
+    </div>
+    <button onclick="document.getElementById('loginToastReview').remove()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">&times;</button>
+  `;
+
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  }));
+
+  setTimeout(() => {
+    const el = document.getElementById('loginToastReview');
+    if (el) {
+      el.style.transform = 'translateX(-50%) translateY(-100px)';
+      setTimeout(() => el.remove(), 400);
+    }
+  }, 5000);
+}
+
+// ============================================
 // LOADING BAR NAVIGATION
 // ============================================
 function startNavigation(url) {
@@ -222,6 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const propertyToSave = {
         property_id: currentPropertyData.property_id,
         id: currentPropertyData.property_id,
+        address_line1: currentPropertyData.address_line1 || null,
+        city: currentPropertyData.city || null,
         location: currentPropertyData.address_line1 || currentPropertyData.city || 'Location not specified',
         type: currentPropertyData.property_type || 'Property',
         bedrooms: currentPropertyData.bedrooms || 0,
@@ -271,10 +331,7 @@ async function loadPropertyDetails(propertyId) {
 }
 
 function updateSEOMeta(property) {
-  const location = property.address_line1
-    ? `${property.address_line1}, ${property.city}`
-    : property.city || 'Nairobi';
-
+  const location = property.address_line1 ? `${property.address_line1}, ${property.city}` : property.city || 'Nairobi';
   const title = `${property.bedrooms} Bed ${property.property_type} in ${location} - Ksh ${Number(property.price).toLocaleString('en-KE')} | HomeLoop`;
   const description = `${property.bedrooms} bedroom ${property.property_type} in ${location} for Ksh ${Number(property.price).toLocaleString('en-KE')}/month. ${property.units_available} unit(s) available.`;
   const image = property.images && property.images.length > 0 ? property.images[0] : '';
@@ -297,22 +354,10 @@ function updateSEOMeta(property) {
   schema.textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
-    "name": title,
-    "description": description,
-    "url": url,
-    "image": image,
-    "offers": {
-      "@type": "Offer",
-      "price": property.price,
-      "priceCurrency": "KES",
-      "availability": property.units_available > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": property.address_line1 || '',
-      "addressLocality": property.city || 'Nairobi',
-      "addressCountry": "KE"
-    },
+    "name": title, "description": description, "url": url, "image": image,
+    "offers": { "@type": "Offer", "price": property.price, "priceCurrency": "KES",
+      "availability": property.units_available > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" },
+    "address": { "@type": "PostalAddress", "streetAddress": property.address_line1 || '', "addressLocality": property.city || 'Nairobi', "addressCountry": "KE" },
     "numberOfRooms": property.bedrooms
   });
   document.head.appendChild(schema);
@@ -321,7 +366,6 @@ function updateSEOMeta(property) {
 function displayPropertyDetails(property) {
   updateSEOMeta(property);
 
-  // Hero image
   const heroImage = document.querySelector('.hero-image');
   if (heroImage && property.images && property.images.length > 0) {
     heroImage.style.backgroundImage = `url('${property.images[0]}')`;
@@ -357,7 +401,6 @@ function displayPropertyDetails(property) {
     descriptionElement.innerHTML = descriptionText.trim() ? descriptionText : 'No additional information provided.';
   }
 
-  // Gallery images
   const gallery = document.querySelector('.gallery');
   if (gallery && property.images && property.images.length > 1) {
     gallery.innerHTML = '';
@@ -369,47 +412,34 @@ function displayPropertyDetails(property) {
     });
   }
 
-  // Videos — same as bundle.html
   const houseDescSection = document.querySelector('.house-description');
   if (houseDescSection && property.videos && property.videos.length > 0) {
     houseDescSection.querySelector('.video-section')?.remove();
-
     const videoSection = document.createElement('div');
     videoSection.className = 'video-section';
-    videoSection.innerHTML = `
-      <h3><i class="fa-solid fa-video"></i> Property Videos</h3>
-      <div class="videos-grid"></div>
-    `;
-
+    videoSection.innerHTML = `<h3><i class="fa-solid fa-video"></i> Property Videos</h3><div class="videos-grid"></div>`;
     const videosGrid = videoSection.querySelector('.videos-grid');
     property.videos.slice(0, 2).forEach((videoUrl) => {
       const video = document.createElement('video');
-      video.controls = true;
-      video.preload = 'metadata';
+      video.controls = true; video.preload = 'metadata';
       const source = document.createElement('source');
-      source.src = videoUrl;
-      source.type = 'video/mp4';
+      source.src = videoUrl; source.type = 'video/mp4';
       video.appendChild(source);
       video.insertAdjacentText('beforeend', 'Your browser does not support the video tag.');
       videosGrid.appendChild(video);
     });
-
     houseDescSection.appendChild(videoSection);
   }
 
-  // Chat button
-  if (property.agent_user_id) {
+  if (property.agent_user_id || property.agent_id) {
     const chatAgentBtn = document.getElementById('chatAgentBtn');
     if (chatAgentBtn) {
-      chatAgentBtn.dataset.agentId = property.agent_user_id;
+      chatAgentBtn.dataset.agentId = property.agent_user_id || property.agent_id;
       chatAgentBtn.dataset.propertyId = property.property_id;
     }
   }
 
-  // ✅ Build agent profile card with icon fallback — same as bundle.html
   updateAgentProfileCard(property);
-
-  // Clean URL
   history.replaceState({ propertyId: property.property_id }, document.title, window.location.pathname);
 
   const bookBtn = document.querySelector('.btn.book');
@@ -417,54 +447,37 @@ function displayPropertyDetails(property) {
 }
 
 // ============================================
-// AGENT PROFILE CARD — with icon fallback
-// Matches bundle.html exactly
+// AGENT PROFILE CARD
 // ============================================
 function updateAgentProfileCard(property) {
   const agentProfileCard = document.getElementById('agentProfileCard');
   if (!agentProfileCard) return;
 
-  // Set link
   const agentId = property.agent_user_id || property.agent_id;
   if (agentId) agentProfileCard.href = `agent profile.html?agent_id=${agentId}`;
 
-  // Clear existing content and rebuild — same structure as bundle.html
   agentProfileCard.innerHTML = '';
 
-  // ✅ Icon fallback — shown by default, hidden when photo loads
   const iconFallback = document.createElement('div');
   iconFallback.className = 'agent-profile-icon-fallback';
   iconFallback.style.cssText = `
-    width: 60px; height: 60px;
-    border-radius: 50%;
+    width: 60px; height: 60px; border-radius: 50%;
     border: 3px solid #ff4dd2;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    background: rgba(255, 77, 210, 0.1);
+    flex-shrink: 0; background: rgba(255, 77, 210, 0.1);
   `;
   iconFallback.innerHTML = '<i class="fa-solid fa-circle-user" style="font-size:42px;color:#ff4dd2;"></i>';
 
-  // ✅ Photo — hidden until successfully loaded
   const photo = document.createElement('img');
   photo.className = 'agent-profile-photo';
   photo.alt = 'Agent';
   photo.style.display = 'none';
-  photo.onload = function() {
-    this.style.display = 'block';
-    iconFallback.style.display = 'none';
-  };
-  photo.onerror = function() {
-    this.style.display = 'none';
-    iconFallback.style.display = 'flex';
-  };
+  photo.onload = function() { this.style.display = 'block'; iconFallback.style.display = 'none'; };
+  photo.onerror = function() { this.style.display = 'none'; iconFallback.style.display = 'flex'; };
 
-  // Set photo src if available
   const photoPath = property.agent_photo || property.agent_profile_picture;
-  if (photoPath) {
-    photo.src = `${API_BASE_URL}${photoPath}`;
-  }
+  if (photoPath) photo.src = `${API_BASE_URL}${photoPath}`;
 
-  // Info
   const info = document.createElement('div');
   info.className = 'agent-profile-info';
 
@@ -477,7 +490,6 @@ function updateAgentProfileCard(property) {
 
   info.appendChild(name);
   info.appendChild(sub);
-
   agentProfileCard.appendChild(iconFallback);
   agentProfileCard.appendChild(photo);
   agentProfileCard.appendChild(info);
@@ -609,7 +621,7 @@ function showReviewForm(bookingId = null) {
 
   modal.querySelector('#reviewForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    await submitReview(propertyId, bookingId);
+    await submitReview(propertyId, bookingId, modal);
   });
 }
 
@@ -620,7 +632,7 @@ function updateStarDisplay(stars, rating, filled) {
   });
 }
 
-async function submitReview(propertyId, bookingId) {
+async function submitReview(propertyId, bookingId, modal) {
   const rating = document.getElementById('ratingValue').value;
   const comment = document.getElementById('reviewComment').value;
   if (!rating) { showStyledAlert('Please select a rating', 'error'); return; }
@@ -635,9 +647,12 @@ async function submitReview(propertyId, bookingId) {
     });
     const data = await response.json();
     if (response.ok) {
-      document.getElementById('reviewModal').remove();
+      if (modal) modal.remove();
       showStyledAlert('Thank you for your review!', 'success');
       await loadPropertyReviews(propertyId);
+    } else if (response.status === 401 || (data.message && data.message.toLowerCase().includes('token'))) {
+      if (modal) modal.remove();
+      showLoginToastForReview();
     } else {
       showStyledAlert(data.message || 'Error submitting review', 'error');
     }
@@ -645,17 +660,6 @@ async function submitReview(propertyId, bookingId) {
     console.error('Error submitting review:', error);
     showStyledAlert('Error submitting review. Please try again.', 'error');
   }
-}
-
-function generateStars(rating) {
-  const full = Math.floor(rating);
-  const half = rating % 1 >= 0.5;
-  return '⭐'.repeat(full) + (half ? '⭐' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
-}
-
-function formatReviewDate(dateString) {
-  try { return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
-  catch { return dateString; }
 }
 
 // ============================================
@@ -670,9 +674,7 @@ async function loadSimilarProperties(propertyId) {
       const data = await response.json();
       displaySimilarProperties(data.properties);
     }
-  } catch (error) {
-    console.error('Error loading similar properties:', error);
-  }
+  } catch (error) { console.error('Error loading similar properties:', error); }
 }
 
 function displaySimilarProperties(properties) {
@@ -686,9 +688,14 @@ function displaySimilarProperties(properties) {
   }
 }
 
+// ============================================
+// CREATE PROPERTY CARD (similar properties)
+// — No overlay bundle tag, blue BUNDLE text, monthly_rent for price
+// ============================================
 function createPropertyCard(property) {
   const card = document.createElement('a');
-  const href = property.bundle_id ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
+  const isBundle = property.is_bundle === true || !!property.bundle_id;
+  const href = isBundle ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
   card.href = href;
   card.className = 'card';
 
@@ -700,20 +707,32 @@ function createPropertyCard(property) {
     ? `${property.address_line1}${property.city && !property.address_line1.includes(property.city) ? ', ' + property.city : ''}`
     : property.city || 'Location not specified';
 
-  const bundleTag = property.bundle_id ? '<div class="bundle-tag"><i class="fas fa-gift"></i> Bundle</div>' : '';
+  // Type — blue BUNDLE, blue Airbnb, green Commercial, else default
+  let typeHtml = '';
+  if (isBundle) {
+    typeHtml = `<p class="type bundle-type">BUNDLE</p>`;
+  } else {
+    const propType = property.property_type || 'Property';
+    if (propType === 'Airbnb') {
+      typeHtml = `<p class="type airbnb-badge">Airbnb</p>`;
+    } else if (propType === 'Commercial') {
+      typeHtml = `<p class="type commercial-badge">Commercial</p>`;
+    } else {
+      typeHtml = `<p class="type">${escapeHtml(propType)}</p>`;
+    }
+  }
 
-  let propertyTypeBadge = '';
-  const propType = property.property_type || 'Property';
-  if (propType === 'Airbnb') propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
-  else if (propType === 'Commercial') propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
-  else propertyTypeBadge = `<p class="type">${escapeHtml(propType)}</p>`;
+  // Price — bundles show monthly_rent
+  const priceDisplay = isBundle
+    ? `Ksh ${Number(property.monthly_rent || property.price || 0).toLocaleString('en-KE')}`
+    : `Ksh ${formatPrice(property.price)}`;
 
   card.innerHTML = `
-    <div class="card-image" style="background-image:url('${imageUrl}')">${bundleTag}</div>
+    <div class="card-image" style="background-image:url('${imageUrl}')"></div>
     <p class="location"><i class="fas fa-map-marker-alt" style="color:#FFA500;"></i> ${escapeHtml(fullLocation)}</p>
-    ${propertyTypeBadge}
+    ${typeHtml}
     <p>${property.bedrooms || 0} Bed • ${property.bathrooms || 0} Bath</p>
-    <p class="price">Ksh ${formatPrice(property.price)}</p>
+    <p class="price">${priceDisplay}</p>
     <p class="units-left">Only ${property.units_available || 1} unit${property.units_available !== 1 ? 's' : ''} left</p>
   `;
 
@@ -724,6 +743,17 @@ function createPropertyCard(property) {
 // ============================================
 // HELPERS
 // ============================================
+function generateStars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5;
+  return '⭐'.repeat(full) + (half ? '⭐' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
+}
+
+function formatReviewDate(dateString) {
+  try { return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+  catch { return dateString; }
+}
+
 function formatPrice(price) { return Number(price).toLocaleString('en-KE'); }
 
 function escapeHtml(text) {

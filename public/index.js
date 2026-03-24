@@ -34,12 +34,10 @@ function initializeFilterToggle() {
 
   console.log('Initializing filter toggle');
 
-  // Always start hidden
   if (filterControls) {
     filterControls.classList.remove('expanded');
   }
 
-  // Click the entire filter header to toggle open/close
   if (filterHeader) {
     filterHeader.style.cursor = 'pointer';
     filterHeader.addEventListener('click', function() {
@@ -295,7 +293,7 @@ function applyFilters() {
   updateActiveFiltersDisplay();
   updateResultsCount(filteredFeatured.length + filteredRecommended.length);
 
-  // ✅ Always collapse filter after applying
+  // Always collapse filter after applying
   setTimeout(() => {
     collapseFilter();
   }, 200);
@@ -308,50 +306,102 @@ function applyFilters() {
   }, 400);
 }
 
+// ========================================
+// FILTER PROPERTIES
+// Bundles pass the type filter if ANY property inside them matches.
+// e.g. searching "Apartment" will show bundles that contain apartments.
+// ========================================
+
 function filterProperties(properties) {
   return properties.filter(property => {
+    const isBundle = property.is_bundle === true || !!property.bundle_id;
+
+    // --- LOCATION FILTER ---
     if (activeFilters.location) {
       const searchTerm = activeFilters.location.toLowerCase().trim();
       const city = (property.city || '').toLowerCase();
       const address = (property.address_line1 || '').toLowerCase();
-      
+
       if (!city.includes(searchTerm) && !address.includes(searchTerm)) {
         return false;
       }
     }
-    
-    if (activeFilters.type && property.property_type !== activeFilters.type) {
-      return false;
+
+    // --- TYPE FILTER ---
+    if (activeFilters.type) {
+      if (isBundle) {
+        // Check if any property inside the bundle matches the type filter.
+        // The bundle object should carry a `properties` array from the API.
+        // If the API doesn't send it, the bundle passes through (fail-open).
+        const bundleProperties = property.properties || property.bundle_properties || [];
+        if (bundleProperties.length > 0) {
+          const hasMatchingType = bundleProperties.some(
+            p => (p.property_type || '').toLowerCase() === activeFilters.type.toLowerCase()
+          );
+          if (!hasMatchingType) return false;
+        }
+        // If bundle has no nested properties array yet, let it through
+      } else {
+        if (property.property_type !== activeFilters.type) return false;
+      }
     }
-    
+
+    // --- PRICE FILTER ---
     if (activeFilters.price) {
       const [minPrice, maxPrice] = activeFilters.price.split('-').map(Number);
-      const propertyPrice = Number(property.price);
-      if (propertyPrice < minPrice || propertyPrice > maxPrice) {
-        return false;
+
+      if (isBundle) {
+        // Bundles use monthly_rent as their comparable price
+        const bundlePrice = Number(property.monthly_rent || property.price || 0);
+        if (bundlePrice < minPrice || bundlePrice > maxPrice) return false;
+      } else {
+        const propertyPrice = Number(property.price);
+        if (propertyPrice < minPrice || propertyPrice > maxPrice) return false;
       }
     }
-    
+
+    // --- BEDROOMS FILTER ---
     if (activeFilters.bedrooms) {
       const beds = Number(activeFilters.bedrooms);
-      const propertyBeds = Number(property.bedrooms);
-      if (beds === 4 && propertyBeds < 4) {
-        return false;
-      } else if (beds !== 4 && propertyBeds !== beds) {
-        return false;
+
+      if (isBundle) {
+        // Bundle passes if ANY unit inside matches the bedroom count
+        const bundleProperties = property.properties || property.bundle_properties || [];
+        if (bundleProperties.length > 0) {
+          const hasMatchingBeds = bundleProperties.some(p => {
+            const propBeds = Number(p.bedrooms);
+            return beds === 4 ? propBeds >= 4 : propBeds === beds;
+          });
+          if (!hasMatchingBeds) return false;
+        }
+        // If no nested properties, let bundle through
+      } else {
+        const propertyBeds = Number(property.bedrooms);
+        if (beds === 4 && propertyBeds < 4) return false;
+        if (beds !== 4 && propertyBeds !== beds) return false;
       }
     }
-    
+
+    // --- BATHROOMS FILTER ---
     if (activeFilters.bathrooms) {
       const baths = Number(activeFilters.bathrooms);
-      const propertyBaths = Number(property.bathrooms);
-      if (baths === 3 && propertyBaths < 3) {
-        return false;
-      } else if (baths !== 3 && propertyBaths !== baths) {
-        return false;
+
+      if (isBundle) {
+        const bundleProperties = property.properties || property.bundle_properties || [];
+        if (bundleProperties.length > 0) {
+          const hasMatchingBaths = bundleProperties.some(p => {
+            const propBaths = Number(p.bathrooms);
+            return baths === 3 ? propBaths >= 3 : propBaths === baths;
+          });
+          if (!hasMatchingBaths) return false;
+        }
+      } else {
+        const propertyBaths = Number(property.bathrooms);
+        if (baths === 3 && propertyBaths < 3) return false;
+        if (baths !== 3 && propertyBaths !== baths) return false;
       }
     }
-    
+
     return true;
   });
 }
@@ -401,7 +451,7 @@ function resetFilters() {
   if (activeFiltersDiv) activeFiltersDiv.style.display = 'none';
   if (resultsCountDiv) resultsCountDiv.style.display = 'none';
 
-  // ✅ Collapse after reset too
+  // Collapse after reset too
   setTimeout(() => {
     collapseFilter();
   }, 200);
@@ -543,48 +593,64 @@ async function loadRecommendedProperties() {
   }
 }
 
+// ========================================
+// CREATE PROPERTY CARD
+// ========================================
+
 function createPropertyCard(property) {
   const card = document.createElement('a');
-  
-  const isBundle = property.is_bundle === true || property.bundle_id;
-  card.href = isBundle ? `bundle.html?id=${property.bundle_id}` : `house.html?id=${property.property_id}`;
+
+  const isBundle = property.is_bundle === true || !!property.bundle_id;
+  card.href = isBundle
+    ? `bundle.html?id=${property.bundle_id}`
+    : `house.html?id=${property.property_id}`;
   card.className = 'card';
-  
-  // ✅ FIXED: Cloudinary URLs are already complete - no API_BASE_URL prefix needed
-  const imageUrl = property.images && property.images.length > 0 
+
+  // Cloudinary URLs are already complete — no API_BASE_URL prefix needed
+  const imageUrl = property.images && property.images.length > 0
     ? property.images[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60';
-  
-  const fullLocation = property.address_line1 
+
+  const fullLocation = property.address_line1
     ? `${property.address_line1}${property.city && !property.address_line1.includes(property.city) ? ', ' + property.city : ''}`
     : property.city || 'Location not specified';
-  
+
   const bedrooms = Math.floor(property.bedrooms || 0);
   const bathrooms = Math.floor(property.bathrooms || 0);
-  
-  let propertyTypeBadge = '';
-  const propType = property.property_type || 'Property';
-  
-  if (propType === 'Airbnb') {
-    propertyTypeBadge = '<span class="property-type-badge airbnb-badge">Airbnb</span>';
-  } else if (propType === 'Commercial') {
-    propertyTypeBadge = '<span class="property-type-badge commercial-badge">Commercial</span>';
+
+  // Property type display:
+  // - Bundles → blue "BUNDLE" in caps (same style as Airbnb)
+  // - Airbnb  → blue "Airbnb"
+  // - Commercial → green "Commercial"
+  // - Others → default grey
+  let typeHtml = '';
+  if (isBundle) {
+    typeHtml = `<p class="type bundle-type">BUNDLE</p>`;
   } else {
-    propertyTypeBadge = `<p class="type">${propType}</p>`;
+    const propType = property.property_type || 'Property';
+    if (propType === 'Airbnb') {
+      typeHtml = `<p class="type airbnb-badge">Airbnb</p>`;
+    } else if (propType === 'Commercial') {
+      typeHtml = `<p class="type commercial-badge">Commercial</p>`;
+    } else {
+      typeHtml = `<p class="type">${propType}</p>`;
+    }
   }
-  
-  const bundleTag = isBundle ? '<div class="bundle-tag"><i class="fa-solid fa-gift"></i> Bundle</div>' : '';
-  
+
+  // Price: bundles show monthly_rent, regular properties show price
+  const priceDisplay = isBundle
+    ? `Ksh ${Number(property.monthly_rent || property.price || 0).toLocaleString('en-KE')}`
+    : `Ksh ${formatPrice(property.price)}`;
+
   card.innerHTML = `
-    ${bundleTag}
     <div class="card-image" style="background-image:url('${imageUrl}')"></div>
     <p class="location"><i class="fas fa-map-marker-alt" style="color: #FFA500;"></i> ${fullLocation}</p>
-    ${propertyTypeBadge}
+    ${typeHtml}
     <p>${bedrooms} Bed • ${bathrooms} Bath</p>
-    <p class="price">Ksh ${formatPrice(property.price)}</p>
-    <p class="units-left">Only ${property.units_available || 1} unit${property.units_available !== 1 ? 's' : ''} left</p>
+    <p class="price">${priceDisplay}</p>
+    <p class="units-left">Only ${property.units_available || 1} unit${(property.units_available || 1) !== 1 ? 's' : ''} left</p>
   `;
-  
+
   return card;
 }
 
