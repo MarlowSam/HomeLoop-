@@ -99,6 +99,26 @@ const uploadLimiter = rateLimit({
   standardHeaders: true, legacyHeaders: false,
 });
 
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 3,
+  standardHeaders: true, legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: 'Too many reset attempts. Please wait 15 minutes before trying again.'
+    });
+  }
+});
+
+const resetPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 5,
+  standardHeaders: true, legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: 'Too many attempts. Please wait 15 minutes before trying again.'
+    });
+  }
+});
+
 // ==========================================
 // CORS
 // ==========================================
@@ -141,7 +161,7 @@ app.use('/api/oauth', oauthRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/bundles', bundlesRoutes);
 app.use('/api/favourites', favouritesRoutes);
-app.use('/api/agent/dashboard', agentDashboardRoutes); // ✅ New single-query dashboard summary
+app.use('/api/agent/dashboard', agentDashboardRoutes);
 
 console.log('✅ All routes registered');
 
@@ -150,6 +170,8 @@ console.log('✅ All routes registered');
 // ==========================================
 app.use("/api/auth/login", loginLimiter);
 app.use("/api/auth/signup", signupLimiter);
+app.use("/api/auth/forgot-password", forgotPasswordLimiter);
+app.use("/api/auth/reset-password", resetPasswordLimiter);
 app.post("/api/properties", uploadLimiter);
 app.put("/api/properties/:id", uploadLimiter);
 app.post("/api/bundles", uploadLimiter);

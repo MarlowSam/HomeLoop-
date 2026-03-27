@@ -892,6 +892,16 @@ textarea {
   .visit-form textarea {
     font-size: 0.9rem;
   }
+  /* Fix date and time inputs full width on all devices */
+.visit-form input[type="date"],
+.visit-form input[type="time"] {
+  width: 100%;
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 100%;
+  box-sizing: border-box;
+}
 
   .payment-modal-content,
   .success-modal-content {
