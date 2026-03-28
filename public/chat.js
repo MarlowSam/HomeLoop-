@@ -9,7 +9,6 @@ let isSocketInitialized = false;
 let socketConnectionPromise = null;
 let currentUserId = null;
 
-// ✅ Track message IDs we've already rendered to prevent duplicates
 const renderedMessageIds = new Set();
 
 // ============================================
@@ -50,7 +49,7 @@ function showLoginToast() {
       <div style="color:#fff;font-size:0.88rem;font-weight:600;margin-bottom:7px;">Please log in to chat with an agent</div>
       <div style="display:flex;gap:8px;">
         <a href="login.html" style="color:#fff;background:linear-gradient(135deg,#ff4dd2,#ff9900);padding:5px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;text-decoration:none;">Log In</a>
-        <a href="signup.html" style="color:#ff4dd2;border:1px solid rgba(255,77,210,0.5);padding:5px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;text-decoration:none;">Sign Up</a>
+        <a href="signup.html" style="color:#fff;border:1px solid rgba(255,77,210,0.5);padding:5px 16px;border-radius:20px;font-size:0.78rem;font-weight:600;text-decoration:none;">Sign Up</a>
       </div>
     </div>
     <button onclick="document.getElementById('loginToast').remove()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;flex-shrink:0;padding:0;line-height:1;">&times;</button>
@@ -100,6 +99,7 @@ async function getAuthToken() {
     });
     if (response.ok) {
       const data = await response.json();
+      // ✅ FIX: Always update currentUserId here so it's never null
       currentUserId = data.user.userId;
       return data.token;
     }
@@ -122,6 +122,7 @@ async function initializeSocket() {
     return Promise.reject(new Error('No token'));
   }
 
+  // ✅ FIX: currentUserId is now guaranteed to be set before socket events fire
   socketConnectionPromise = new Promise((resolve, reject) => {
     try {
       socket = io(API_BASE_URL, {
@@ -148,17 +149,20 @@ async function initializeSocket() {
         socketConnectionPromise = null;
       });
 
+      // ✅ FIX: Only skip own messages if currentUserId is actually set
       socket.on('new_message', (message) => {
-        // ✅ Only render if this message wasn't already added optimistically
-        // Messages sent by the current user are already shown — skip them
-        // Messages from others (agent replies) should always be shown
-        if (String(message.sender_id) === String(currentUserId)) {
-          // Own message — already appended optimistically, skip
-          return;
+        // Only skip if we are sure about currentUserId AND it matches
+        if (currentUserId && String(message.sender_id) === String(currentUserId)) {
+          return; // Own message already shown optimistically
         }
-        appendUserMessage(message);
-        const chatBody = document.getElementById('chatMessages');
-        if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+
+        // ✅ Only append if chat is open and message belongs to current conversation
+        if (currentConversationId && String(message.conversation_id) === String(currentConversationId)) {
+          appendUserMessage(message);
+          const chatBody = document.getElementById('chatMessages');
+          if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+          markMessagesAsRead(currentConversationId);
+        }
       });
 
       socket.on('user_typing', (data) => {
@@ -191,7 +195,6 @@ async function openChat(propertyId, agentId) {
   currentPropertyId = propertyId;
   currentAgentId = agentId;
 
-  // Clear rendered IDs when opening a new chat
   renderedMessageIds.clear();
 
   try {
@@ -257,7 +260,6 @@ async function loadMessages(conversationId) {
       chatBody.innerHTML = '';
       if (greeting) chatBody.appendChild(greeting);
 
-      // ✅ Track all loaded message IDs so socket won't re-render them
       renderedMessageIds.clear();
       data.messages.forEach(msg => {
         if (msg.message_id) renderedMessageIds.add(msg.message_id);
@@ -278,7 +280,7 @@ function appendUserMessage(message) {
   const chatBody = document.getElementById('chatMessages');
   if (!chatBody) return;
 
-  const isOwn = message.sender_id === currentUserId;
+  const isOwn = String(message.sender_id) === String(currentUserId);
   const timestamp = new Date(message.created_at).toLocaleTimeString('en-US', {
     hour: '2-digit', minute: '2-digit'
   });
@@ -323,7 +325,7 @@ function appendUserMessage(message) {
 }
 
 // ============================================
-// SEND MESSAGE — optimistic append, no socket echo
+// SEND MESSAGE
 // ============================================
 function sendMessage() {
   const input = document.getElementById('chatInput');
@@ -335,7 +337,6 @@ function sendMessage() {
     return;
   }
 
-  // ✅ Append immediately — socket new_message will be ignored for own messages
   appendUserMessage({
     sender_id: currentUserId,
     sender_name: 'You',
@@ -468,19 +469,14 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
-}
-
 async function checkAuthentication() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET', credentials: 'include'
     });
     if (response.ok) {
+      const data = await response.json();
+      currentUserId = data.user.userId; // ✅ FIX: Set userId on page load
       updateUnreadBadge();
       setInterval(updateUnreadBadge, 30000);
     }

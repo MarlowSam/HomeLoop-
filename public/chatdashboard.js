@@ -1,7 +1,11 @@
 // chatdashboard.js - Chat and Inquiry Management
 
+// ✅ FIX: Agent socket for real-time updates in open chat window
+let agentChatSocket = null;
+let agentChatCurrentConversationId = null;
+let agentCurrentUserId = null;
+
 async function checkForInquiries() {
-  // Silent badge update only — never shows popup
   try {
     const response = await fetch(`${API_BASE_URL}/api/chat/agent/inquiry-count`, {
       method: 'GET', credentials: 'include'
@@ -15,7 +19,6 @@ async function checkForInquiries() {
   }
 }
 
-// Called on page load — badge only, NO popup
 async function checkForInquiriesOnLoad() {
   await checkForInquiries();
 }
@@ -32,7 +35,6 @@ function updateInquiryBadge(count) {
   }
 }
 
-// ✅ Only called when a NEW message arrives via socket
 function showInquiryNotification(count) {
   if (document.getElementById('inquiryNotificationModal')) return;
 
@@ -144,6 +146,8 @@ async function openChatWindow(conversationId, propertyId) {
     const data = await response.json();
     const messages = data.messages || [];
     const currentUserId = await getCurrentAgentId();
+    agentCurrentUserId = currentUserId;
+    agentChatCurrentConversationId = conversationId;
 
     let clientName = 'Client';
     const clientMsg = messages.find(m => String(m.sender_id) !== String(currentUserId));
@@ -202,12 +206,17 @@ async function openChatWindow(conversationId, propertyId) {
     const msgContainer = document.getElementById('agentChatMessages');
     if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
 
+    // ✅ FIX: Join socket room so agent receives real-time messages
+    await joinAgentChatSocket(conversationId);
+
     document.getElementById('agentChatInput').addEventListener('focus', () => {
       setTimeout(() => { if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight; }, 350);
     });
 
-    // ✅ Close — silent badge only, no popup, correct function name
     document.getElementById('closeAgentChat').onclick = async () => {
+      // ✅ FIX: Leave socket room when closing chat
+      leaveAgentChatSocket(conversationId);
+      agentChatCurrentConversationId = null;
       overlay.remove();
       document.body.style.overflow = '';
       await checkForInquiries();
@@ -224,6 +233,67 @@ async function openChatWindow(conversationId, propertyId) {
   } catch (error) {
     console.error('Error loading conversation:', error);
     await showCustomAlert('Failed to open chat window.');
+  }
+}
+
+// ============================================
+// ✅ FIX: Agent socket — join conversation room
+// ============================================
+async function joinAgentChatSocket(conversationId) {
+  try {
+    if (agentChatSocket && agentChatSocket.connected) {
+      agentChatSocket.emit('join_conversation', conversationId);
+      return;
+    }
+
+    const authRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      method: 'GET', credentials: 'include'
+    });
+    if (!authRes.ok) return;
+    const authData = await authRes.json();
+    const token = authData.token;
+    if (!token) return;
+
+    agentChatSocket = io(API_BASE_URL, {
+      auth: { token },
+      transports: ['websocket', 'polling']
+    });
+
+    agentChatSocket.on('connect', () => {
+      console.log('✅ Agent chat socket connected');
+      agentChatSocket.emit('join_conversation', conversationId);
+    });
+
+    // ✅ FIX: Listen for new messages and append them live
+    agentChatSocket.on('new_message', (message) => {
+      // Skip own messages (already shown optimistically)
+      if (agentCurrentUserId && String(message.sender_id) === String(agentCurrentUserId)) return;
+
+      // Only append if this conversation is open
+      if (String(message.conversation_id) === String(agentChatCurrentConversationId)) {
+        appendAgentMessage(message, agentCurrentUserId);
+        const msgs = document.getElementById('agentChatMessages');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        markAgentMessagesAsRead(conversationId);
+        checkForInquiries();
+      }
+    });
+
+    agentChatSocket.on('connect_error', (err) => {
+      console.error('Agent chat socket error:', err.message);
+    });
+
+  } catch (error) {
+    console.error('Error joining agent chat socket:', error);
+  }
+}
+
+// ============================================
+// ✅ FIX: Leave conversation room on close
+// ============================================
+function leaveAgentChatSocket(conversationId) {
+  if (agentChatSocket && agentChatSocket.connected) {
+    agentChatSocket.emit('leave_conversation', conversationId);
   }
 }
 
@@ -259,12 +329,12 @@ function appendAgentMessage(message, currentUserId) {
   container.appendChild(wrapper);
 }
 
-// ✅ Optimistic send — no reload, no blank flash, correct function name
 async function sendAgentMessage(conversationId, propertyId, currentUserId) {
   const input = document.getElementById('agentChatInput');
   const messageText = input.value.trim();
   if (!messageText) return;
 
+  // ✅ Optimistic append
   appendAgentMessage({
     sender_id: currentUserId,
     sender_name: 'You',
@@ -287,7 +357,6 @@ async function sendAgentMessage(conversationId, propertyId, currentUserId) {
     if (response.ok) {
       markAgentMessagesAsRead(conversationId);
       checkForInquiries();
-      // ✅ Correct function name from listings.js
       if (typeof loadAgentProperties === 'function') {
         loadAgentProperties();
       }
@@ -312,15 +381,13 @@ async function markAgentMessagesAsRead(conversationId) {
 }
 
 // ============================================
-// SOCKET — new inquiry popup ONLY when a new
-// message arrives from a client via socket
+// SOCKET — notification for new inquiries
 // ============================================
 async function initAgentSocketNotifications() {
   if (window._agentSocketInitialized) return;
   window._agentSocketInitialized = true;
 
   try {
-    // ✅ Get token via API — correct way with httpOnly cookies
     const authRes = await fetch(`${API_BASE_URL}/api/auth/me`, {
       method: 'GET', credentials: 'include'
     });
@@ -338,7 +405,6 @@ async function initAgentSocketNotifications() {
       console.log('✅ Agent notification socket connected');
     });
 
-    // ✅ Only fires popup when a new message arrives AND chat is not open
     notifSocket.on('new_message_notification', async () => {
       const chatOpen = !!document.getElementById('agentChatOverlay');
       if (chatOpen) return;
@@ -367,7 +433,6 @@ async function initAgentSocketNotifications() {
   }
 }
 
-// Auto-init
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initAgentSocketNotifications);
 } else {
