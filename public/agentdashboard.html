@@ -717,7 +717,12 @@
         <div class="agent-properties">
           <div class="section-header">
             <h2>Featured Listings</h2>
-            <a href="#" class="see-all">See All</a>
+            <a href="#" class="see-all edit-listings-btn" data-section="featured" 
+     onclick="event.preventDefault(); 
+     if(this.textContent.trim()==='Cancel'){deactivateSelectionMode();}
+     else{activateSelectionMode('featured');}">
+    Edit Listings
+  </a>
           </div>
           <div class="house-cards horizontal-scroll">
             <a href="property1.html" class="card">
@@ -762,7 +767,12 @@
         <div class="agent-properties">
           <div class="section-header">
             <h2>My Properties</h2>
-            <a href="#" class="see-all">See All</a>
+            <a href="#" class="see-all edit-listings-btn" data-section="regular"
+   onclick="event.preventDefault(); 
+   if(this.textContent.trim()==='Cancel'){deactivateSelectionMode();}
+   else{activateSelectionMode('regular');}">
+  Edit Listings
+</a>
           </div>
           <div class="house-cards horizontal-scroll">
             <a href="property1.html" class="card">
@@ -945,9 +955,10 @@
 <!-- Load Helper Functions -->
 <script src="helpers.js"></script>
 
-<!-- ✅ Load edit scripts BEFORE listings.js -->
+<!-- ✅ Load edit and selection scripts BEFORE listings.js -->
 <script src="editlisting.js"></script>
 <script src="editbundle.js"></script>
+<script src="listingselection.js"></script>
 
 <!-- Load Feature Modules -->
 <script src="overview.js"></script>
