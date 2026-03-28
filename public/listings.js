@@ -1273,7 +1273,14 @@ function createPropertyCardWithInquiry(property, hasInquiry) {
         window.location.href = `house.html?id=${property.property_id}`;
       }
     }
-  });
+ });
+  
+  // ✅ ADD: Attach long press for edit/delete
+  if (isBundle) {
+    window.attachLongPress(card, property, showInquiryBadge, true);
+  } else {
+    window.attachLongPress(card, property, showInquiryBadge, false);
+  }
   
   return card;
 }

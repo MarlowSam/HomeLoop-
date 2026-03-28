@@ -23,6 +23,9 @@ import favouritesRoutes from './routes/favourites.js';
 import agentDashboardRoutes from './routes/agentdashboard.js';
 import chatHandler from './socket/chatHandler.js';
 import { startReviewScheduler } from "./services/reviewScheduler.js";
+import editPropertyRoutes from './routes/editproperty.js';
+import deletePropertyRoutes from './routes/deleteproperty.js';
+import editBundleRoutes from './routes/editbundle.js';
 
 dotenv.config();
 
@@ -162,6 +165,10 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/bundles', bundlesRoutes);
 app.use('/api/favourites', favouritesRoutes);
 app.use('/api/agent/dashboard', agentDashboardRoutes);
+app.use('/api/properties/:id', editPropertyRoutes);
+app.use('/api/properties/:id', deletePropertyRoutes);
+app.use('/api/bundles/:id', editBundleRoutes);
+
 
 console.log('✅ All routes registered');
 
