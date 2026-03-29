@@ -1261,28 +1261,27 @@ function createPropertyCardWithInquiry(property, hasInquiry) {
     ${inquiryBadge}
   `;
   
-  card.addEventListener('click', function() {
-    if (showInquiryBadge) {
-      // Open chat for this property's inquiry
-      openAgentChat(property.property_id);
-    } else {
-      // Navigate to property/bundle page
-      if (property.bundle_id) {
-        window.location.href = `bundle.html?id=${property.bundle_id}`;
-      } else {
-        window.location.href = `house.html?id=${property.property_id}`;
-      }
-    }
- });
-  
-  // ✅ ADD: Attach long press for edit/delete
-  if (isBundle) {
-    window.attachLongPress(card, property, showInquiryBadge, true);
-  } else {
-    window.attachLongPress(card, property, showInquiryBadge, false);
+  card.addEventListener('click', function(e) {
+  // ✅ If selection mode is active, let handleCardSelectionClick handle it
+  if (selectionModeActive) return;
+  if (showInquiryBadge) {
+    openAgentChat(property.property_id);
   }
   
-  return card;
+});
+  
+  // ✅ Attach property data for selection mode
+card._selectionProperty = property;
+card._selectionProperty._hasInquiry = showInquiryBadge;
+
+// ✅ Attach long press for edit/delete
+if (isBundle) {
+  window.attachLongPress(card, property, showInquiryBadge, true);
+} else {
+  window.attachLongPress(card, property, showInquiryBadge, false);
+}
+
+return card;
 }
 
 console.log('✅ listings.js loaded - showSection function available:', typeof showSection);

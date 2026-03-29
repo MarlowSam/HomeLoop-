@@ -1,1 +1,1 @@
-SELECT * FROM properties WHERE bundle_id = 1;
+DESCRIBE bookings;

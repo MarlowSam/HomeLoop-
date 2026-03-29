@@ -155,20 +155,25 @@ app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 console.log('📝 Registering API routes...');
 
 app.use("/api/auth", authRoutes);
+
+// ✅ Edit and delete BEFORE propertiesRoutes
+app.use('/api/properties', editPropertyRoutes);
+app.use('/api/properties', deletePropertyRoutes);
 app.use("/api/properties", propertiesRoutes);
+
 app.use("/api/agents", agentsRoutes);
 app.use("/api/bookings", bookingsRoutes);
 app.use("/api/reviews", reviewsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/chat', chatRoutes);
+
+// ✅ Edit bundle BEFORE bundlesRoutes
+app.use('/api/bundles', editBundleRoutes);
 app.use('/api/bundles', bundlesRoutes);
+
 app.use('/api/favourites', favouritesRoutes);
 app.use('/api/agent/dashboard', agentDashboardRoutes);
-app.use('/api/properties/:id', editPropertyRoutes);
-app.use('/api/properties/:id', deletePropertyRoutes);
-app.use('/api/bundles/:id', editBundleRoutes);
-
 
 console.log('✅ All routes registered');
 

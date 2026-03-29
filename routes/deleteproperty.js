@@ -27,7 +27,7 @@ router.delete("/:id", verifyToken, requireAgent, async (req, res) => {
 
     // Check for existing bookings
     const [bookings] = await db.promise().query(
-      `SELECT booking_id FROM bookings WHERE property_id = ? LIMIT 1`,
+      `SELECT id FROM bookings WHERE property_id = ? LIMIT 1`,
       [propertyId]
     );
 
@@ -37,9 +37,11 @@ router.delete("/:id", verifyToken, requireAgent, async (req, res) => {
       });
     }
 
-    // Check for existing conversations/inquiries
+    // ✅ Only block if there are actual messages in the conversation
     const [conversations] = await db.promise().query(
-      `SELECT conversation_id FROM conversations WHERE property_id = ? LIMIT 1`,
+      `SELECT c.conversation_id FROM conversations c
+       INNER JOIN messages m ON c.conversation_id = m.conversation_id
+       WHERE c.property_id = ? LIMIT 1`,
       [propertyId]
     );
 

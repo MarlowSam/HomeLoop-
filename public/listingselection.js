@@ -4,7 +4,6 @@
 let selectionModeActive = false;
 let selectedProperty = null;
 let selectedCard = null;
-let actionBar = null;
 let activeSection = null;
 
 // ==========================================
@@ -16,20 +15,26 @@ function activateSelectionMode(sectionType) {
   selectedCard = null;
   activeSection = sectionType;
 
-  // Change Edit Listings button to Cancel for this section
+  // Change Edit Listings button to Cancel
   const btn = document.querySelector(`.edit-listings-btn[data-section="${sectionType}"]`);
   if (btn) {
     btn.textContent = 'Cancel';
     btn.style.color = '#ff4444';
   }
 
-  // Add circles to cards in this section only
-  const container = sectionType === 'featured'
-    ? document.querySelector('#listings .agent-properties:first-of-type .house-cards')
-    : document.querySelector('#listings .agent-properties:last-of-type .house-cards');
+  // Get correct container based on section
+  const allSections = document.querySelectorAll('#listings .agent-properties');
+  let container = null;
+
+  if (sectionType === 'featured') {
+    container = allSections[0]?.querySelector('.house-cards');
+  } else {
+    container = allSections[1]?.querySelector('.house-cards');
+  }
 
   if (!container) return;
 
+  // Add circles to all cards in this section
   const cards = container.querySelectorAll('.card');
   cards.forEach(card => {
     card.querySelector('.selection-circle')?.remove();
@@ -56,9 +61,6 @@ function activateSelectionMode(sectionType) {
     card.appendChild(circle);
     card.addEventListener('click', handleCardSelectionClick);
   });
-
-  // Show empty action bar
-  showActionBar();
 }
 
 // ==========================================
@@ -88,9 +90,6 @@ function deactivateSelectionMode() {
     card.removeEventListener('click', handleCardSelectionClick);
   });
 
-  // Hide action bar
-  hideActionBar();
-
   selectedProperty = null;
   selectedCard = null;
   activeSection = null;
@@ -103,12 +102,13 @@ function handleCardSelectionClick(e) {
   if (!selectionModeActive) return;
   e.preventDefault();
   e.stopPropagation();
+  e.stopImmediatePropagation();
 
   const card = e.currentTarget;
   const property = card._selectionProperty;
   if (!property) return;
 
-  // Deselect previous
+  // Deselect previous card
   if (selectedCard && selectedCard !== card) {
     selectedCard.style.outline = 'none';
     selectedCard.style.boxShadow = '';
@@ -134,117 +134,18 @@ function handleCardSelectionClick(e) {
     circle.innerHTML = '<i class="fas fa-check" style="color:white;font-size:0.7rem;"></i>';
   }
 
-  updateActionBar(property);
-}
-
-// ==========================================
-// ACTION BAR
-// ==========================================
-function showActionBar() {
-  hideActionBar();
-
-  actionBar = document.createElement('div');
-  actionBar.id = 'listingActionBar';
-  actionBar.style.cssText = `
-    position: fixed;
-    bottom: -120px;
-    left: 0; right: 0;
-    background: #2d0036;
-    border-top: 2px solid rgba(255, 77, 210, 0.4);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 9999;
-    box-shadow: 0 -4px 20px rgba(255, 77, 210, 0.3);
-    transition: bottom 0.3s ease;
-  `;
-
-  actionBar.innerHTML = `
-    <p id="actionBarHint" style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0;">
-      Tap a property to select it
-    </p>
-    <button id="actionEditBtn" style="display:none;padding:10px 24px;
-      background:linear-gradient(135deg,#ff69ff,#8a2be2);color:white;border:none;
-      border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;
-      display:none;align-items:center;gap:8px;">
-      <i class="fas fa-edit"></i> Edit
-    </button>
-    <button id="actionDeleteBtn" style="display:none;padding:10px 24px;
-      background:linear-gradient(135deg,#ff4444,#cc0000);color:white;border:none;
-      border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;
-      display:none;align-items:center;gap:8px;">
-      <i class="fas fa-trash"></i> Delete
-    </button>
-    <button id="actionCancelBtn" style="padding:10px 24px;
-      background:rgba(255,255,255,0.1);color:white;
-      border:1px solid rgba(255,255,255,0.2);
-      border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;
-      display:flex;align-items:center;gap:8px;">
-      <i class="fas fa-times"></i> Cancel
-    </button>
-  `;
-
-  document.body.appendChild(actionBar);
-
-  // Slide up
-  requestAnimationFrame(() => {
-    setTimeout(() => { actionBar.style.bottom = '0'; }, 10);
-  });
-
-  // Cancel button
-  document.getElementById('actionCancelBtn').addEventListener('click', () => {
-    deactivateSelectionMode();
-  });
-}
-
-function updateActionBar(property) {
-  if (!actionBar) return;
-
-  const hint = document.getElementById('actionBarHint');
-  const editBtn = document.getElementById('actionEditBtn');
-  const deleteBtn = document.getElementById('actionDeleteBtn');
-
-  if (hint) hint.style.display = 'none';
-
+  // Show action menu like long press
   const isBundle = property._isBundleRepresentative === true;
   const hasInquiry = property._bundleHasInquiry || property._hasInquiry;
 
-  // Edit button — always show
-  if (editBtn) {
-    editBtn.style.display = 'flex';
-    editBtn.onclick = () => {
-      deactivateSelectionMode();
-      if (isBundle) {
-        window.openEditBundleForm(property);
-      } else {
-        openEditPropertyForm(property);
-      }
-    };
-  }
+  const rect = card.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top;
 
-  // Delete button — only show if no inquiry
-  if (deleteBtn) {
-    if (!hasInquiry) {
-      deleteBtn.style.display = 'flex';
-      deleteBtn.onclick = () => {
-        deactivateSelectionMode();
-        confirmDeleteProperty(property);
-      };
-    } else {
-      deleteBtn.style.display = 'none';
-    }
-  }
-}
-
-function hideActionBar() {
-  if (actionBar) {
-    actionBar.style.bottom = '-120px';
-    setTimeout(() => {
-      actionBar?.remove();
-      actionBar = null;
-    }, 300);
+  if (isBundle) {
+    showBundleActionMenu(property, x, y);
+  } else {
+    showPropertyActionMenu(property, hasInquiry, x, y);
   }
 }
 
@@ -255,3 +156,20 @@ window.activateSelectionMode = activateSelectionMode;
 window.deactivateSelectionMode = deactivateSelectionMode;
 
 console.log('✅ listingselection.js loaded');
+
+// ==========================================
+// WIRE UP EDIT LISTINGS BUTTONS
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.edit-listings-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const section = btn.dataset.section;
+      if (btn.textContent.trim() === 'Cancel') {
+        deactivateSelectionMode();
+      } else {
+        activateSelectionMode(section);
+      }
+    });
+  });
+});

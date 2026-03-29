@@ -9,9 +9,6 @@ import { verifyToken, requireAgent } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// ==========================================
-// FILE UPLOAD CONFIGURATION
-// ==========================================
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -69,7 +66,8 @@ router.put("/:id",
   verifyToken,
   requireAgent,
   upload.fields([
-    { name: 'images', maxCount: 10 },
+    { name: 'heroImage', maxCount: 1 },
+    { name: 'galleryImages', maxCount: 3 },
     { name: 'videos', maxCount: 2 }
   ]),
   async (req, res) => {
@@ -79,7 +77,6 @@ router.put("/:id",
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
-      // Verify agent owns this property
       const [existing] = await db.promise().query(
         `SELECT * FROM properties WHERE property_id = ? AND agent_id = ?`,
         [propertyId, req.user.userId]
@@ -91,25 +88,26 @@ router.put("/:id",
 
       const currentProperty = existing[0];
 
-      // Parse existing images/videos from DB
-      let existingImages = typeof currentProperty.images === 'string'
-        ? JSON.parse(currentProperty.images)
-        : currentProperty.images || [];
+      // Get kept images and videos from frontend
+      const keepImages = req.body.keepImages ? JSON.parse(req.body.keepImages) : [];
+      const keepVideos = req.body.keepVideos ? JSON.parse(req.body.keepVideos) : [];
 
-      let existingVideos = typeof currentProperty.videos === 'string'
-        ? JSON.parse(currentProperty.videos)
-        : currentProperty.videos || [];
+      // ✅ Upload new hero image if provided
+      const heroFile = req.files?.heroImage?.[0] || null;
+      let newHeroUrl = null;
+      if (heroFile) {
+        const result = await uploadToCloudinary(heroFile.buffer, {
+          folder: 'homeloop/properties',
+          resource_type: 'image',
+          transformation: [{ quality: 85, width: 2000, height: 2000, crop: 'limit' }]
+        });
+        newHeroUrl = result.secure_url;
+      }
 
-      // Get images/videos to keep (sent from frontend as JSON strings)
-      const keepImages = req.body.keepImages ? JSON.parse(req.body.keepImages) : existingImages;
-      const keepVideos = req.body.keepVideos ? JSON.parse(req.body.keepVideos) : existingVideos;
-
-      // Upload new images to Cloudinary
-      const newImageFiles = req.files?.images || [];
-      const newVideoFiles = req.files?.videos || [];
-
-      const newImageUrls = await Promise.all(
-        newImageFiles.map(file =>
+      // ✅ Upload new gallery images if provided
+      const galleryFiles = req.files?.galleryImages || [];
+      const newGalleryUrls = await Promise.all(
+        galleryFiles.map(file =>
           uploadToCloudinary(file.buffer, {
             folder: 'homeloop/properties',
             resource_type: 'image',
@@ -118,8 +116,10 @@ router.put("/:id",
         )
       );
 
+      // ✅ Upload new videos if provided
+      const videoFiles = req.files?.videos || [];
       const newVideoUrls = await Promise.all(
-        newVideoFiles.map(file =>
+        videoFiles.map(file =>
           uploadToCloudinary(file.buffer, {
             folder: 'homeloop/videos',
             resource_type: 'video'
@@ -127,18 +127,25 @@ router.put("/:id",
         )
       );
 
-      // Merge kept images with new uploads
-      const finalImages = [
-        ...keepImages,
-        ...newImageUrls.map(r => r.secure_url)
-      ];
+      // ✅ Build final images: hero first then gallery
+      // keepImages already has hero first then gallery from frontend
+      let finalImages = [...keepImages];
+      if (newHeroUrl) {
+        // Replace first image (hero) with new one
+        if (finalImages.length > 0) {
+          finalImages[0] = newHeroUrl;
+        } else {
+          finalImages.unshift(newHeroUrl);
+        }
+      }
+      // Add new gallery images
+      finalImages = [...finalImages, ...newGalleryUrls.map(r => r.secure_url)];
 
       const finalVideos = [
         ...keepVideos,
         ...newVideoUrls.map(r => r.secure_url)
       ];
 
-      // Parse updated fields
       let {
         title, description, property_type, listing_type,
         price, viewing_fee, bedrooms, bathrooms,

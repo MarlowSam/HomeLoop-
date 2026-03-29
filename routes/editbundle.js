@@ -9,9 +9,6 @@ import { verifyToken, requireAgent } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// ==========================================
-// FILE UPLOAD CONFIGURATION
-// ==========================================
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -68,7 +65,7 @@ function validateNumber(num, min = 0, max = 1000) {
 router.put("/:id",
   verifyToken,
   requireAgent,
-  upload.any(), // Accept any field name for flexibility with multiple properties
+  upload.any(),
   async (req, res) => {
     try {
       const bundleId = parseInt(req.params.id);
@@ -76,7 +73,6 @@ router.put("/:id",
         return res.status(400).json({ message: "Invalid bundle ID" });
       }
 
-      // Verify agent owns this bundle
       const [bundleRows] = await db.promise().query(
         `SELECT * FROM bundles WHERE bundle_id = ? AND agent_id = ?`,
         [bundleId, req.user.userId]
@@ -86,7 +82,6 @@ router.put("/:id",
         return res.status(404).json({ message: "Bundle not found or access denied" });
       }
 
-      // Update bundle viewing fee if provided
       if (req.body.bundleViewingFee) {
         const viewingFee = validatePrice(req.body.bundleViewingFee);
         await db.promise().query(
@@ -95,53 +90,52 @@ router.put("/:id",
         );
       }
 
-      // Get all properties in this bundle
       const [bundleProperties] = await db.promise().query(
         `SELECT * FROM properties WHERE bundle_id = ? AND agent_id = ?`,
         [bundleId, req.user.userId]
       );
 
-      // Parse properties data from request body
-      // Frontend sends: properties[0][title], properties[0][price], etc.
       const propertiesData = JSON.parse(req.body.propertiesData || '[]');
 
-      // Group uploaded files by property index
-      // Frontend sends files as: property_0_images, property_1_images, etc.
+      // ✅ Group uploaded files by property index with hero/gallery separation
       const filesByProperty = {};
       if (req.files) {
         req.files.forEach(file => {
-          const match = file.fieldname.match(/^property_(\d+)_(images|videos)$/);
+          // Match: property_0_heroImage, property_0_galleryImages, property_0_videos
+          const match = file.fieldname.match(/^property_(\d+)_(heroImage|galleryImages|videos)$/);
           if (match) {
             const propIndex = parseInt(match[1]);
             const fileType = match[2];
-            if (!filesByProperty[propIndex]) filesByProperty[propIndex] = { images: [], videos: [] };
+            if (!filesByProperty[propIndex]) {
+              filesByProperty[propIndex] = { heroImage: [], galleryImages: [], videos: [] };
+            }
             filesByProperty[propIndex][fileType].push(file);
           }
         });
       }
 
-      // Update each property in the bundle
       for (let i = 0; i < bundleProperties.length; i++) {
         const currentProp = bundleProperties[i];
         const propData = propertiesData[i] || {};
-        const propFiles = filesByProperty[i] || { images: [], videos: [] };
+        const propFiles = filesByProperty[i] || { heroImage: [], galleryImages: [], videos: [] };
 
-        // Get existing images/videos
-        let existingImages = typeof currentProp.images === 'string'
-          ? JSON.parse(currentProp.images)
-          : currentProp.images || [];
+        const keepImages = propData.keepImages || [];
+        const keepVideos = propData.keepVideos || [];
 
-        let existingVideos = typeof currentProp.videos === 'string'
-          ? JSON.parse(currentProp.videos)
-          : currentProp.videos || [];
+        // ✅ Upload new hero if provided
+        let newHeroUrl = null;
+        if (propFiles.heroImage.length > 0) {
+          const result = await uploadToCloudinary(propFiles.heroImage[0].buffer, {
+            folder: 'homeloop/properties',
+            resource_type: 'image',
+            transformation: [{ quality: 85, width: 2000, height: 2000, crop: 'limit' }]
+          });
+          newHeroUrl = result.secure_url;
+        }
 
-        // Images/videos to keep
-        const keepImages = propData.keepImages || existingImages;
-        const keepVideos = propData.keepVideos || existingVideos;
-
-        // Upload new images
-        const newImageUrls = await Promise.all(
-          propFiles.images.map(file =>
+        // ✅ Upload new gallery images
+        const newGalleryUrls = await Promise.all(
+          propFiles.galleryImages.map(file =>
             uploadToCloudinary(file.buffer, {
               folder: 'homeloop/properties',
               resource_type: 'image',
@@ -150,7 +144,7 @@ router.put("/:id",
           )
         );
 
-        // Upload new videos
+        // ✅ Upload new videos
         const newVideoUrls = await Promise.all(
           propFiles.videos.map(file =>
             uploadToCloudinary(file.buffer, {
@@ -160,8 +154,21 @@ router.put("/:id",
           )
         );
 
-        const finalImages = [...keepImages, ...newImageUrls.map(r => r.secure_url)];
-        const finalVideos = [...keepVideos, ...newVideoUrls.map(r => r.secure_url)];
+        // ✅ Build final images: hero first then gallery
+        let finalImages = [...keepImages];
+        if (newHeroUrl) {
+          if (finalImages.length > 0) {
+            finalImages[0] = newHeroUrl;
+          } else {
+            finalImages.unshift(newHeroUrl);
+          }
+        }
+        finalImages = [...finalImages, ...newGalleryUrls.map(r => r.secure_url)];
+
+        const finalVideos = [
+          ...keepVideos,
+          ...newVideoUrls.map(r => r.secure_url)
+        ];
 
         const title = sanitizeString(propData.title) || currentProp.title;
         const description = sanitizeString(propData.description) || currentProp.description;
@@ -191,11 +198,7 @@ router.put("/:id",
       }
 
       console.log(`✅ Bundle ${bundleId} updated successfully`);
-
-      res.json({
-        message: "Bundle updated successfully",
-        bundleId
-      });
+      res.json({ message: "Bundle updated successfully", bundleId });
 
     } catch (err) {
       console.error("❌ Error updating bundle:", err);

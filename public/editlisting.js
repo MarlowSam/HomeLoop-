@@ -38,7 +38,6 @@ function attachLongPress(card, property, hasInquiry, isBundle = false) {
 // ACTION MENU — SINGLE PROPERTY
 // ==========================================
 function showPropertyActionMenu(property, hasInquiry, x, y) {
-  // Remove any existing menu
   document.querySelector('.property-action-menu')?.remove();
 
   const menu = document.createElement('div');
@@ -74,7 +73,6 @@ function showPropertyActionMenu(property, hasInquiry, x, y) {
   };
   menu.appendChild(editBtn);
 
-  // Only show delete if no inquiry
   if (!hasInquiry) {
     const deleteBtn = document.createElement('button');
     deleteBtn.style.cssText = `
@@ -109,14 +107,12 @@ function showPropertyActionMenu(property, hasInquiry, x, y) {
   cancelBtn.onclick = () => menu.remove();
   menu.appendChild(cancelBtn);
 
-  // Add animation style
   const style = document.createElement('style');
   style.textContent = `@keyframes menuSlideIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }`;
   menu.appendChild(style);
 
   document.body.appendChild(menu);
 
-  // Click outside to close
   setTimeout(() => {
     document.addEventListener('click', function closeMenu() {
       menu.remove();
@@ -193,7 +189,6 @@ function showBundleActionMenu(property, x, y) {
 // EDIT PROPERTY FORM
 // ==========================================
 function openEditPropertyForm(property) {
-  // Remove any existing edit overlay
   document.getElementById('editPropertyOverlay')?.remove();
 
   const overlay = document.createElement('div');
@@ -203,57 +198,84 @@ function openEditPropertyForm(property) {
     width: 100%; height: 100%;
     background: linear-gradient(135deg, #1a0033 0%, #2d0052 100%);
     z-index: 10002; overflow-y: auto;
-    padding: 2rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem 1rem;
   `;
 
   const images = Array.isArray(property.images) ? property.images : JSON.parse(property.images || '[]');
   const videos = Array.isArray(property.videos) ? property.videos : JSON.parse(property.videos || '[]');
 
-  // Build existing images HTML
-  let existingImagesHTML = images.map((url, i) => `
-    <div class="edit-image-preview" data-url="${url}" style="width:100px;height:100px;border-radius:8px;overflow:hidden;position:relative;border:2px solid #ff69ff;display:inline-block;margin:4px;">
+  // ✅ Separate hero (first image) from gallery (rest)
+  const heroImage = images[0] || null;
+  const galleryImages = images.slice(1);
+
+  // Hero image same size as gallery thumbnails, no HERO badge
+  const heroImageHTML = heroImage ? `
+    <div class="edit-image-preview" data-url="${heroImage}" data-type="hero"
+      style="width:100px;height:100px;border-radius:8px;overflow:hidden;position:relative;border:2px solid #ff69ff;display:inline-block;margin:4px;">
+      <img src="${heroImage}" style="width:100%;height:100%;object-fit:cover;">
+      <button type="button" onclick="removeExistingImage(this, '${heroImage}', 'hero')"
+        style="position:absolute;top:3px;right:3px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.8rem;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+  ` : '<p style="color:rgba(255,255,255,0.5);">No hero image</p>';
+
+  const galleryImagesHTML = galleryImages.map(url => `
+    <div class="edit-image-preview" data-url="${url}" data-type="gallery"
+      style="width:100px;height:100px;border-radius:8px;overflow:hidden;position:relative;border:2px solid #ff69ff;display:inline-block;margin:4px;">
       <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
-      <button type="button" onclick="removeExistingImage(this, '${url}')" style="position:absolute;top:3px;right:3px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;">×</button>
+      <button type="button" onclick="removeExistingImage(this, '${url}', 'gallery')"
+        style="position:absolute;top:3px;right:3px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.8rem;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
     </div>
   `).join('');
 
-  // Build existing videos HTML
-  let existingVideosHTML = videos.map((url, i) => `
-    <div class="edit-video-preview" data-url="${url}" style="width:180px;height:130px;border-radius:8px;overflow:hidden;position:relative;border:2px solid #ff69ff;display:inline-block;margin:4px;background:#000;">
-      <video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted></video>
-      <button type="button" onclick="removeExistingVideo(this, '${url}')" style="position:absolute;top:3px;right:3px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">×</button>
+  const existingVideosHTML = videos.map(url => `
+    <div class="edit-video-preview" data-url="${url}"
+      style="width:160px;height:120px;border-radius:8px;overflow:hidden;position:relative;border:2px solid #ff69ff;display:inline-block;margin:4px;background:#000;">
+      <video src="${url}" style="width:100%;height:100%;object-fit:cover;" muted playsinline></video>
+      <button type="button" onclick="removeExistingVideo(this, '${url}')"
+        style="position:absolute;top:3px;right:3px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
     </div>
   `).join('');
 
   overlay.innerHTML = `
     <div style="max-width:800px;margin:0 auto;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
-        <h1 style="color:#ff69ff;font-size:1.8rem;">Edit Property</h1>
-        <button onclick="document.getElementById('editPropertyOverlay').remove()" 
-          style="background:rgba(255,255,255,0.1);border:none;color:white;font-size:1.5rem;cursor:pointer;width:40px;height:40px;border-radius:50%;">×</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;position:sticky;top:0;background:linear-gradient(135deg,#1a0033,#2d0052);padding:1rem 0;z-index:10;">
+        <h1 style="color:#ff69ff;font-size:1.5rem;margin:0;">Edit Property</h1>
+        <button id="closeEditOverlay"
+          style="background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:white;font-size:1.5rem;cursor:pointer;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">×</button>
       </div>
 
-      <form id="editPropertyForm" style="background:rgba(138,43,226,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:2rem;">
-        
-        <!-- Existing Images -->
+      <form id="editPropertyForm" style="background:rgba(138,43,226,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;">
+
+        <!-- Hero Image -->
         <div style="margin-bottom:1.5rem;">
-          <label style="display:block;margin-bottom:0.5rem;color:rgba(255,255,255,0.9);font-weight:500;">Current Images</label>
-          <div id="existingImagesContainer" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
-            ${existingImagesHTML || '<p style="color:rgba(255,255,255,0.5);">No images</p>'}
-          </div>
-          <label style="display:block;margin-bottom:0.5rem;color:rgba(255,255,255,0.9);font-weight:500;">Add New Images</label>
-          <input type="file" id="editHeroImage" accept="image/*" multiple
+          <label style="display:block;margin-bottom:0.5rem;color:#ff69ff;font-weight:600;font-size:1rem;">Hero Image (Main Display)</label>
+          <div id="existingHeroContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem;">${heroImageHTML}</div>
+          <label style="display:block;margin-bottom:0.4rem;color:rgba(255,255,255,0.8);font-size:0.9rem;">Replace Hero Image</label>
+          <input type="file" id="editHeroImage" accept="image/*"
             style="width:100%;padding:0.75rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;">
-          <div id="newImagesPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+          <div id="newHeroPreview" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;"></div>
         </div>
 
-        <!-- Existing Videos -->
+        <!-- Gallery Images -->
         <div style="margin-bottom:1.5rem;">
-          <label style="display:block;margin-bottom:0.5rem;color:rgba(255,255,255,0.9);font-weight:500;">Current Videos</label>
-          <div id="existingVideosContainer" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
-            ${existingVideosHTML || '<p style="color:rgba(255,255,255,0.5);">No videos</p>'}
+          <label style="display:block;margin-bottom:0.5rem;color:#ff69ff;font-weight:600;font-size:1rem;">Gallery Images</label>
+          <div id="existingGalleryContainer" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem;">
+            ${galleryImagesHTML || '<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;">No gallery images</p>'}
           </div>
-          <label style="display:block;margin-bottom:0.5rem;color:rgba(255,255,255,0.9);font-weight:500;">Add New Videos</label>
+          <label style="display:block;margin-bottom:0.4rem;color:rgba(255,255,255,0.8);font-size:0.9rem;">Add Gallery Images (up to 3)</label>
+          <input type="file" id="editGalleryImages" accept="image/*" multiple
+            style="width:100%;padding:0.75rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;">
+          <div id="newGalleryPreview" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;"></div>
+        </div>
+
+        <!-- Videos -->
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block;margin-bottom:0.5rem;color:#ff69ff;font-weight:600;font-size:1rem;">Videos</label>
+          <div id="existingVideosContainer" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0.75rem;">
+            ${existingVideosHTML || '<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;">No videos</p>'}
+          </div>
+          <label style="display:block;margin-bottom:0.4rem;color:rgba(255,255,255,0.8);font-size:0.9rem;">Add New Videos (up to 2)</label>
           <input type="file" id="editVideos" accept="video/mp4,video/webm" multiple
             style="width:100%;padding:0.75rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;">
           <div id="newVideosPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
@@ -319,12 +341,13 @@ function openEditPropertyForm(property) {
         </div>
 
         <!-- Form Actions -->
-        <div style="display:flex;gap:1rem;justify-content:center;">
-          <button type="submit" style="padding:0.75rem 2rem;background:linear-gradient(135deg,#ff69ff,#8a2be2);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;">
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+          <button type="submit"
+            style="padding:0.875rem 2rem;background:linear-gradient(135deg,#ff69ff,#8a2be2);color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.5rem;touch-action:manipulation;">
             <i class="fas fa-save"></i> Save Changes
           </button>
-          <button type="button" onclick="document.getElementById('editPropertyOverlay').remove()"
-            style="padding:0.75rem 2rem;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">
+          <button type="button" id="cancelEditBtn"
+            style="padding:0.875rem 2rem;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
             Cancel
           </button>
         </div>
@@ -334,23 +357,59 @@ function openEditPropertyForm(property) {
 
   document.body.appendChild(overlay);
 
-  // Track images/videos to keep
-  window._editKeepImages = [...images];
+  // ✅ Track hero, gallery, videos separately
+  window._editHeroImage = heroImage;
+  window._editKeepGallery = [...galleryImages];
   window._editKeepVideos = [...videos];
-  window._editNewImages = [];
+  window._editNewHero = null;
+  window._editNewGallery = [];
   window._editNewVideos = [];
 
-  // New images preview
+  // ✅ Mobile-friendly close button using addEventListener
+  document.getElementById('closeEditOverlay').addEventListener('click', () => {
+    document.getElementById('editPropertyOverlay')?.remove();
+  });
+  document.getElementById('closeEditOverlay').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    document.getElementById('editPropertyOverlay')?.remove();
+  });
+
+  document.getElementById('cancelEditBtn').addEventListener('click', () => {
+    document.getElementById('editPropertyOverlay')?.remove();
+  });
+  document.getElementById('cancelEditBtn').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    document.getElementById('editPropertyOverlay')?.remove();
+  });
+
+  // New hero image preview
   document.getElementById('editHeroImage').addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    window._editNewImages = files;
-    const preview = document.getElementById('newImagesPreview');
+    const file = e.target.files[0];
+    if (!file) return;
+    window._editNewHero = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('newHeroPreview').innerHTML = `
+        <div style="width:100px;height:100px;border-radius:8px;overflow:hidden;border:2px solid #4CAF50;display:inline-block;">
+          <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <p style="color:#4CAF50;font-size:0.85rem;margin-top:4px;">✅ New hero image selected</p>
+      `;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // New gallery images preview
+  document.getElementById('editGalleryImages').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files).slice(0, 3);
+    window._editNewGallery = files;
+    const preview = document.getElementById('newGalleryPreview');
     preview.innerHTML = '';
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const div = document.createElement('div');
-        div.style.cssText = 'width:100px;height:100px;border-radius:8px;overflow:hidden;border:2px solid #ff69ff;display:inline-block;';
+        div.style.cssText = 'width:100px;height:100px;border-radius:8px;overflow:hidden;border:2px solid #4CAF50;display:inline-block;';
         div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
         preview.appendChild(div);
       };
@@ -368,8 +427,8 @@ function openEditPropertyForm(property) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const div = document.createElement('div');
-        div.style.cssText = 'width:180px;height:130px;border-radius:8px;overflow:hidden;border:2px solid #ff69ff;display:inline-block;background:#000;';
-        div.innerHTML = `<video src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" muted></video>`;
+        div.style.cssText = 'width:160px;height:120px;border-radius:8px;overflow:hidden;border:2px solid #4CAF50;display:inline-block;background:#000;';
+        div.innerHTML = `<video src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" muted playsinline></video>`;
         preview.appendChild(div);
       };
       reader.readAsDataURL(file);
@@ -386,9 +445,13 @@ function openEditPropertyForm(property) {
 // ==========================================
 // REMOVE EXISTING IMAGE/VIDEO
 // ==========================================
-window.removeExistingImage = function(btn, url) {
+window.removeExistingImage = function(btn, url, type) {
   btn.closest('.edit-image-preview').remove();
-  window._editKeepImages = window._editKeepImages.filter(u => u !== url);
+  if (type === 'hero') {
+    window._editHeroImage = null;
+  } else {
+    window._editKeepGallery = window._editKeepGallery.filter(u => u !== url);
+  }
 };
 
 window.removeExistingVideo = function(btn, url) {
@@ -422,13 +485,24 @@ async function submitEditProperty(propertyId) {
     formData.append('address_line1', location);
     formData.append('city', city);
     formData.append('units_available', document.getElementById('editUnits').value);
-    formData.append('keepImages', JSON.stringify(window._editKeepImages));
+
+    // ✅ Build final images array: hero first then gallery
+    const keepImages = [];
+    if (window._editHeroImage) keepImages.push(window._editHeroImage);
+    keepImages.push(...window._editKeepGallery);
+
+    formData.append('keepImages', JSON.stringify(keepImages));
     formData.append('keepVideos', JSON.stringify(window._editKeepVideos));
 
-    // Append new images
-    (window._editNewImages || []).forEach(file => formData.append('images', file));
+    // ✅ New hero image goes first
+    if (window._editNewHero) {
+      formData.append('heroImage', window._editNewHero);
+    }
 
-    // Append new videos
+    // ✅ New gallery images
+    (window._editNewGallery || []).forEach(file => formData.append('galleryImages', file));
+
+    // ✅ New videos
     (window._editNewVideos || []).forEach(file => formData.append('videos', file));
 
     const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
@@ -474,16 +548,18 @@ function confirmDeleteProperty(property) {
       <div style="font-size:3rem;margin-bottom:1rem;">🗑️</div>
       <h2 style="color:#ff4444;margin-bottom:1rem;">Delete Property?</h2>
       <p style="color:#ddd;margin-bottom:1.5rem;line-height:1.6;">
-        Are you sure you want to delete <strong>${property.address_line1 || 'this property'}</strong>? 
+        Are you sure you want to delete <strong>${property.address_line1 || 'this property'}</strong>?
         This action cannot be undone.
       </p>
-      <div style="display:flex;gap:1rem;justify-content:center;">
-        <button id="confirmDeleteBtn" style="padding:12px 24px;background:linear-gradient(135deg,#ff4444,#cc0000);
-          color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button id="confirmDeleteBtn"
+          style="padding:12px 24px;background:linear-gradient(135deg,#ff4444,#cc0000);
+          color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
           <i class="fas fa-trash"></i> Yes, Delete
         </button>
-        <button id="cancelDeleteBtn" style="padding:12px 24px;background:rgba(255,255,255,0.1);
-          color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">
+        <button id="cancelDeleteBtn"
+          style="padding:12px 24px;background:rgba(255,255,255,0.1);
+          color:white;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
           Cancel
         </button>
       </div>
@@ -492,13 +568,20 @@ function confirmDeleteProperty(property) {
 
   document.body.appendChild(modal);
 
-  document.getElementById('cancelDeleteBtn').onclick = () => modal.remove();
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  // ✅ Mobile-friendly event listeners
+  document.getElementById('cancelDeleteBtn').addEventListener('click', () => modal.remove());
+  document.getElementById('cancelDeleteBtn').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    modal.remove();
+  });
 
-  document.getElementById('confirmDeleteBtn').onclick = async () => {
-    const btn = document.getElementById('confirmDeleteBtn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
-    btn.disabled = true;
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+  const doDelete = async () => {
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    confirmBtn.disabled = true;
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/properties/${property.property_id}`, {
@@ -521,6 +604,12 @@ function confirmDeleteProperty(property) {
       showNotification('Error deleting property. Please try again.', 'error');
     }
   };
+
+  confirmBtn.addEventListener('click', doDelete);
+  confirmBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    doDelete();
+  });
 }
 
 // ==========================================
