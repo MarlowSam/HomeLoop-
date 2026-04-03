@@ -5,10 +5,10 @@
 .chat-popup {
   display: none;
   position: fixed;
-  top: 0; left: 0;
   width: 100%;
   height: 100%;
   height: 100dvh;
+  top: 0; left: 0;
   background: #1a001f;
   border-radius: 0;
   box-shadow: none;
@@ -21,6 +21,28 @@
 
 .chat-popup.chat-visible {
   transform: translateY(0);
+}
+
+/* Desktop — small floating window top-right */
+@media (min-width: 769px) {
+  .chat-popup {
+    top: 80px;
+    right: 20px;
+    left: auto;
+    width: 380px;
+    height: 500px;
+    border-radius: 18px;
+    box-shadow: 0 8px 35px rgba(255, 77, 210, 0.4);
+    border: 2px solid rgba(255, 77, 210, 0.3);
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .chat-popup.chat-visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ============================================
